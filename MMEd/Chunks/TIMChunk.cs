@@ -225,10 +225,9 @@ namespace MMEd.Chunks
 
        public Bitmap ToBitmap()
         {
-            if (mBitmapCache != null &&
-                mBitmapCache.IsAlive)
+            if (mBitmapCache != null)
             {
-                return (Bitmap)mBitmapCache.Target;
+                return mBitmapCache;
             }
             Bitmap acc = new Bitmap(ImageWidth, ImageHeight, PixelFormat.Format32bppArgb);
             for (int y = 0; y < ImageHeight; y++)
@@ -243,11 +242,11 @@ namespace MMEd.Chunks
                     acc.SetPixel(x + 1, y, right);
                 }
             }
-            mBitmapCache = new WeakReference(acc);
+            mBitmapCache = acc;
             return acc;
         }
 
-        WeakReference mBitmapCache;
+        Bitmap mBitmapCache;
         int mIdx=-1;
         public TIMChunk() { }
         public TIMChunk(int xiIdx, Stream xiInStr, int xiExpectedLength)

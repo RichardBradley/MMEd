@@ -33,6 +33,12 @@ namespace MMEd.Chunks
         [Description("most of the level data is in here")]
         public SHETChunk SHET;
 
+        public TIMChunk GetTileById(short xiId)
+        {
+            //assume the first named image group is tiles
+            return ((NamedImageGroup)NamedImageGroups.mChildren[1]).mChildren[xiId] as TIMChunk;
+        }
+
         public override void Deserialise(Stream inStr)
         {
             if (inStr is FileStream)

@@ -26,7 +26,7 @@ namespace MMEd.Chunks
             int type = bin.ReadInt32();
             if (type != 1)
             {
-                throw new DeserialisationException(string.Format("Expecting type 1, found type {0} at offset {1}", type), inStr.Position - 8);
+                throw new DeserialisationException(string.Format("Expecting type 1, found type {0}", type), inStr.Position - 8);
             }
             Label = bin.ReadBytes(length);
 

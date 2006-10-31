@@ -40,6 +40,13 @@ namespace MMEd
             //   odd
             ViewTabXML.Tag = XMLViewer.InitialiseViewer(this);
             ViewTabImg.Tag = ImageViewer.InitialiseViewer(this);
+            ViewTabGrid.Tag = GridViewer.InitialiseViewer(this);
+
+            //auto-load last level
+            if (mLocalSettings.LastOpenedFile != null)
+            {
+                LoadLevelFromFile(mLocalSettings.LastOpenedFile);
+            }
         }
 
         private void MnuiFileOpen_Click(object sender, EventArgs e)
@@ -49,31 +56,37 @@ namespace MMEd
             DialogResult res = ofd.ShowDialog(this);
             if (res == DialogResult.OK)
             {
-                Level lNewLevel = new Level();
-                string lExceptionWhen = "opening file";
-                try
+                LoadLevelFromFile(ofd.FileName);
+            }
+        }
+
+        private void LoadLevelFromFile(string xiFilename)
+        {
+            Level lNewLevel = new Level();
+            string lExceptionWhen = "opening file";
+            try
+            {
+                using (FileStream fs = File.OpenRead(xiFilename))
                 {
-                    using (FileStream fs = File.OpenRead(ofd.FileName))
+                    lExceptionWhen = "deserialising the level";
+                    lNewLevel.Deserialise(fs);
+                    if (fs.Length != fs.Position)
                     {
-                        lExceptionWhen = "deserialising the level";
-                        lNewLevel.Deserialise(fs);
-                        if (fs.Length != fs.Position)
-                        {
-                            //This won't ever actually happen, because SHET expects
-                            //trailing zeros to EOF
-                            throw new DeserialisationException(string.Format("Deserialisatoin terminated early at byte {0} of {1}", fs.Position, fs.Length));
-                        }
+                        //This won't ever actually happen, because SHET expects
+                        //trailing zeros to EOF
+                        throw new DeserialisationException(string.Format("Deserialisatoin terminated early at byte {0} of {1}", fs.Position, fs.Length));
                     }
                 }
-                catch (Exception err)
-                {
-                    Trace.WriteLine(err);
-                    MessageBox.Show(string.Format("Exception occurred while {0}: {1}", lExceptionWhen, err.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-                // level loaded OK, now fill tree:
-                Level = lNewLevel;
             }
+            catch (Exception err)
+            {
+                Trace.WriteLine(err);
+                MessageBox.Show(string.Format("Exception occurred while {0}: {1}", lExceptionWhen, err.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            // level loaded OK, now fill tree:
+            Level = lNewLevel;
+            mLocalSettings.LastOpenedFile = xiFilename;
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -99,6 +112,7 @@ namespace MMEd
                     return;
                 }
             }
+            mLocalSettings.LastSavedFile = sfd.FileName;
         }
 
         public Level Level
@@ -184,7 +198,7 @@ namespace MMEd
             }
 
             // update subjects
-            ViewerTabControl_Selected(null, null);
+            ViewerTabControl_SelectedIndexChanged(null, null);
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -193,6 +207,10 @@ namespace MMEd
         }
 
         private void ViewerTabControl_Selected(object sender, TabControlEventArgs e)
+        {
+        }
+
+        private void ViewerTabControl_SelectedIndexChanged(object sender, EventArgs e)
         {
             TabPage lActiveViewerPage = ViewerTabControl.SelectedTab;
             TreeNode lActiveNode = ChunkTreeView.SelectedNode;
@@ -210,5 +228,9 @@ namespace MMEd
             }
         }
 
+        private void GridDisplayPanelHolder_Paint(object sender, PaintEventArgs e)
+        {
+            //
+        }
     }
 }

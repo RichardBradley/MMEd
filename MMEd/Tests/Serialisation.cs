@@ -16,17 +16,28 @@ namespace MMEd.Tests
     {
         private string[] GetSampleLevelFiles()
         {
-            //qq just one level for now (TODO: make the tests below work for all levels)
-            return new string[] { @"E:\MMs\mm3\public_html\MMs\MICRO\BREAKY\BREAKY1.DAT" };
-            /*
-            ArrayList acc = new ArrayList();
-           foreach(string file in Directory.GetFiles(@"E:\MMs\mm3\public_html\MMs\MICRO", "*.DAT", SearchOption.AllDirectories))
+            //are we on the Softwire network?
+            //N.B. This test only really works if you're rtb
+            string baseDir =
+                System.Environment.GetEnvironmentVariable("USERDOMAIN") == "ZOO"
+            ? @"E:\MMs\mm3\public_html\MMs"
+            : @"D:\mm3\public_html\MMs";
+
+            if (true)
             {
-                if (Regex.IsMatch(file, "[A-Z]+\\\\[A-Z]+[0-9]\\.DAT$"))
-                    acc.Add(file);
+                //qq just one level for now (TODO: make the tests below work for all levels)
+                return new string[] { baseDir + @"\MICRO\BREAKY\BREAKY1.DAT" };
             }
-            return (string[])acc.ToArray(typeof(string));
-             */
+            else
+            {
+                ArrayList acc = new ArrayList();
+                foreach (string file in Directory.GetFiles(baseDir + @"\MICRO", "*.DAT", SearchOption.AllDirectories))
+                {
+                    if (Regex.IsMatch(file, "[A-Z]+\\\\[A-Z]+[0-9]\\.DAT$"))
+                        acc.Add(file);
+                }
+                return (string[])acc.ToArray(typeof(string));
+            }
         }
 
         [Test]

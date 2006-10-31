@@ -46,8 +46,11 @@ namespace MMEd
         public void Save()
         {
             Directory.CreateDirectory(Path.GetDirectoryName(GetExpectedFilename()));
-            XmlSerializer xs = new XmlSerializer(typeof(LocalSettings));
-            xs.Serialize(File.Create(GetExpectedFilename()), this);
+            using (FileStream fs = File.Create(GetExpectedFilename()))
+            {
+                XmlSerializer xs = new XmlSerializer(typeof(LocalSettings));
+                xs.Serialize(fs, this);
+            }
         }
     }
 }

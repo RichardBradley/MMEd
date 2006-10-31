@@ -90,6 +90,7 @@
     <Compile Include="Util\StreamUtils.cs" />
     <Compile Include="Util\Utils.cs" />
     <Compile Include="Viewer.cs" />
+    <Compile Include="Viewers\GridViewer.cs" />
     <Compile Include="Viewers\ImageViewer.cs" />
     <Compile Include="Viewers\XMLViewer.cs" />
   </ItemGroup>
