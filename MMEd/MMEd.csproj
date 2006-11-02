@@ -35,6 +35,18 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="Tao.OpenGl, Version=0.0.0.0, Culture=neutral, PublicKeyToken=1ca010269a4501ef">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\GLTK\lib\Tao.OpenGl.dll</HintPath>
+    </Reference>
+    <Reference Include="Tao.OpenGl.Glu, Version=1.5.0.3, Culture=neutral, PublicKeyToken=3661ea75021374b5">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\GLTK\lib\Tao.OpenGl.Glu.dll</HintPath>
+    </Reference>
+    <Reference Include="Tao.Platform.Windows, Version=1.0.0.3, Culture=neutral, PublicKeyToken=701104b2da67a104">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\GLTK\lib\Tao.Platform.Windows.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Chunk.cs" />
@@ -90,9 +102,16 @@
     <Compile Include="Util\StreamUtils.cs" />
     <Compile Include="Util\Utils.cs" />
     <Compile Include="Viewer.cs" />
+    <Compile Include="Viewers\ThreeDeeViewer.cs" />
     <Compile Include="Viewers\GridViewer.cs" />
     <Compile Include="Viewers\ImageViewer.cs" />
     <Compile Include="Viewers\XMLViewer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GLTK\GLTK.csproj">
+      <Project>{D52784AE-DD6E-4DB3-8D2A-76B37B00A32C}</Project>
+      <Name>GLTK</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

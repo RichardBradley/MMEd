@@ -34,5 +34,13 @@ namespace MMEd.Chunks
             bout.Write(Z);
             bout.Write((short)0);
         }
+
+      public double Norm()
+      {
+        double dX = (double)X;
+        double dY = (double)Y;
+        double dZ = (double)Z;
+        return Math.Sqrt(dX * dX + dY * dY + dZ * dZ);
+      }
     }
 }

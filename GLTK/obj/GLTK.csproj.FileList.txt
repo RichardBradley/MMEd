@@ -1,0 +1,10 @@
+obj\Debug\ResolveAssemblyReference.cache
+bin\Debug\GLTK.dll
+bin\Debug\GLTK.pdb
+obj\Debug\GLTK.dll
+obj\Debug\GLTK.pdb
+bin\Debug\Tao.Glfw.dll
+bin\Debug\Tao.OpenGl.dll
+bin\Debug\Tao.OpenGl.ExtensionLoader.dll
+bin\Debug\Tao.OpenGl.Glu.dll
+bin\Debug\Tao.Platform.Windows.dll

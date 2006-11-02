@@ -41,6 +41,7 @@ namespace MMEd
             ViewTabXML.Tag = XMLViewer.InitialiseViewer(this);
             ViewTabImg.Tag = ImageViewer.InitialiseViewer(this);
             ViewTabGrid.Tag = GridViewer.InitialiseViewer(this);
+            ViewTab3D.Tag = ThreeDeeViewer.InitialiseViewer(this);
 
             //auto-load last level
             if (mLocalSettings.LastOpenedFile != null)
@@ -128,6 +129,7 @@ namespace MMEd
                 ChunkTreeView.Nodes[0].Expand();
                 ChunkTreeView.EndUpdate();
                 ChunkTreeView_AfterSelect(null, null);
+                Text = string.Format("MMEd [{0}]", mLevel.Name);
             }
             get
             {
@@ -232,5 +234,6 @@ namespace MMEd
         {
             //
         }
+
     }
 }
