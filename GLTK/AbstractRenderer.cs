@@ -90,7 +90,7 @@ namespace GLTK
 
         if (NextFrame != null)
         {
-          NextFrame(this, new EventArgs());
+          NextFrame(this, new NextFrameArgs(false));
         }
       }
     }
@@ -127,10 +127,6 @@ namespace GLTK
     protected void SetViewPort(int xiWidth, int xiHeight)
     {
       Gl.glViewport(0, 0, xiWidth, xiHeight);
-      Gl.glMatrixMode(Gl.GL_PROJECTION);
-      Gl.glLoadIdentity();
-      Glu.gluPerspective(80, xiWidth / (double)xiHeight, 0.1, 1e5); //qq make param //45
-      Gl.glMatrixMode(Gl.GL_MODELVIEW);
     }
 
     public void Dispose()
@@ -152,10 +148,27 @@ namespace GLTK
       Gl.glClear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
     }
 
-    public void SetCamera(Matrix xiTransform)
+    public void SetCamera(Camera xiCamera)
     {
+      Gl.glMatrixMode(Gl.GL_PROJECTION);
+      Gl.glLoadIdentity();
+
+      int[] lViewPort = new int[4];
+      Gl.glGetIntegerv(Gl.GL_VIEWPORT, lViewPort);
+
+      if (mPickMode)
+      {
+        Glu.gluPickMatrix((double)mPickX, (double)(lViewPort[3] - mPickY), 1, 1, lViewPort);
+      }
+
+      Glu.gluPerspective(
+        xiCamera.Fov, 
+        (double)(lViewPort[0] - lViewPort[3]) / (double)(lViewPort[3] - lViewPort[1]), 
+        xiCamera.NearClip, 
+        xiCamera.FarClip);
+
       Gl.glMatrixMode(Gl.GL_MODELVIEW);
-      Gl.glLoadMatrixd(xiTransform.Inverse().ToArray());
+      Gl.glLoadMatrixd(xiCamera.Transform.Inverse().ToArray());
     }
 
     public void PushTransform(Matrix xiTransform)
@@ -217,7 +230,83 @@ namespace GLTK
       return lTextureId;
     }
 
-    public abstract void RenderMesh(Mesh xiMesh);
+    public Mesh Pick(int x, int y)
+    {
+      lock (typeof(AbstractRenderer))
+      {
+        int lPickIndex = int.MinValue;
+
+        try
+        {
+          mPickMode = true;
+          mPickX = x;
+          mPickY = y;
+          mPickMeshes.Clear();
+          mPickIndex = 0;
+
+          int[] lPickBuffer = new int[512];
+
+          Gl.glSelectBuffer(lPickBuffer.Length, lPickBuffer);
+
+          Gl.glRenderMode(Gl.GL_SELECT);
+
+          Gl.glInitNames();
+          Gl.glPushName(0);
+
+          Gl.glMatrixMode(Gl.GL_PROJECTION);
+          Gl.glPushMatrix();
+          Gl.glMatrixMode(Gl.GL_MODELVIEW);
+
+          if (NextFrame != null)
+          {
+            NextFrame(this, new NextFrameArgs(true));
+          }
+
+          Gl.glMatrixMode(Gl.GL_PROJECTION);
+          Gl.glPopMatrix();
+          Gl.glMatrixMode(Gl.GL_MODELVIEW);
+
+          int lHits = Gl.glRenderMode(Gl.GL_RENDER);
+
+          int lDepth = int.MaxValue;
+          for (int ii = 0; ii < lHits; ++ii)
+          {
+            if (lPickBuffer[ii * 4 + 1] < lDepth)
+            {
+              lDepth = lPickBuffer[ii * 4 + 1];
+              lPickIndex = lPickBuffer[ii * 4 + 3];
+            }
+          }
+        }
+        finally
+        {
+          mPickMode = false;
+        }
+
+        if (mPickMeshes.ContainsKey(lPickIndex))
+        {
+          return mPickMeshes[lPickIndex];
+        }
+        else
+        {
+          return null;
+        }
+      }
+    }
+
+    public void RenderMesh(Mesh xiMesh)
+    {
+      if (mPickMode)
+      {
+        Gl.glLoadName(mPickIndex);
+        mPickMeshes.Add(mPickIndex, xiMesh);
+        ++mPickIndex;
+      }
+
+      RenderMeshInternal(xiMesh);
+    }
+
+    protected abstract void RenderMeshInternal(Mesh xiMesh);
 
     public delegate void NextFrameEventHandler(AbstractRenderer xiSender, EventArgs xiArgs);
     public event NextFrameEventHandler NextFrame;
@@ -225,5 +314,11 @@ namespace GLTK
     private RenderingSurface mSurface;
     private IntPtr mRenderingContext = IntPtr.Zero;
     private Hashtable mImageToTextureIdMap = new Hashtable();
+
+    private bool mPickMode = false;
+    private int mPickIndex = 0;
+    private Dictionary<int, Mesh> mPickMeshes = new Dictionary<int, Mesh>();
+    private double mPickX;
+    private double mPickY;
   }
 }

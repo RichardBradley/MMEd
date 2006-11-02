@@ -36,7 +36,7 @@ namespace MMEd.Viewers
       mRenderer.Attach(mMainForm.Viewer3DRenderingSurface);
 
       mScene = new Scene(mRenderer);
-      mCamera = new Entity();
+      mCamera = new Camera(80, 0.1, 1e5);
       mScene.Camera = mCamera;
     }
 
@@ -76,10 +76,23 @@ namespace MMEd.Viewers
 
     void Viewer3DRenderingSurface_MouseDown(object sender, MouseEventArgs e)
     {
-      mMainForm.Viewer3DRenderingSurface.Capture = true;
-      mLastMouseDown = e.Location;
-      mDraggingButton = e.Button;
-      mDraggingView = true;
+      if (e.Button == MouseButtons.Middle)
+      {
+        Mesh lMesh = mRenderer.Pick(e.X, e.Y);
+        if (lMesh != null)
+        {
+          lMesh.RenderMode = lMesh.RenderMode == RenderMode.Filled ?
+            RenderMode.Textured : RenderMode.Filled;
+          mMainForm.Viewer3DRenderingSurface.Invalidate();
+        }
+      }
+      else
+      {
+        mMainForm.Viewer3DRenderingSurface.Capture = true;
+        mLastMouseDown = e.Location;
+        mDraggingButton = e.Button;
+        mDraggingView = true;
+      }
     }
 
     void mMainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -103,7 +116,7 @@ namespace MMEd.Viewers
     private IEntityProvider mSubject = null;
 
     Scene mScene;
-    Entity mCamera;
+    Camera mCamera;
     AbstractRenderer mRenderer;
 
     public override void SetSubject(Chunk xiChunk)

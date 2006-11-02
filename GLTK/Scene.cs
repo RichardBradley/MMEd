@@ -15,7 +15,7 @@ namespace GLTK
     {
       xiSender.Clear();
       
-      xiSender.SetCamera(mCamera.Transform);
+      xiSender.SetCamera(mCamera);
       foreach (Entity lObject in mObjects)
       {
         xiSender.PushTransform(lObject.Transform);
@@ -27,7 +27,7 @@ namespace GLTK
       }
     }
 
-    public Entity Camera
+    public Camera Camera
     {
       get { return mCamera; }
       set { mCamera = value; }
@@ -60,6 +60,6 @@ namespace GLTK
     }
 
     private List<Entity> mObjects = new List<Entity>();
-    private Entity mCamera = new Entity();
+    private Camera mCamera = new Camera();
   }
 }

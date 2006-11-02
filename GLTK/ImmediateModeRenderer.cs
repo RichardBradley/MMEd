@@ -7,7 +7,7 @@ namespace GLTK
 {
   public class ImmediateModeRenderer : AbstractRenderer
   {
-    public override void RenderMesh(Mesh xiMesh)
+    protected override void RenderMeshInternal(Mesh xiMesh)
     {
       switch (xiMesh.RenderMode)
       {

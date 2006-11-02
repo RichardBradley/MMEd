@@ -56,11 +56,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AbstractRenderer.cs" />
+    <Compile Include="Camera.cs" />
     <Compile Include="DeviceContextEventArgs.cs" />
     <Compile Include="Entity.cs" />
     <Compile Include="ImmediateModeRenderer.cs" />
     <Compile Include="Matrix.cs" />
     <Compile Include="Mesh.cs" />
+    <Compile Include="NextFrameArgs.cs" />
     <Compile Include="Point.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RenderingSurface.cs">
