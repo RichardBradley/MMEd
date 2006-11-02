@@ -52,8 +52,8 @@ namespace MMEd.Viewers
       System.Drawing.Point lNewMousePoint = e.Location;
       if (mDraggingButton == MouseButtons.Left)
       {
-        mCamera.Rotate2(-0.01 * (lNewMousePoint.X - mLastMouseDown.X), mCamera.YAxis);
-        mCamera.Rotate2(-0.01 * (lNewMousePoint.Y - mLastMouseDown.Y), mCamera.XAxis);
+        mCamera.Rotate2(-0.01 * (lNewMousePoint.X - mLastMouseDown.X), Vector.ZAxis);
+        mCamera.Rotate2(0.01 * (lNewMousePoint.Y - mLastMouseDown.Y), mCamera.XAxis);
       }
       else if (mDraggingButton == MouseButtons.Right)
       {
