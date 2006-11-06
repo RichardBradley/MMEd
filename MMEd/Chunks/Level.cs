@@ -251,7 +251,6 @@ namespace MMEd.Chunks
 
     public override void ReplaceChild(Chunk xiFrom, Chunk xiTo)
     {
-      throw new Exception("TODO");
       if (xiFrom == NamedImageGroups)
       {
         NamedImageGroups = (GroupingChunk)xiTo;
@@ -262,11 +261,12 @@ namespace MMEd.Chunks
       }
       else if (xiFrom == SHET)
       {
-        SHET = (SHETChunk)xiFrom;
+        SHET = (SHETChunk)xiTo;
       }
       else
       {
-        throw new ArgumentException("xifrom not found!");
+          throw new Exception("TODO");
+          throw new ArgumentException("xifrom not found!");
       }
     }
 

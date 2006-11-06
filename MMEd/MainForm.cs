@@ -100,7 +100,7 @@ namespace MMEd
                 string lExceptionWhen = "opening file";
                 try
                 {
-                    using (FileStream fs = File.OpenWrite(sfd.FileName))
+                    using (FileStream fs = File.Create(sfd.FileName))
                     {
                         lExceptionWhen = "serialising the level";
                         Level.Serialise(fs);
