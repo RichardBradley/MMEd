@@ -21,7 +21,6 @@ namespace GLTK
 
     public void AddTriangle(Vertex v1, Vertex v2, Vertex v3)
     {
-      double d = v1.Normal.x; d = v2.Normal.x; d = v3.Normal.x; //qq
       mVertices.Add(v1);
       mVertices.Add(v2);
       mVertices.Add(v3);
