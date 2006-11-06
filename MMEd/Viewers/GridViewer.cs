@@ -27,6 +27,7 @@ namespace MMEd.Viewers
       mMainForm.GridViewRadioImgNum.CheckedChanged += new System.EventHandler(this.InvalidateGridDisplayEvent);
       mMainForm.GridViewMetaTypeCombo.SelectedIndexChanged += new System.EventHandler(this.InvalidateGridDisplayEvent);
       mMainForm.GridDisplayPanel.MouseMove += new MouseEventHandler(this.InvalidateGridDisplayMouseEvent);
+      mMainForm.GridDisplayPanel.MouseMove += new MouseEventHandler(this.GridDisplayMouseMove);
       mMainForm.GridDisplayPanel.MouseClick += new MouseEventHandler(this.GridDisplayMouseClick);
 
       //mMainForm.ViewerTabControl.KeyPress += new KeyPressEventHandler(this.ViewerTabControl_KeyPress);
@@ -176,6 +177,30 @@ namespace MMEd.Viewers
       mMainForm.GridDisplayPanel.Invalidate(new Rectangle(e.X - 100, e.Y - 100, 200, 200));
     }
 
+    private void GridDisplayMouseMove(object sender, MouseEventArgs e)
+    {
+      if (mSubject != null)
+      {
+        double x = e.X / (double)mSubjectTileWidth;
+        double y = e.Y / (double)mSubjectTileHeight;
+
+        mMainForm.TexSquareLabel.Text = string.Format("{0:0}, {1:0}", x, y);
+        mMainForm.FlatCoordLabel.Text = string.Format("{0:0}, {1:0}", x * mSubject.ScaleX, y * mSubject.ScaleY);
+
+        if (mSubject.RotationVector.Norm() != 0)
+        {
+          mMainForm.WorldCoordLabel.Text = "Only available for non-rotated sheets";
+        }
+        else
+        {
+          mMainForm.WorldCoordLabel.Text = string.Format("{0:0}, {1:0}, {2:0}",
+            x * mSubject.ScaleX + mSubject.OriginPosition.X,
+            y * mSubject.ScaleY + mSubject.OriginPosition.Y,
+            mSubject.OriginPosition.Z);
+        }
+      }
+    }
+
     private void GridDisplayMouseClick(object sender, MouseEventArgs e)
     {
       if (mSubject != null)
@@ -200,8 +225,30 @@ namespace MMEd.Viewers
             val = mSubject.TextureIds[x][y];
           }
 
+          string lReply = Microsoft.VisualBasic.Interaction.InputBox(
+                string.Format("Value at ({0},{1}) is {2} (0x{2:x}). New value:", x, y, val),
+                "MMEd",
+                val.ToString(), //Default value
+                -1, //X coord
+                -1);// Y coord
 
-          MessageBox.Show(string.Format("Value at ({0},{1}) is {2:x}, and if I had an InputBox function, I'd allow you to update it :-(", e.X, e.Y, val));
+          if (lReply != null && lReply != "")
+          {
+            val = short.Parse(lReply);
+
+            if (mMainForm.GridViewRadioImgNum.Checked)
+            {
+              int lDrawNumType =
+               (int)(FlatChunk.TexMetaDataEntries)
+                Enum.Parse(typeof(FlatChunk.TexMetaDataEntries), (string)mMainForm.GridViewMetaTypeCombo.SelectedItem);
+
+              mSubject.TexMetaData[x][y][lDrawNumType] = (byte)val;
+            }
+            else
+            {
+              mSubject.TextureIds[x][y] = val;
+            }
+          }
         }
       }
     }
