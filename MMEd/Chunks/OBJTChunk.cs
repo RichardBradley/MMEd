@@ -37,6 +37,10 @@ namespace MMEd.Chunks
         else
         {
           lChildren.Add(new TypedRawDataChunk(string.Format("raw, type {0}, len {1}", lType, lLen), lType, bin.ReadBytes(lLen)));
+
+          //raw data chunks of type -1 count in the objt indexing scheme:
+          if (lType == -1) lObjtIdx++;
+
           if (lLen == 0)
             break;
         }
