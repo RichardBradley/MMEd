@@ -80,7 +80,7 @@ namespace GLTK
       double lLength = Length;
       if (lLength == 0)
       {
-        return new Vector();
+        return Vector.Zero;
       }
       else
       {

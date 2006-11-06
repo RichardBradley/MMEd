@@ -281,10 +281,10 @@ namespace MMEd.Chunks
         Quad_Flat_Textured = 0x2c,
         Quad_Gouraud_Colored = 0x38,
         Quad_Gouraud_Textured = 0x3c,
-        Unknown1 = 0x21, //?
-        Unknown2 = 0x22, //probably tri flat semi-transparent
-        Unknown3 = 0x32, //probably tri gouraud semi-transparent
-        Unknown4 = 0x36 //probably quad gouraud semi-transparent
+        Unknown21 = 0x21, //?
+        Unknown22 = 0x22, //probably tri flat semi-transparent
+        Unknown32 = 0x32, //probably tri gouraud semi-transparent
+        Unknown36 = 0x36 //probably quad gouraud semi-transparent
       }
 
       public byte mOLen;
@@ -316,16 +316,19 @@ namespace MMEd.Chunks
           throw new DeserialisationException(string.Format("Unrecognised flags: {0:x}", mFlag), bin.BaseStream.Position - 1);
         }
         mMode = (Mode)bin.ReadByte();
-        if (!Enum.IsDefined(typeof(Mode), mMode)
-            || mMode == Mode.Unknown1
-            || mMode == Mode.Unknown2
-            || mMode == Mode.Unknown3
-            || mMode == Mode.Unknown4)
+        if (!Enum.IsDefined(typeof(Mode), mMode))
         {
-          Console.Error.WriteLine(string.Format("Unrecognised mode: {0:x} at {1}", mMode, bin.BaseStream.Position - 1));
+          throw new DeserialisationException(string.Format("Unrecognised mode: {0:x} at {1}", mMode, bin.BaseStream.Position - 1));
+        }
+
+        // don't attempt to parse unknown face types
+        if (mMode == Mode.Unknown21
+            || mMode == Mode.Unknown22
+            || mMode == Mode.Unknown32
+            || mMode == Mode.Unknown36)
+        {
           mData = bin.ReadBytes(4 * mILen);
           return;
-          //qq throw new DeserialisationException(string.Format("Unrecognised mode: {0:x}", mMode), bin.BaseStream.Position - 1);
         }
 
         //data is length mILen * 4
@@ -377,7 +380,7 @@ namespace MMEd.Chunks
                 mCBA = lTop;
               else if (i == 1)
                 mTSB = lTop;
-              else Console.Error.WriteLine("top={0:x}", lTop);
+              else if (lTop != 0) throw new DeserialisationException(string.Format("Expecting unused bytes to be zero, found {0:x}", lTop), bin.BaseStream.Position);
             }
             break;
           default:
