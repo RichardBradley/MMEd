@@ -5,6 +5,7 @@ using System.IO;
 using System.Collections;
 using System.ComponentModel;
 using MMEd.Util;
+using MMEd.Viewers;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using GLTK;
@@ -16,7 +17,8 @@ namespace MMEd.Chunks
   //qq are these really necessary? some unit tests fail without them, but they're
   //   a bit strange
   [XmlInclude(typeof(NamedImageGroup)), XmlInclude(typeof(TIMChunk)),
-  XmlInclude(typeof(OddImageChunk)), XmlInclude(typeof(BumpImageChunk))]
+  XmlInclude(typeof(OddImageChunk)), XmlInclude(typeof(BumpImageChunk)),
+  XmlInclude(typeof(TMDChunk)), XmlInclude(typeof(TypedRawDataChunk))]
   public class Level : Chunk, Viewers.ThreeDeeViewer.IEntityProvider
   {
     [Description("Four int32s at the start of the file, meaning unknown")]
@@ -28,8 +30,14 @@ namespace MMEd.Chunks
     [Description("The textures and sprites")]
     public GroupingChunk NamedImageGroups;
 
-    [Description("Until I can figure out the format")]
-    public RawDataChunk OBJTs;
+    [Description("This is odd. The OBJT starts here, then stops and restarts")]
+    public RawDataChunk OBJTFalseStart;
+
+    [Description("The objects, and some other stuff")]
+    public OBJTChunk OBJT;
+
+    [Description("Dunno yet")]
+    public RawDataChunk Dunno;
 
     [Description("most of the level data is in here")]
     public SHETChunk SHET;
@@ -48,6 +56,32 @@ namespace MMEd.Chunks
         }
       }
       return null;
+    }
+
+    public TMDChunk GetObjtById(int xiId)
+    {
+      if (OBJT == null) return null;
+      // the index includes any chunks of type -1, but not
+      // random ones with typeId != -1
+      foreach (Chunk c in OBJT.GetChildren())
+      {
+        if (c is TMDChunk || (c is TypedRawDataChunk && ((TypedRawDataChunk)c).TypeId == -1))
+        {
+          if (xiId == 0) return c as TMDChunk;
+          else xiId--;
+        }
+      }
+      return null;
+    }
+
+    public bool WaypointIsKeyWaypoint(byte xiWaypoint)
+    {
+      foreach (KeyWaypointsChunk.KeySection ks in SHET.KeyWaypoints.KeySections)
+      {
+        if (ks.From <= xiWaypoint && ks.To >= xiWaypoint)
+          return true;
+      }
+      return false;
     }
 
     public override void Deserialise(Stream inStr)
@@ -98,6 +132,55 @@ namespace MMEd.Chunks
       //put the children so far in a grouping chunk
       NamedImageGroups = new GroupingChunk("textures and sprites", (Chunk[])imageGroups.ToArray(typeof(Chunk)));
 
+      //Now the objects:
+      //because of a bizzarre quirk here, the object chunk starts, then stops, then starts again
+      long lObjtFalseStartPos = inStr.Position;
+
+      try
+      {
+        OBJTChunk lFalseObjt = new OBJTChunk();
+        lFalseObjt.Deserialise(inStr);
+        OBJT = lFalseObjt;
+      }
+      catch (DeserialisationException e)
+      {
+        Console.Error.WriteLine("OBJT false start found, searching for restart...");
+        //look for X,0,65,0 in first bit:
+        inStr.Seek(lObjtFalseStartPos, SeekOrigin.Begin);
+        int lX = bin.ReadInt32();
+        if (bin.ReadInt32() != 0) throw new DeserialisationException("Expecting 0", inStr.Position);
+        if (bin.ReadInt32() != 65) throw new DeserialisationException("Expecting 65", inStr.Position);
+        if (bin.ReadInt32() != 0) throw new DeserialisationException("Expecting 0", inStr.Position);
+
+        if (lX == 65) throw new Exception("I haven't planned for this case!");
+
+        int[] lMatcher = new int[] { 0, 65, 0 };
+
+        //longest observed false starts are Pool3 (1052 bytes) and Rest4 (2032 bytes)
+        while (inStr.Position - lObjtFalseStartPos < 2100)
+        {
+          int lNext = bin.ReadInt32();
+          if (lNext == lX)
+          {
+            if (Utils.ArrayCompare(lMatcher, new int[] { bin.ReadInt32(), bin.ReadInt32(), bin.ReadInt32() }))
+            {
+              int lFalseStartLen = (int)(inStr.Position - 4 * 4 - lObjtFalseStartPos);
+              inStr.Seek(lObjtFalseStartPos, SeekOrigin.Begin);
+              OBJTFalseStart = new RawDataChunk("OBJT False Start", bin.ReadBytes(lFalseStartLen));
+              OBJT = new OBJTChunk();
+              OBJT.Deserialise(inStr);
+              break;
+            }
+          }
+        }
+        if (OBJT == null)
+        {
+          string lFileName = inStr is FileStream ? ((FileStream)inStr).Name : "unknown";
+          System.Windows.Forms.MessageBox.Show(string.Format("Warning: OBJTs not loaded on level {0}: unable to find false start resumption after: {1}", lFileName, e));
+          inStr.Seek(lObjtFalseStartPos, SeekOrigin.Begin);
+        }
+      }
+
       //read the rest of the file into a "remainder"
       //byte array so we can search for the SHET
       long lStartOfObjts = inStr.Position;
@@ -106,9 +189,6 @@ namespace MMEd.Chunks
       StreamUtils.EnsureRead(inStr, lRest);
 
       //use a heuristic to find the SHET.
-      //TODO: between here and the SHET is an array of OBJTs
-      //in TMD format. I can't get a reliable handle on them yet.
-      //See TMPtoVRML.php for work so far on this.
       //
       //we need an 8bit char set (ASCII is 7bit). windows-1252 will do
       string lRestAsString = Encoding.GetEncoding("windows-1252").GetString(lRest);
@@ -122,12 +202,12 @@ namespace MMEd.Chunks
 
       int SHETstart = matches[0].Index; //(relative to end of images section)
 
-      byte[] objts = new byte[SHETstart];
-      Array.Copy(lRest, 0, objts, 0, SHETstart);
-      OBJTs = new RawDataChunk("OBJTs", objts);
+      byte[] dunno = new byte[SHETstart];
+      Array.Copy(lRest, 0, dunno, 0, SHETstart);
+      Dunno = new RawDataChunk("Dunno", dunno);
 
       //seek to the start of the SHET, and pretend we got here without cheating!
-      objts = lRest = null;
+      dunno = lRest = null;
       inStr.Seek(lStartOfObjts + SHETstart, SeekOrigin.Begin);
 
       SHET = new SHETChunk(inStr, bin);
@@ -155,7 +235,9 @@ namespace MMEd.Chunks
     {
       ArrayList acc = new ArrayList();
       acc.Add(NamedImageGroups);
-      acc.Add(OBJTs);
+      if (OBJTFalseStart != null) acc.Add(OBJTFalseStart);
+      if (OBJT != null) acc.Add(OBJT);
+      if (Dunno != null) acc.Add(Dunno);
       acc.Add(SHET);
       return (Chunk[])acc.ToArray(typeof(Chunk));
     }
@@ -169,13 +251,14 @@ namespace MMEd.Chunks
 
     public override void ReplaceChild(Chunk xiFrom, Chunk xiTo)
     {
+      throw new Exception("TODO");
       if (xiFrom == NamedImageGroups)
       {
         NamedImageGroups = (GroupingChunk)xiTo;
-      }
-      else if (xiFrom == OBJTs)
+      }//qq
+      else if (xiFrom == Dunno)
       {
-        OBJTs = (RawDataChunk)xiTo;
+        Dunno = (RawDataChunk)xiTo;
       }
       else if (xiFrom == SHET)
       {
@@ -187,13 +270,13 @@ namespace MMEd.Chunks
       }
     }
 
-    public IEnumerable<GLTK.Entity> GetEntities(AbstractRenderer xiRenderer, Level xiLevel)
+    public IEnumerable<GLTK.Entity> GetEntities(AbstractRenderer xiRenderer, Level xiLevel, ThreeDeeViewer.eTextureMode xiTextureMode, FlatChunk.TexMetaDataEntries xiSelectedMetadata)
     {
       List<Entity> lAcc = new List<Entity>();
 
       foreach (FlatChunk fl in SHET.Flats)
       {
-        lAcc.AddRange(fl.GetEntities(xiRenderer, xiLevel));
+        lAcc.AddRange(fl.GetEntities(xiRenderer, xiLevel, xiTextureMode, xiSelectedMetadata));
       }
 
       return lAcc;

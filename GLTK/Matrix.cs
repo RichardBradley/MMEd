@@ -243,6 +243,11 @@ namespace GLTK
         mElements[3, 0], mElements[3, 1], mElements[3, 2], mElements[3, 3] };
     }
 
+    public Matrix Clone()
+    {
+      return new Matrix((double[,])mElements.Clone());
+    }
+
     private double[,] mElements;
 
   }

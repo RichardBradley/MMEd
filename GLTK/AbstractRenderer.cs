@@ -122,6 +122,7 @@ namespace GLTK
       Gl.glEnable(Gl.GL_DEPTH_TEST);
       Gl.glDepthFunc(Gl.GL_LEQUAL);
       Gl.glHint(Gl.GL_PERSPECTIVE_CORRECTION_HINT, Gl.GL_NICEST);
+      Gl.glColorMaterial(Gl.GL_FRONT_AND_BACK, Gl.GL_AMBIENT_AND_DIFFUSE);
     }
 
     protected void SetViewPort(int xiWidth, int xiHeight)
@@ -171,6 +172,125 @@ namespace GLTK
       Gl.glLoadMatrixd(xiCamera.Transform.Inverse().ToArray());
     }
 
+    public void ResetLights()
+    {
+      lock (typeof(AbstractRenderer))
+      {
+        Gl.glDisable(Gl.GL_LIGHT0);
+        Gl.glDisable(Gl.GL_LIGHT1);
+        Gl.glDisable(Gl.GL_LIGHT2);
+        Gl.glDisable(Gl.GL_LIGHT3);
+        Gl.glDisable(Gl.GL_LIGHT4);
+        Gl.glDisable(Gl.GL_LIGHT5);
+        Gl.glDisable(Gl.GL_LIGHT6);
+        Gl.glDisable(Gl.GL_LIGHT7);
+      }
+
+      mNextLight = 0;
+    }
+
+    public int SetLight(Light xiLight)
+    {
+      SetLight(GetLightId(mNextLight), xiLight);
+
+      int lRet = mNextLight;
+
+      if (mNextLight > 6)
+      {
+        mNextLight = 0;
+      }
+      else
+      {
+        ++mNextLight;
+      }
+
+      return lRet;
+    }
+
+    private static int GetLightId(int xiLightNumber)
+    {
+      switch (xiLightNumber)
+      {
+        case 0:
+          return Gl.GL_LIGHT0;
+        case 1:
+          return Gl.GL_LIGHT1;
+        case 2:
+          return Gl.GL_LIGHT2;
+        case 3:
+          return Gl.GL_LIGHT3;
+        case 4:
+          return Gl.GL_LIGHT4;
+        case 5:
+          return Gl.GL_LIGHT5;
+        case 6:
+          return Gl.GL_LIGHT6;
+        case 7:
+          return Gl.GL_LIGHT7;
+        default:
+          throw new Exception("Only 7 lights are supported");
+      }
+    }
+
+    public int SetLight(int xiLightId, Light xiLight)
+    {
+      lock (typeof(AbstractRenderer))
+      {
+        Gl.glLightfv(
+          xiLightId,
+          Gl.GL_POSITION,
+          new float[] { 
+          (float)xiLight.Position.x, 
+          (float)xiLight.Position.y, 
+          (float)xiLight.Position.z,
+           1f});
+
+        Gl.glLightfv(
+          xiLightId,
+          Gl.GL_DIFFUSE,
+          new float[] { 
+          (float)xiLight.DiffuseColor.R  / 255, 
+          (float)xiLight.DiffuseColor.G  / 255, 
+          (float)xiLight.DiffuseColor.B  / 255,
+          (float)xiLight.DiffuseIntensity});
+
+        Gl.glLightfv(
+          xiLightId,
+          Gl.GL_AMBIENT,
+          new float[] { 
+          (float)xiLight.AmbientColor.R  / 255, 
+          (float)xiLight.AmbientColor.G  / 255, 
+          (float)xiLight.AmbientColor.B  / 255,
+          (float)xiLight.AmbientIntensity});
+
+        Gl.glLightfv(
+          xiLightId,
+          Gl.GL_SPECULAR,
+          new float[] { 
+          (float)xiLight.SpecularColor.R  / 255, 
+          (float)xiLight.SpecularColor.G  / 255, 
+          (float)xiLight.SpecularColor.B  / 255,
+          (float)xiLight.SpecularIntensity});
+
+        Gl.glEnable(GetLightId(mNextLight));
+      }
+
+      return xiLightId;
+    }
+
+    public void EnableLighting()
+    {
+      Gl.glEnable(Gl.GL_LIGHTING);
+      Gl.glEnable(Gl.GL_COLOR_MATERIAL);
+      Gl.glColorMaterial(Gl.GL_FRONT_AND_BACK, Gl.GL_AMBIENT_AND_DIFFUSE);
+    }
+
+    public void DisableLighting()
+    {
+      Gl.glDisable(Gl.GL_LIGHTING);
+      Gl.glDisable(Gl.GL_COLOR_MATERIAL);
+    }
+
     public void PushTransform(Matrix xiTransform)
     {
       Gl.glPushMatrix();
@@ -203,7 +323,17 @@ namespace GLTK
       int lTextureId;
       Gl.glGenTextures(1, out lTextureId);
 
-      xiTexture.RotateFlip(RotateFlipType.RotateNoneFlipY);
+      //qq disabled because:
+      // 1) the Flat textures were upside down
+      // 2) this function modifies the bitmap which is it passed, which
+      //    is bad and unexpected
+      // I don't know if (1) is inherent in GL (i.e. if this change is correct)
+      // or if it's because the z-axis is inverted in the levels (i.e. this change
+      // is incorrect)
+      // (2) needs to be fixed if the change to fix (1) is reverted.
+      //
+      //xiTexture.RotateFlip(RotateFlipType.RotateNoneFlipY);
+      //
       Rectangle rectangle = new Rectangle(0, 0, xiTexture.Width, xiTexture.Height);
       BitmapData lData = xiTexture.LockBits(
         new Rectangle(0, 0, xiTexture.Width, xiTexture.Height),
@@ -320,5 +450,7 @@ namespace GLTK
     private Dictionary<int, Mesh> mPickMeshes = new Dictionary<int, Mesh>();
     private double mPickX;
     private double mPickY;
+
+    private int mNextLight = 0;
   }
 }

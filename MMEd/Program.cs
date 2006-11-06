@@ -15,6 +15,7 @@ namespace MMEd
             //run the tests here if NUnit is being difficult:
             //new MMEd.Tests.Serialisation().TestBinarySerialisationIsInvertible();
             //new MMEd.Tests.Serialisation().TestXmlSerialisationIsInvertible();
+            //return;
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new MainForm());

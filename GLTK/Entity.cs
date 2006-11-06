@@ -37,7 +37,7 @@ namespace GLTK
       Reorthogonalise();
     }
 
-    public void Rotate(double xiAngle, Vector xiAxis)
+    public void RotateAboutWorldOrigin(double xiAngle, Vector xiAxis)
     {
       if (xiAxis.Length == 0)
       {
@@ -62,15 +62,13 @@ namespace GLTK
       Reorthogonalise();
     }
 
-    //the other "rotate" rotates about the world origin
-    //this one should rotate about the object's origin.
-    //I'm too confused to change all 'rotate's into 'rotate2's
-    public void Rotate2(double xiAngle, Vector xiAxis)
+    //rotates about the Entity's current origin.
+    public void Rotate(double xiAngle, Vector xiAxis)
     {
-      Point start = Position;
+      Point lStart = Position;
       Position = Point.Origin;
-      Rotate(xiAngle, xiAxis);
-      Position = start;
+      RotateAboutWorldOrigin(xiAngle, xiAxis);
+      Position = lStart;
     }
 
     public void LookAt(Point xiTarget, Vector xiUp)

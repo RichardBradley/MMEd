@@ -51,6 +51,8 @@
   <ItemGroup>
     <Compile Include="Chunk.cs" />
     <Compile Include="Chunks\BumpImageChunk.cs" />
+    <Compile Include="Chunks\OBJTChunk.cs" />
+    <Compile Include="Chunks\TMDChunk.cs" />
     <Compile Include="Chunks\DeserialisationException.cs" />
     <Compile Include="Chunks\FlatChunk.cs" />
     <Compile Include="Chunks\GroupingChunk.cs" />
@@ -62,6 +64,7 @@
     <Compile Include="Chunks\Short3Coord.cs" />
     <Compile Include="Chunks\TIMChunk.cs" />
     <Compile Include="Chunks\RawDataChunk.cs" />
+    <Compile Include="Chunks\TypedRawDataChunk.cs" />
     <Compile Include="GlobalSettings.cs" />
     <Compile Include="LocalSettings.cs" />
     <Compile Include="MainForm.cs">
@@ -99,9 +102,11 @@
     <Compile Include="Tests\Libraries.cs" />
     <Compile Include="Tests\Serialisation.cs" />
     <Compile Include="Tests\Utils.cs" />
+    <Compile Include="Util\PropertyController.cs" />
     <Compile Include="Util\StreamUtils.cs" />
     <Compile Include="Util\Utils.cs" />
     <Compile Include="Viewer.cs" />
+    <Compile Include="Viewers\OwnedMesh.cs" />
     <Compile Include="Viewers\ThreeDeeViewer.cs" />
     <Compile Include="Viewers\GridViewer.cs" />
     <Compile Include="Viewers\ImageViewer.cs" />

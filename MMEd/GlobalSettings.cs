@@ -7,15 +7,15 @@ using System.Text;
 
 namespace MMEd
 {
-    public class GlobalSettings
-    {
-        public PowerUpType[] PowerUps;
+  public class GlobalSettings
+  {
+    public PowerUpType[] PowerUps;
 
-    }
+  }
 
-    public class PowerUpType
-    {
-        public string Name;
-        //TODO: weapon icons here?
-    }
+  public class PowerUpType
+  {
+    public string Name;
+    //TODO: weapon icons here?
+  }
 }

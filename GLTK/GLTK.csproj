@@ -60,6 +60,7 @@
     <Compile Include="DeviceContextEventArgs.cs" />
     <Compile Include="Entity.cs" />
     <Compile Include="ImmediateModeRenderer.cs" />
+    <Compile Include="Light.cs" />
     <Compile Include="Matrix.cs" />
     <Compile Include="Mesh.cs" />
     <Compile Include="NextFrameArgs.cs" />

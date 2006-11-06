@@ -229,11 +229,5 @@ namespace MMEd
                 }
             }
         }
-
-        private void GridDisplayPanelHolder_Paint(object sender, PaintEventArgs e)
-        {
-            //
-        }
-
     }
 }

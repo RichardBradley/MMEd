@@ -47,6 +47,36 @@ namespace GLTK
       }
 
       Gl.glEnd();
+
+      if (DebugNormalDrawLength != 0)
+      {
+        Gl.glBegin(Gl.GL_LINES);
+
+        Gl.glColor3d(0.0, 0.0, 1.0);
+
+        foreach (Vertex lVertex in xiMesh.Vertices)
+        {
+          Gl.glVertex3d(lVertex.Position.x, lVertex.Position.y, lVertex.Position.z);
+          Point lNormalEnd = lVertex.Position + DebugNormalDrawLength * lVertex.Normal;
+          Gl.glVertex3d(lNormalEnd.x, lNormalEnd.y, lNormalEnd.z);
+        }
+
+        Gl.glEnd();
+      }
     }
+
+    public double DebugNormalDrawLength
+    {
+      get
+      {
+        return mDebugNormalDrawLength;
+      }
+      set
+      {
+        mDebugNormalDrawLength = value;
+      }
+    }
+
+    private double mDebugNormalDrawLength = 0;
   }
 }

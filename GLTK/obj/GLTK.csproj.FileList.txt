@@ -8,3 +8,13 @@ bin\Debug\Tao.OpenGl.dll
 bin\Debug\Tao.OpenGl.ExtensionLoader.dll
 bin\Debug\Tao.OpenGl.Glu.dll
 bin\Debug\Tao.Platform.Windows.dll
+bin\Release\GLTK.dll
+bin\Release\GLTK.pdb
+bin\Release\Tao.Glfw.dll
+bin\Release\Tao.OpenGl.dll
+bin\Release\Tao.OpenGl.ExtensionLoader.dll
+bin\Release\Tao.OpenGl.Glu.dll
+bin\Release\Tao.Platform.Windows.dll
+obj\Release\ResolveAssemblyReference.cache
+obj\Release\GLTK.dll
+obj\Release\GLTK.pdb

@@ -14,8 +14,18 @@ namespace GLTK
     void Renderer_NextFrame(AbstractRenderer xiSender, EventArgs xiArgs)
     {
       xiSender.Clear();
+      xiSender.ResetLights();
       
       xiSender.SetCamera(mCamera);
+
+      foreach (Light lLight in mLights)
+      {
+        if (lLight.On)
+        {
+          xiSender.SetLight(lLight);
+        }
+      }
+
       foreach (Entity lObject in mObjects)
       {
         xiSender.PushTransform(lObject.Transform);
@@ -54,11 +64,41 @@ namespace GLTK
       }
     }
 
+    public void AddLight(Light xiLight)
+    {
+      mLights.Add(xiLight);
+    }
+
+    public void RemoveLight(Light xiLight)
+    {
+      if (mLights.Contains(xiLight))
+      {
+        mLights.Remove(xiLight);
+      }
+    }
+
     public void Clear()
     {
         mObjects.Clear();
     }
 
+    public int ObjectCount
+    {
+      get
+      {
+        return mObjects.Count;
+      }
+    }
+
+    public Entity this[int xiIndex]
+    {
+      get
+      {
+        return mObjects[xiIndex];
+      }
+    }
+
+    private List<Light> mLights = new List<Light>();
     private List<Entity> mObjects = new List<Entity>();
     private Camera mCamera = new Camera();
   }

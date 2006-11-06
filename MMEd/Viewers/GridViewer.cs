@@ -173,7 +173,7 @@ namespace MMEd.Viewers
 
     private void InvalidateGridDisplayMouseEvent(object sender, MouseEventArgs e)
     {
-      mMainForm.GridDisplayPanel.Invalidate(new Rectangle(e.X-100,e.Y-100,200,200));
+      mMainForm.GridDisplayPanel.Invalidate(new Rectangle(e.X - 100, e.Y - 100, 200, 200));
     }
 
     private void GridDisplayMouseClick(object sender, MouseEventArgs e)

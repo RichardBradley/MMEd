@@ -88,6 +88,13 @@ namespace GLTK
       }
     }
 
+    public double Dot(Vector xiOther)
+    {
+      return mElements[0] * xiOther.mElements[0]
+           + mElements[1] * xiOther.mElements[1]
+           + mElements[2] * xiOther.mElements[2];
+    }
+
     public static Vector operator +(Vector xiLhs, Vector xiRhs)
     {
       return new Vector(

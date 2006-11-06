@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.ComponentModel;
+using System.Drawing;
 using MMEd.Util;
 using MMEd.Viewers;
 using GLTK;
+using Point = GLTK.Point;
 
 // A Flat from within the SHET
 // Represents a drivable surface.
@@ -111,6 +113,9 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
     [Description("The weapons on this Flat")]
     public WeaponEntry[] Weapons;
 
+    [Description("no idea")]
+    public byte[] TrailingData;
+
     public void Deserialise(BinaryReader bin)
     {
       //header
@@ -181,6 +186,18 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
           Weapons[i] = new WeaponEntry(bin);
         }
       }
+      else if (Utils.ArrayCompare(NextN, new byte[] { 156, 255, 1, 0, 4, 0 }))
+      {
+        //applying POOL5 hack!! qqq
+        System.Windows.Forms.MessageBox.Show("Warning: applying POOL5 specific hack to trailing bytes of jumprmp3 Flat");
+        TrailingData = bin.ReadBytes(22);
+      }
+      else if (Utils.ArrayCompare(NextN, new byte[] { 106, 255, 1, 0, 243, 255 }))
+      {
+        //applying GARDEN3 hack!! qqq
+        System.Windows.Forms.MessageBox.Show("Warning: applying GARDEN3 specific hack to trailing bytes of grasssht Flat");
+        TrailingData = bin.ReadBytes(22);
+      }
     }
 
     public override void Deserialise(System.IO.Stream inStr)
@@ -247,6 +264,12 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
         {
           w.WriteToStream(bout);
         }
+      }
+
+      //pool5 hack:
+      if (TrailingData != null)
+      {
+        bout.Write(TrailingData);
       }
     }
 
@@ -342,9 +365,9 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
       throw new Exception("The method or operation is not implemented.");
     }
 
-    public IEnumerable<GLTK.Entity> GetEntities(AbstractRenderer xiRenderer, Level xiLevel)
+    public IEnumerable<GLTK.Entity> GetEntities(AbstractRenderer xiRenderer, Level xiLevel, ThreeDeeViewer.eTextureMode xiTextureMode, FlatChunk.TexMetaDataEntries xiSelectedMetadata)
     {
-      //hack:
+      //qq hack:
       if (this.TreeNode.Checked)
       {
         return new Entity[0];
@@ -354,22 +377,36 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
       // invert the textures along the y-axis
       // use level co-ords, so z is down
 
-      Entity lAcc = new Entity();
+      /////////////////////////////////////////////////////
+      // The surface
+      Entity lSurface = new Entity();
+
+      Font lNumberFont = null;
+      Brush lNumberFGBrush = null, lNumberBGBrush = null;
+      Pen lWaypointPen = null, lKeyWaypointPen = null;
+      if (xiTextureMode == ThreeDeeViewer.eTextureMode.NormalTexturesWithMetadata)
+      {
+        lNumberFont = new Font(FontFamily.GenericMonospace, 10);
+        lNumberFGBrush = new SolidBrush(Color.Black);
+        lNumberBGBrush = new SolidBrush(Color.White);
+        lWaypointPen = new Pen(Color.Black, 1f);
+        lKeyWaypointPen = new Pen(Color.Red, 2f);
+      }
 
       for (int x = 0; x < Width; x++)
       {
         for (int y = 0; y < Height; y++)
         {
-          Mesh lSquare = new Mesh();
+          Mesh lSquare = new OwnedMesh(this);
           lSquare.AddTriangle(
-          new Vertex(new Point(x, y, 0), 0, 1),
-          new Vertex(new Point(x + 1, y, 0), 1, 1),
-          new Vertex(new Point(x + 1, y + 1, 0), 1, 0));
+          new Vertex(new Point(x, y, 0), 0, 0),
+          new Vertex(new Point(x + 1, y, 0), 1, 0),
+          new Vertex(new Point(x + 1, y + 1, 0), 1, 1));
 
           lSquare.AddTriangle(
-            new Vertex(new Point(x, y, 0), 0, 1),
-            new Vertex(new Point(x + 1, y + 1, 0), 1, 0),
-            new Vertex(new Point(x, y + 1, 0), 0, 0));
+            new Vertex(new Point(x, y, 0), 0, 0),
+            new Vertex(new Point(x + 1, y + 1, 0), 1, 1),
+            new Vertex(new Point(x, y + 1, 0), 0, 1));
 
           if (this.TreeNode.Checked) //(inactive)
           {
@@ -382,25 +419,110 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
             if (lTIM != null)
             {
               //some TIMs can't be loaded yet: they're null
-              lSquare.Texture = xiRenderer.ImageToTextureId(lTIM.ToBitmap());
+              Bitmap lTexture = lTIM.ToBitmap();
+              if (xiTextureMode == ThreeDeeViewer.eTextureMode.NormalTexturesWithMetadata
+                  && TexMetaData != null)
+              {
+                byte lVal = TexMetaData[x][y][(int)xiSelectedMetadata];
+
+                if (lVal != 0)
+                {
+                  lTexture = (Bitmap)lTexture.Clone();
+
+                  Graphics g = Graphics.FromImage(lTexture);
+
+                  string lText = string.Format("{0:x}", lVal);
+
+                  SizeF size = g.MeasureString(lText, lNumberFont);
+
+                  float xf = lTexture.Width / 2.0f - size.Width / 2.0f;
+                  float yf = lTexture.Height / 2.0f - size.Height / 2.0f;
+
+                  g.FillRectangle(lNumberBGBrush, xf, yf, size.Width, size.Height);
+
+                  g.DrawString(
+                      lText,
+                      lNumberFont,
+                      lNumberFGBrush,
+                      xf,
+                      yf);
+
+                  if (xiSelectedMetadata == TexMetaDataEntries.Waypoint)
+                  {
+                    Pen lPen = xiLevel.WaypointIsKeyWaypoint(lVal)
+                        ? lKeyWaypointPen
+                        : lWaypointPen;
+
+                    g.DrawRectangle(
+                        lPen,
+                        0, 0, lTexture.Width - 1, lTexture.Height - 1);
+
+                  }
+                }
+              }
+              else if (xiTextureMode == ThreeDeeViewer.eTextureMode.BumpmapTextures)
+              {
+                throw new Exception("TODO");
+              }
+
+              lSquare.Texture = xiRenderer.ImageToTextureId(lTexture);
             }
           }
 
-          lAcc.Meshes.Add(lSquare);
+          lSurface.Meshes.Add(lSquare);
         }
       }
 
-      lAcc.Scale(ScaleX, ScaleY, 1.0);
+      lSurface.Scale(ScaleX, ScaleY, 1.0);
       if (RotationVector.Norm() != 0)
       {
         //the rotation is z-y-x
-        lAcc.Rotate(RotationVector.Z / 1024.0 * Math.PI / 2.0, Vector.ZAxis);
-        lAcc.Rotate(RotationVector.Y / 1024.0 * Math.PI / 2.0, Vector.YAxis);
-        lAcc.Rotate(RotationVector.X / 1024.0 * Math.PI / 2.0, Vector.XAxis);
+        lSurface.RotateAboutWorldOrigin(RotationVector.Z / 1024.0 * Math.PI / 2.0, Vector.ZAxis);
+        lSurface.RotateAboutWorldOrigin(-RotationVector.Y / 1024.0 * Math.PI / 2.0, Vector.YAxis);
+        lSurface.RotateAboutWorldOrigin(-RotationVector.X / 1024.0 * Math.PI / 2.0, Vector.XAxis);
       }
-      lAcc.Position = ThreeDeeViewer.Short3CoordToPoint(OriginPosition);
 
-      return new Entity[] { lAcc };
+      Point lNewPos = ThreeDeeViewer.Short3CoordToPoint(OriginPosition);
+      lSurface.Position = new Point(lNewPos.x, lNewPos.y, -lNewPos.z);
+
+      List<Entity> lAcc = new List<Entity>();
+      lAcc.Add(lSurface);
+
+      /////////////////////////////////////////////////////
+      // The child objects
+      if (Objects != null)
+      {
+        foreach (ObjectEntry oe in Objects)
+        {
+          TMDChunk lObjt = xiLevel.GetObjtById(oe.ObjtType);
+          if (lObjt != null)
+          {
+            //qq hack!
+            Entity[] lEarr = (Entity[])lObjt.GetEntities(xiRenderer, xiLevel, xiTextureMode, xiSelectedMetadata);
+            if (lEarr.Length != 1) throw new Exception("hack failed!");
+            Entity lE = lEarr[0];
+
+            //lE.Transform = lSurface.Transform.Clone(); //is this a value assign?
+
+            // lE.Scale(ScaleX, ScaleY, 1.0); // is this ShortUnknown?
+            if (oe.RotationVector.Norm() != 0)
+            {
+              //the rotation is z-y-x
+              lE.RotateAboutWorldOrigin(-oe.RotationVector.Z / 1024.0 * Math.PI / 2.0, Vector.ZAxis);
+              lE.RotateAboutWorldOrigin(-oe.RotationVector.Y / 1024.0 * Math.PI / 2.0, Vector.YAxis);
+              lE.RotateAboutWorldOrigin(-oe.RotationVector.X / 1024.0 * Math.PI / 2.0, Vector.XAxis);
+            }
+            //lE.Position = lSurface.Position;
+            //lE.Move(ThreeDeeViewer.Short3CoordToPoint(oe.OriginPosition).GetPositionVector());
+
+            lE.Position = ThreeDeeViewer.Short3CoordToPoint(oe.OriginPosition);
+            lE.Scale(1, 1, -1);
+            lAcc.Add(lE);
+          }
+        }
+      }
+
+      return lAcc;
     }
   }
 }
