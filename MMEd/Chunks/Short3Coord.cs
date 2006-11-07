@@ -42,5 +42,10 @@ namespace MMEd.Chunks
       double dZ = (double)Z;
       return Math.Sqrt(dX * dX + dY * dY + dZ * dZ);
     }
+
+    public override string ToString()
+    {
+      return string.Format("({0},{1},{2})", X, Y, Z);
+    }
   }
 }

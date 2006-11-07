@@ -21,7 +21,7 @@ namespace MMEd
             {
                 mLocalSettings.Save();
             }
-            catch 
+            catch
             {
                 //if unable to save local settings, just drop them
             }
@@ -34,7 +34,7 @@ namespace MMEd
             // Load global settings
             this.mGlobalSettings = new GlobalSettings();
             this.mLocalSettings = LocalSettings.GetInstance();
-            
+
             //register the viewer manager classes
             //qq there must be a better way of doing this, it seems a bit
             //   odd
@@ -43,6 +43,7 @@ namespace MMEd
             ViewTabBump.Tag = BumpViewer.InitialiseViewer(this);
             ViewTabGrid.Tag = GridViewer.InitialiseViewer(this);
             ViewTab3D.Tag = ThreeDeeViewer.InitialiseViewer(this);
+            ViewTabVRAM.Tag = VRAMViewer.InitialiseViewer(this);
 
             //auto-load last level
             if (mLocalSettings.LastOpenedFile != null)
@@ -184,7 +185,7 @@ namespace MMEd
             // set the enabled state of all the tabs
             foreach (Viewer lViewer in Viewer.GetViewers())
             {
-                if (lViewer.CanViewChunk(lActiveChunk)) 
+                if (lViewer.CanViewChunk(lActiveChunk))
                 {
                     if (!ViewerTabControl.TabPages.Contains(lViewer.Tab))
                     {

@@ -198,11 +198,17 @@ namespace MMEd.Chunks
 
     public IEnumerable<GLTK.Entity> GetEntities(AbstractRenderer xiRenderer, Level xiLevel, ThreeDeeViewer.eTextureMode xiTextureMode, FlatChunk.TexMetaDataEntries xiSelectedMetadata)
     {
+      return GetEntities(xiRenderer, xiLevel, xiTextureMode, xiSelectedMetadata, this);
+    }
+
+    public IEnumerable<GLTK.Entity> GetEntities(AbstractRenderer xiRenderer, Level xiLevel, ThreeDeeViewer.eTextureMode xiTextureMode, FlatChunk.TexMetaDataEntries xiSelectedMetadata, object xiMeshOwner)
+    {
       Entity lAcc = new Entity();
-      Mesh lMesh = new OwnedMesh(this);
-      lMesh.RenderMode = RenderMode.Filled; //TODO: tex
-      lAcc.Meshes.Add(lMesh);
-      //qq move into Face class?
+      Mesh lColouredMesh = null;
+      Mesh lTexturedMesh = null;
+      int lTexPageId = int.MinValue;
+
+      //qq move all this into Face class?
       Vertex[] lVBuff = new Vertex[4];
       foreach (Face f in Faces)
       {
@@ -211,18 +217,52 @@ namespace MMEd.Chunks
           for (int v = 0; v < f.mVertexIds.Length; v++)
           {
             lVBuff[v] = new Vertex(ThreeDeeViewer.Short3CoordToPoint(Vertices[f.mVertexIds[v]]));
+            
             //normal
             if (v < f.mNormalIds.Length)
               lVBuff[v].Normal = ThreeDeeViewer.Short3CoordToPoint(Normals[f.mNormalIds[v]]).GetPositionVector().Normalise();
             else lVBuff[v].Normal = ThreeDeeViewer.Short3CoordToPoint(Normals[f.mNormalIds[0]]).GetPositionVector().Normalise();
+
             //color:
-            if (f.mColors == null)
-              lVBuff[v].Color = Color.Magenta;
-            else if (v < f.mColors.Length)
+            if (f.mColors != null && v < f.mColors.Length)
               lVBuff[v].Color = Utils.PSRGBColorToColor(f.mColors[v]);
-            else
+            else if (f.mColors != null)
               lVBuff[v].Color = Utils.PSRGBColorToColor(f.mColors[0]);
-            //TODO: tex
+            
+            //tex coords
+            if (f.mTexCoords != null && v < f.mTexCoords.Length)
+            {
+              lVBuff[v].TexCoordX = f.mTexCoords[v].X / (double)VRAMViewer.TEX_PAGE_WIDTH;
+              lVBuff[v].TexCoordY = f.mTexCoords[v].Y / (double)VRAMViewer.TEX_PAGE_HEIGHT;
+            }
+          }
+
+          //tex or solid?
+          Mesh lMesh;
+          if (f.mTexCoords != null)
+          {
+            if (lTexturedMesh == null)
+            {
+              lTexturedMesh = new OwnedMesh(xiMeshOwner);
+              lTexturedMesh.RenderMode = RenderMode.Textured;
+              int lThisFacePageId = f.mTSB & 0xff; //qq TODO ren TSB
+              if (lTexPageId != int.MinValue && lThisFacePageId != lTexPageId)
+              {
+                throw new Exception("Object refers to multiple texture pages!");
+              }
+              lTexPageId = lThisFacePageId;
+              lTexturedMesh.Texture = xiRenderer.ImageToTextureId(xiLevel.GetTexturePageById(lTexPageId)); 
+            }
+            lMesh = lTexturedMesh;
+          }
+          else
+          {
+            if (lColouredMesh == null)
+            {
+              lColouredMesh = new OwnedMesh(xiMeshOwner);
+              lColouredMesh.RenderMode = RenderMode.Filled;
+            }
+            lMesh = lColouredMesh;
           }
 
           if (f.mVertexIds.Length == 3)
@@ -236,6 +276,12 @@ namespace MMEd.Chunks
           }
         }
       }
+
+      if (lTexturedMesh != null) lAcc.Meshes.Add(lTexturedMesh);
+      if (lColouredMesh != null) lAcc.Meshes.Add(lColouredMesh);
+
+      lAcc.Scale(1, 1, -1);
+
       return new Entity[] { lAcc };
     }
 

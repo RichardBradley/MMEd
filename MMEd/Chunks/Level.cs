@@ -9,6 +9,7 @@ using MMEd.Viewers;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using GLTK;
+using Bitmap = System.Drawing.Bitmap;
 
 // Represents an entire MMv3 level (PS version)
 
@@ -72,6 +73,11 @@ namespace MMEd.Chunks
         }
       }
       return null;
+    }
+
+    public Bitmap GetTexturePageById(int xiId)
+    {
+      return VRAMViewer.GetInstance().GetTexturePage(this, xiId);
     }
 
     public bool WaypointIsKeyWaypoint(byte xiWaypoint)

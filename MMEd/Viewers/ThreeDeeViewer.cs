@@ -13,7 +13,7 @@ namespace MMEd.Viewers
 {
   public class ThreeDeeViewer : Viewer
   {
-    private double MoveScale = 100;
+    private double MOVE_SCALE = 100;
 
     //indicates that an object can provide an enumeration of GLTK.Entity objects
     //to be redered as a ThreeDee scene
@@ -101,12 +101,12 @@ namespace MMEd.Viewers
         switch (MovementMode)
         {
           case eMovementMode.FlyMode:
-            mCamera.Move(-0.1 * MoveScale * (lNewMousePoint.X - mLastMouseDown.X) * mCamera.XAxis);
-            mCamera.Move(0.1 * MoveScale * (lNewMousePoint.Y - mLastMouseDown.Y) * mCamera.ZAxis);
+            mCamera.Move(-0.1 * MOVE_SCALE * (lNewMousePoint.X - mLastMouseDown.X) * mCamera.XAxis);
+            mCamera.Move(0.1 * MOVE_SCALE * (lNewMousePoint.Y - mLastMouseDown.Y) * mCamera.ZAxis);
             break;
           case eMovementMode.InspectMode:
             Vector lStartPos = mCamera.Position.GetPositionVector();
-            Vector lMoveVec = 0.1 * MoveScale * (lNewMousePoint.Y - mLastMouseDown.Y) * mCamera.ZAxis;
+            Vector lMoveVec = 0.1 * MOVE_SCALE * (lNewMousePoint.Y - mLastMouseDown.Y) * mCamera.ZAxis;
             //don't move through the origin
             if (lMoveVec.Dot(lStartPos) / lStartPos.LengthSquared > -1.0)
             {
@@ -148,6 +148,11 @@ namespace MMEd.Viewers
             OwnedMesh om = (OwnedMesh)lMesh;
             Chunk c = (Chunk)om.Owner;
             MessageBox.Show(string.Format("Clicked on {0} with name {1}", c.GetType().Name, c.Name));
+          }
+          else if (lMesh is OwnedMesh && ((OwnedMesh)lMesh).Owner is FlatChunk.ObjectEntry)
+          {
+            FlatChunk.ObjectEntry oe = (FlatChunk.ObjectEntry)((OwnedMesh)lMesh).Owner;
+            MessageBox.Show(string.Format("Clicked on object type {0} at {1}, rotation {2}", oe.ObjtType, oe.OriginPosition, oe.RotationVector));
           }
           else
           {
@@ -208,22 +213,22 @@ namespace MMEd.Viewers
     public override void SetSubject(Chunk xiChunk)
     {
       if (!(xiChunk is IEntityProvider)) xiChunk = null;
+      mOptionsMenu.Visible = (xiChunk != null);
       if (mSubject == xiChunk) return;
       bool lResetViewMode = true;
       if (xiChunk != null && mSubject != null && xiChunk.GetType() == mSubject.GetType())
         lResetViewMode = false;
       mSubject = (IEntityProvider)xiChunk;
 
-      mOptionsMenu.Visible = (mSubject != null);
-      MoveScale = xiChunk is Level ? 100 : 100;
+      const double MOVE_SCALE = 100;
 
       Cursor prevCursor = mMainForm.Viewer3DRenderingSurface.Cursor;
       mMainForm.Viewer3DRenderingSurface.Cursor = Cursors.WaitCursor;
       RebuildScene();
       if (mSubject != null)
       {
-        mCamera.Position = new GLTK.Point(-3 * MoveScale, -3 * MoveScale, 3 * MoveScale);
-        mCamera.LookAt(new GLTK.Point(3 * MoveScale, 3 * MoveScale, 0), new GLTK.Vector(0, 0, 1));
+        mCamera.Position = new GLTK.Point(-3 * MOVE_SCALE, -3 * MOVE_SCALE, 3 * MOVE_SCALE);
+        mCamera.LookAt(new GLTK.Point(3 * MOVE_SCALE, 3 * MOVE_SCALE, 0), new GLTK.Vector(0, 0, 1));
 
         //set defaults
         if (lResetViewMode)
@@ -455,32 +460,32 @@ namespace MMEd.Viewers
       {
         case 'W':
         case 'w':
-          mCamera.Move(-1.0 * mCamera.ZAxis * MoveScale);
+          mCamera.Move(-1.0 * mCamera.ZAxis * MOVE_SCALE);
           break;
 
         case 'S':
         case 's':
-          mCamera.Move(1.0 * mCamera.ZAxis * MoveScale);
+          mCamera.Move(1.0 * mCamera.ZAxis * MOVE_SCALE);
           break;
 
         case 'A':
         case 'a':
-          mCamera.Move(-1.0 * mCamera.XAxis * MoveScale);
+          mCamera.Move(-1.0 * mCamera.XAxis * MOVE_SCALE);
           break;
 
         case 'D':
         case 'd':
-          mCamera.Move(1.0 * mCamera.XAxis * MoveScale);
+          mCamera.Move(1.0 * mCamera.XAxis * MOVE_SCALE);
           break;
 
         case 'Q':
         case 'q':
-          mCamera.Move(-1.0 * mCamera.ZAxis * MoveScale);
+          mCamera.Move(-1.0 * mCamera.ZAxis * MOVE_SCALE);
           break;
 
         case 'E':
         case 'e':
-          mCamera.Move(1.0 * mCamera.ZAxis * MoveScale);
+          mCamera.Move(1.0 * mCamera.ZAxis * MOVE_SCALE);
           break;
 
         case 'I':

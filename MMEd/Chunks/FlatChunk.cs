@@ -497,14 +497,10 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
           TMDChunk lObjt = xiLevel.GetObjtById(oe.ObjtType);
           if (lObjt != null)
           {
-            //qq hack!
-            Entity[] lEarr = (Entity[])lObjt.GetEntities(xiRenderer, xiLevel, xiTextureMode, xiSelectedMetadata);
-            if (lEarr.Length != 1) throw new Exception("hack failed!");
+            Entity[] lEarr = (Entity[])lObjt.GetEntities(xiRenderer, xiLevel, xiTextureMode, xiSelectedMetadata, oe);
+            if (lEarr.Length != 1) throw new Exception("hack failed!"); //qq
             Entity lE = lEarr[0];
 
-            //lE.Transform = lSurface.Transform.Clone(); //is this a value assign?
-
-            // lE.Scale(ScaleX, ScaleY, 1.0); // is this ShortUnknown?
             if (oe.RotationVector.Norm() != 0)
             {
               //the rotation is z-y-x
@@ -512,11 +508,8 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
               lE.RotateAboutWorldOrigin(-oe.RotationVector.Y / 1024.0 * Math.PI / 2.0, Vector.YAxis);
               lE.RotateAboutWorldOrigin(-oe.RotationVector.X / 1024.0 * Math.PI / 2.0, Vector.XAxis);
             }
-            //lE.Position = lSurface.Position;
-            //lE.Move(ThreeDeeViewer.Short3CoordToPoint(oe.OriginPosition).GetPositionVector());
 
             lE.Position = ThreeDeeViewer.Short3CoordToPoint(oe.OriginPosition);
-            lE.Scale(1, 1, -1);
             lAcc.Add(lE);
           }
         }

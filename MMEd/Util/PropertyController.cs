@@ -12,22 +12,41 @@ namespace MMEd.Util
   {
     private object mTarget;
     private PropertyInfo mProperty;
+    private NamedValueHolder[] mAllowedValues;
 
     public PropertyController(
         object xiTarget,
         string xiPropertyName)
-      : this(xiTarget, xiPropertyName, null) { }
+      : this(xiTarget, xiPropertyName, null, null) { }
 
     public PropertyController(
         object xiTarget,
         string xiPropertyName,
         string xiPropertyUpdateEventName)
+      : this (xiTarget, xiPropertyName, xiPropertyUpdateEventName, null) {}
+
+    public PropertyController(
+        object xiTarget,
+        string xiPropertyName,
+        NamedValueHolder[] xiAllowedValues)
+      : this(xiTarget, xiPropertyName, null, xiAllowedValues) { }
+
+    public PropertyController(
+        object xiTarget,
+        string xiPropertyName,
+        string xiPropertyUpdateEventName,
+        NamedValueHolder[] xiAllowedValues)
     {
       mTarget = xiTarget;
       mProperty = mTarget.GetType().GetProperty(xiPropertyName);
       if (mProperty == null) throw new ArgumentException(string.Format("Property \"{0}\" not found on type {1}", xiPropertyName, xiTarget.GetType()));
       Type lPropType = mProperty.PropertyType;
-      if (!lPropType.IsEnum && lPropType != typeof(bool)) throw new ArgumentException(string.Format("Only enumerated or boolean properties supported. Property \"{0}\" is neither", xiPropertyName));
+      mAllowedValues = xiAllowedValues;
+
+      if (!lPropType.IsEnum 
+        && lPropType != typeof(bool)
+        && xiAllowedValues == null) throw new ArgumentException("If property is not enumerated or boolean, then you must provide an array of allowed values");
+
       if (xiPropertyUpdateEventName != null)
       {
         EventInfo lEv = mTarget.GetType().GetEvent(xiPropertyUpdateEventName);
@@ -35,12 +54,24 @@ namespace MMEd.Util
       }
     }
 
+    
     private ToolStripMenuItem[] mToolStripItems;
     public ToolStripMenuItem[] CreateMenuItems()
     {
       if (mToolStripItems != null) throw new Exception("Can't create more than one group of menu items");
       List<ToolStripMenuItem> lAcc = new List<ToolStripMenuItem>();
-      if (mProperty.PropertyType.IsEnum)
+      if (mAllowedValues != null)
+      {
+        foreach (NamedValueHolder lNV in mAllowedValues)
+        {
+          ToolStripMenuItem lItem = new ToolStripMenuItem();
+          lItem.Text = lNV.Name;
+          lItem.Tag = lNV.Value;
+          lItem.Click += new EventHandler(this.ToolStripClickHandler);
+          lAcc.Add(lItem);
+        }
+      }
+      else if (mProperty.PropertyType.IsEnum)
       {
         foreach (string lValue in Enum.GetNames(mProperty.PropertyType))
         {
@@ -51,7 +82,7 @@ namespace MMEd.Util
           lAcc.Add(lItem);
         }
       }
-      else
+      else //bool
       {
         ToolStripMenuItem lItem = new ToolStripMenuItem();
         lItem.Text = Utils.CamelCaseToSentence(mProperty.Name);
@@ -63,7 +94,7 @@ namespace MMEd.Util
       return mToolStripItems;
     }
 
-    private class NamedValueHolder
+    public class NamedValueHolder
     {
       public object Value;
       public string Name;
@@ -91,19 +122,31 @@ namespace MMEd.Util
     public ToolStripComboBox CreateToolStripComboBox()
     {
       if (mToolStripComboBox != null) throw new Exception("Can't create more than one menu combo box");
-      if (!mProperty.PropertyType.IsEnum) throw new Exception("Only enumerated properties can use menu combo box");
+      if (!mProperty.PropertyType.IsEnum && mAllowedValues == null) throw new Exception("Only enumerated properties or properties with a list of allowed values can use menu combo box");
       mToolStripComboBox = new ToolStripComboBox();
-      foreach (object lValue in Enum.GetValues(mProperty.PropertyType))
+
+      if (mAllowedValues != null)
       {
-        mToolStripComboBox.Items.Add(new NamedValueHolder(Utils.CamelCaseToSentence(Enum.GetName(mProperty.PropertyType, lValue)), lValue));
+        foreach (NamedValueHolder lNV in mAllowedValues)
+        {
+          mToolStripComboBox.Items.Add(lNV);
+        }
       }
+      else
+      {
+        foreach (object lValue in Enum.GetValues(mProperty.PropertyType))
+        {
+          mToolStripComboBox.Items.Add(new NamedValueHolder(Utils.CamelCaseToSentence(Enum.GetName(mProperty.PropertyType, lValue)), lValue));
+        }
+      }
+
       mToolStripComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
-      mToolStripComboBox.Click += new EventHandler(this.ComboBoxClickHandler);
+      mToolStripComboBox.SelectedIndexChanged += new EventHandler(this.ComboBoxSelectHandler);
       ValueChangeHandler(null, null);
       return mToolStripComboBox;
     }
 
-    public void ComboBoxClickHandler(object xiSender, EventArgs xiArgs)
+    public void ComboBoxSelectHandler(object xiSender, EventArgs xiArgs)
     {
       object lNewValue = ((NamedValueHolder)((ToolStripComboBox)xiSender).SelectedItem).Value;
       mProperty.SetValue(mTarget, lNewValue, null);
@@ -113,7 +156,11 @@ namespace MMEd.Util
     public void ToolStripClickHandler(object xiSender, EventArgs xiArgs)
     {
       object lNewValue;
-      if (mProperty.PropertyType.IsEnum)
+      if (mAllowedValues != null)
+      {
+        lNewValue = ((ToolStripMenuItem)xiSender).Tag;
+      }
+      else if (mProperty.PropertyType.IsEnum)
       {
         string lNewValueStr = (string)((ToolStripMenuItem)xiSender).Tag;
         lNewValue = Enum.Parse(mProperty.PropertyType, lNewValueStr);
@@ -128,8 +175,20 @@ namespace MMEd.Util
 
     public void ValueChangeHandler(object xiSender, EventArgs xiArgs)
     {
-
-      if (mProperty.PropertyType.IsEnum)
+      if (mAllowedValues != null)
+      {
+        object lNewValue = mProperty.GetValue(mTarget, null);
+        if (mToolStripItems != null)
+        {
+          foreach (ToolStripMenuItem t in mToolStripItems)
+            t.Checked = (t.Tag != null && t.Tag.Equals(lNewValue));
+        }
+        if (mToolStripComboBox != null)
+        {
+          mToolStripComboBox.SelectedItem = new NamedValueHolder(null, lNewValue);
+        }
+      } 
+      else if (mProperty.PropertyType.IsEnum)
       {
         object lNewValue = mProperty.GetValue(mTarget, null);
         string lNewValueStr = Enum.GetName(mProperty.PropertyType, lNewValue);
