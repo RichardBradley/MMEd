@@ -35,44 +35,48 @@ namespace MMEd
           this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
           this.MainSplitter = new System.Windows.Forms.SplitContainer();
           this.ChunkTreeView = new System.Windows.Forms.TreeView();
-          this.ViewerTabControl = new System.Windows.Forms.TabControl();
-          this.ViewTabSummary = new System.Windows.Forms.TabPage();
-          this.label1 = new System.Windows.Forms.Label();
-          this.ViewTabXML = new System.Windows.Forms.TabPage();
-          this.XMLViewerCommitBtn = new System.Windows.Forms.Button();
-          this.XMLTextBox = new System.Windows.Forms.TextBox();
-          this.ViewTabImg = new System.Windows.Forms.TabPage();
-          this.ImgPictureBox = new System.Windows.Forms.PictureBox();
-          this.ViewTabGrid = new System.Windows.Forms.TabPage();
-          this.groupBox2 = new System.Windows.Forms.GroupBox();
-          this.GridDisplayPanelHolder = new System.Windows.Forms.Panel();
-          this.GridDisplayPanel = new System.Windows.Forms.Panel();
-          this.groupBox1 = new System.Windows.Forms.GroupBox();
-          this.GridViewMetaTypeCombo = new System.Windows.Forms.ComboBox();
-          this.GridViewRadioImgNum = new System.Windows.Forms.RadioButton();
-          this.GridViewRadioImages = new System.Windows.Forms.RadioButton();
           this.ViewTab3D = new System.Windows.Forms.TabPage();
           this.Viewer3DRenderingSurface = new GLTK.RenderingSurface();
+          this.ViewTabGrid = new System.Windows.Forms.TabPage();
+          this.groupBox1 = new System.Windows.Forms.GroupBox();
+          this.GridViewRadioImages = new System.Windows.Forms.RadioButton();
+          this.GridViewRadioImgNum = new System.Windows.Forms.RadioButton();
+          this.GridViewMetaTypeCombo = new System.Windows.Forms.ComboBox();
+          this.GridDisplayPanelHolder = new System.Windows.Forms.Panel();
+          this.GridDisplayPanel = new System.Windows.Forms.Panel();
+          this.groupBox2 = new System.Windows.Forms.GroupBox();
           this.label2 = new System.Windows.Forms.Label();
           this.label3 = new System.Windows.Forms.Label();
           this.TexSquareLabel = new System.Windows.Forms.Label();
           this.FlatCoordLabel = new System.Windows.Forms.Label();
           this.label4 = new System.Windows.Forms.Label();
           this.WorldCoordLabel = new System.Windows.Forms.Label();
+          this.ViewTabImg = new System.Windows.Forms.TabPage();
+          this.ImgPictureBox = new System.Windows.Forms.PictureBox();
+          this.ViewTabXML = new System.Windows.Forms.TabPage();
+          this.XMLTextBox = new System.Windows.Forms.TextBox();
+          this.XMLViewerCommitBtn = new System.Windows.Forms.Button();
+          this.ViewTabSummary = new System.Windows.Forms.TabPage();
+          this.label1 = new System.Windows.Forms.Label();
+          this.ViewerTabControl = new System.Windows.Forms.TabControl();
+          this.ViewTabBump = new System.Windows.Forms.TabPage();
+          this.BumpPictureBox = new System.Windows.Forms.PictureBox();
           this.mMenuStrip.SuspendLayout();
           this.MainSplitter.Panel1.SuspendLayout();
           this.MainSplitter.Panel2.SuspendLayout();
           this.MainSplitter.SuspendLayout();
-          this.ViewerTabControl.SuspendLayout();
-          this.ViewTabSummary.SuspendLayout();
-          this.ViewTabXML.SuspendLayout();
+          this.ViewTab3D.SuspendLayout();
+          this.ViewTabGrid.SuspendLayout();
+          this.groupBox1.SuspendLayout();
+          this.GridDisplayPanelHolder.SuspendLayout();
+          this.groupBox2.SuspendLayout();
           this.ViewTabImg.SuspendLayout();
           ((System.ComponentModel.ISupportInitialize)(this.ImgPictureBox)).BeginInit();
-          this.ViewTabGrid.SuspendLayout();
-          this.groupBox2.SuspendLayout();
-          this.GridDisplayPanelHolder.SuspendLayout();
-          this.groupBox1.SuspendLayout();
-          this.ViewTab3D.SuspendLayout();
+          this.ViewTabXML.SuspendLayout();
+          this.ViewTabSummary.SuspendLayout();
+          this.ViewerTabControl.SuspendLayout();
+          this.ViewTabBump.SuspendLayout();
+          ((System.ComponentModel.ISupportInitialize)(this.BumpPictureBox)).BeginInit();
           this.SuspendLayout();
           // 
           // mMenuStrip
@@ -142,198 +146,6 @@ namespace MMEd
           this.ChunkTreeView.TabIndex = 6;
           this.ChunkTreeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.ChunkTreeView_AfterSelect);
           // 
-          // ViewerTabControl
-          // 
-          this.ViewerTabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                      | System.Windows.Forms.AnchorStyles.Left)
-                      | System.Windows.Forms.AnchorStyles.Right)));
-          this.ViewerTabControl.Controls.Add(this.ViewTabSummary);
-          this.ViewerTabControl.Controls.Add(this.ViewTabXML);
-          this.ViewerTabControl.Controls.Add(this.ViewTabImg);
-          this.ViewerTabControl.Controls.Add(this.ViewTabGrid);
-          this.ViewerTabControl.Controls.Add(this.ViewTab3D);
-          this.ViewerTabControl.Location = new System.Drawing.Point(3, 3);
-          this.ViewerTabControl.Name = "ViewerTabControl";
-          this.ViewerTabControl.SelectedIndex = 0;
-          this.ViewerTabControl.Size = new System.Drawing.Size(644, 561);
-          this.ViewerTabControl.TabIndex = 0;
-          this.ViewerTabControl.Selected += new System.Windows.Forms.TabControlEventHandler(this.ViewerTabControl_Selected);
-          this.ViewerTabControl.SelectedIndexChanged += new System.EventHandler(this.ViewerTabControl_SelectedIndexChanged);
-          // 
-          // ViewTabSummary
-          // 
-          this.ViewTabSummary.Controls.Add(this.label1);
-          this.ViewTabSummary.Location = new System.Drawing.Point(4, 22);
-          this.ViewTabSummary.Name = "ViewTabSummary";
-          this.ViewTabSummary.Padding = new System.Windows.Forms.Padding(3);
-          this.ViewTabSummary.Size = new System.Drawing.Size(636, 535);
-          this.ViewTabSummary.TabIndex = 0;
-          this.ViewTabSummary.Text = "Summary";
-          this.ViewTabSummary.UseVisualStyleBackColor = true;
-          // 
-          // label1
-          // 
-          this.label1.AutoSize = true;
-          this.label1.Location = new System.Drawing.Point(6, 3);
-          this.label1.Name = "label1";
-          this.label1.Size = new System.Drawing.Size(175, 13);
-          this.label1.TabIndex = 0;
-          this.label1.Text = "Nothing here yet... (hint: open a file)";
-          // 
-          // ViewTabXML
-          // 
-          this.ViewTabXML.Controls.Add(this.XMLViewerCommitBtn);
-          this.ViewTabXML.Controls.Add(this.XMLTextBox);
-          this.ViewTabXML.Location = new System.Drawing.Point(4, 22);
-          this.ViewTabXML.Name = "ViewTabXML";
-          this.ViewTabXML.Padding = new System.Windows.Forms.Padding(3);
-          this.ViewTabXML.Size = new System.Drawing.Size(636, 535);
-          this.ViewTabXML.TabIndex = 1;
-          this.ViewTabXML.Text = "XML";
-          this.ViewTabXML.UseVisualStyleBackColor = true;
-          // 
-          // XMLViewerCommitBtn
-          // 
-          this.XMLViewerCommitBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-          this.XMLViewerCommitBtn.Location = new System.Drawing.Point(558, 477);
-          this.XMLViewerCommitBtn.Name = "XMLViewerCommitBtn";
-          this.XMLViewerCommitBtn.Size = new System.Drawing.Size(75, 31);
-          this.XMLViewerCommitBtn.TabIndex = 1;
-          this.XMLViewerCommitBtn.Text = "Commit";
-          this.XMLViewerCommitBtn.UseVisualStyleBackColor = true;
-          // 
-          // XMLTextBox
-          // 
-          this.XMLTextBox.AcceptsReturn = true;
-          this.XMLTextBox.AcceptsTab = true;
-          this.XMLTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                      | System.Windows.Forms.AnchorStyles.Left)
-                      | System.Windows.Forms.AnchorStyles.Right)));
-          this.XMLTextBox.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-          this.XMLTextBox.Location = new System.Drawing.Point(0, 0);
-          this.XMLTextBox.MaxLength = 0;
-          this.XMLTextBox.Multiline = true;
-          this.XMLTextBox.Name = "XMLTextBox";
-          this.XMLTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-          this.XMLTextBox.Size = new System.Drawing.Size(637, 471);
-          this.XMLTextBox.TabIndex = 0;
-          // 
-          // ViewTabImg
-          // 
-          this.ViewTabImg.Controls.Add(this.ImgPictureBox);
-          this.ViewTabImg.Location = new System.Drawing.Point(4, 22);
-          this.ViewTabImg.Name = "ViewTabImg";
-          this.ViewTabImg.Padding = new System.Windows.Forms.Padding(3);
-          this.ViewTabImg.Size = new System.Drawing.Size(636, 535);
-          this.ViewTabImg.TabIndex = 2;
-          this.ViewTabImg.Text = "Img";
-          this.ViewTabImg.UseVisualStyleBackColor = true;
-          // 
-          // ImgPictureBox
-          // 
-          this.ImgPictureBox.BackColor = System.Drawing.Color.White;
-          this.ImgPictureBox.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-          this.ImgPictureBox.Image = ((System.Drawing.Image)(resources.GetObject("ImgPictureBox.Image")));
-          this.ImgPictureBox.Location = new System.Drawing.Point(0, 0);
-          this.ImgPictureBox.Name = "ImgPictureBox";
-          this.ImgPictureBox.Size = new System.Drawing.Size(304, 254);
-          this.ImgPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-          this.ImgPictureBox.TabIndex = 0;
-          this.ImgPictureBox.TabStop = false;
-          // 
-          // ViewTabGrid
-          // 
-          this.ViewTabGrid.Controls.Add(this.groupBox2);
-          this.ViewTabGrid.Controls.Add(this.GridDisplayPanelHolder);
-          this.ViewTabGrid.Controls.Add(this.groupBox1);
-          this.ViewTabGrid.Location = new System.Drawing.Point(4, 22);
-          this.ViewTabGrid.Name = "ViewTabGrid";
-          this.ViewTabGrid.Padding = new System.Windows.Forms.Padding(3);
-          this.ViewTabGrid.Size = new System.Drawing.Size(636, 535);
-          this.ViewTabGrid.TabIndex = 3;
-          this.ViewTabGrid.Text = "Grid";
-          this.ViewTabGrid.UseVisualStyleBackColor = true;
-          // 
-          // groupBox2
-          // 
-          this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
-                      | System.Windows.Forms.AnchorStyles.Right)));
-          this.groupBox2.Controls.Add(this.WorldCoordLabel);
-          this.groupBox2.Controls.Add(this.label4);
-          this.groupBox2.Controls.Add(this.FlatCoordLabel);
-          this.groupBox2.Controls.Add(this.TexSquareLabel);
-          this.groupBox2.Controls.Add(this.label3);
-          this.groupBox2.Controls.Add(this.label2);
-          this.groupBox2.Location = new System.Drawing.Point(0, 415);
-          this.groupBox2.Name = "groupBox2";
-          this.groupBox2.Size = new System.Drawing.Size(636, 100);
-          this.groupBox2.TabIndex = 2;
-          this.groupBox2.TabStop = false;
-          this.groupBox2.Text = "Data";
-          // 
-          // GridDisplayPanelHolder
-          // 
-          this.GridDisplayPanelHolder.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                      | System.Windows.Forms.AnchorStyles.Left)
-                      | System.Windows.Forms.AnchorStyles.Right)));
-          this.GridDisplayPanelHolder.AutoScroll = true;
-          this.GridDisplayPanelHolder.Controls.Add(this.GridDisplayPanel);
-          this.GridDisplayPanelHolder.Location = new System.Drawing.Point(6, 6);
-          this.GridDisplayPanelHolder.Name = "GridDisplayPanelHolder";
-          this.GridDisplayPanelHolder.Size = new System.Drawing.Size(492, 364);
-          this.GridDisplayPanelHolder.TabIndex = 1;
-          // 
-          // GridDisplayPanel
-          // 
-          this.GridDisplayPanel.Location = new System.Drawing.Point(0, 0);
-          this.GridDisplayPanel.Name = "GridDisplayPanel";
-          this.GridDisplayPanel.Size = new System.Drawing.Size(200, 100);
-          this.GridDisplayPanel.TabIndex = 1;
-          // 
-          // groupBox1
-          // 
-          this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-          this.groupBox1.Controls.Add(this.GridViewMetaTypeCombo);
-          this.groupBox1.Controls.Add(this.GridViewRadioImgNum);
-          this.groupBox1.Controls.Add(this.GridViewRadioImages);
-          this.groupBox1.Location = new System.Drawing.Point(504, 0);
-          this.groupBox1.Name = "groupBox1";
-          this.groupBox1.Size = new System.Drawing.Size(132, 220);
-          this.groupBox1.TabIndex = 0;
-          this.groupBox1.TabStop = false;
-          this.groupBox1.Text = "ViewMode";
-          // 
-          // GridViewMetaTypeCombo
-          // 
-          this.GridViewMetaTypeCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-          this.GridViewMetaTypeCombo.FormattingEnabled = true;
-          this.GridViewMetaTypeCombo.Location = new System.Drawing.Point(6, 65);
-          this.GridViewMetaTypeCombo.Name = "GridViewMetaTypeCombo";
-          this.GridViewMetaTypeCombo.Size = new System.Drawing.Size(118, 21);
-          this.GridViewMetaTypeCombo.TabIndex = 2;
-          // 
-          // GridViewRadioImgNum
-          // 
-          this.GridViewRadioImgNum.AutoSize = true;
-          this.GridViewRadioImgNum.Location = new System.Drawing.Point(6, 42);
-          this.GridViewRadioImgNum.Name = "GridViewRadioImgNum";
-          this.GridViewRadioImgNum.Size = new System.Drawing.Size(109, 17);
-          this.GridViewRadioImgNum.TabIndex = 1;
-          this.GridViewRadioImgNum.Text = "Images + number:";
-          this.GridViewRadioImgNum.UseVisualStyleBackColor = true;
-          // 
-          // GridViewRadioImages
-          // 
-          this.GridViewRadioImages.AutoSize = true;
-          this.GridViewRadioImages.Checked = true;
-          this.GridViewRadioImages.Location = new System.Drawing.Point(6, 19);
-          this.GridViewRadioImages.Name = "GridViewRadioImages";
-          this.GridViewRadioImages.Size = new System.Drawing.Size(81, 17);
-          this.GridViewRadioImages.TabIndex = 0;
-          this.GridViewRadioImages.TabStop = true;
-          this.GridViewRadioImages.Text = "Images only";
-          this.GridViewRadioImages.UseVisualStyleBackColor = true;
-          // 
           // ViewTab3D
           // 
           this.ViewTab3D.Controls.Add(this.Viewer3DRenderingSurface);
@@ -355,6 +167,99 @@ namespace MMEd
           this.Viewer3DRenderingSurface.Size = new System.Drawing.Size(640, 512);
           this.Viewer3DRenderingSurface.TabIndex = 0;
           this.Viewer3DRenderingSurface.Text = "renderingSurface1";
+          // 
+          // ViewTabGrid
+          // 
+          this.ViewTabGrid.Controls.Add(this.groupBox2);
+          this.ViewTabGrid.Controls.Add(this.GridDisplayPanelHolder);
+          this.ViewTabGrid.Controls.Add(this.groupBox1);
+          this.ViewTabGrid.Location = new System.Drawing.Point(4, 22);
+          this.ViewTabGrid.Name = "ViewTabGrid";
+          this.ViewTabGrid.Padding = new System.Windows.Forms.Padding(3);
+          this.ViewTabGrid.Size = new System.Drawing.Size(636, 535);
+          this.ViewTabGrid.TabIndex = 3;
+          this.ViewTabGrid.Text = "Grid";
+          this.ViewTabGrid.UseVisualStyleBackColor = true;
+          // 
+          // groupBox1
+          // 
+          this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+          this.groupBox1.Controls.Add(this.GridViewMetaTypeCombo);
+          this.groupBox1.Controls.Add(this.GridViewRadioImgNum);
+          this.groupBox1.Controls.Add(this.GridViewRadioImages);
+          this.groupBox1.Location = new System.Drawing.Point(504, 0);
+          this.groupBox1.Name = "groupBox1";
+          this.groupBox1.Size = new System.Drawing.Size(132, 220);
+          this.groupBox1.TabIndex = 0;
+          this.groupBox1.TabStop = false;
+          this.groupBox1.Text = "ViewMode";
+          // 
+          // GridViewRadioImages
+          // 
+          this.GridViewRadioImages.AutoSize = true;
+          this.GridViewRadioImages.Checked = true;
+          this.GridViewRadioImages.Location = new System.Drawing.Point(6, 19);
+          this.GridViewRadioImages.Name = "GridViewRadioImages";
+          this.GridViewRadioImages.Size = new System.Drawing.Size(81, 17);
+          this.GridViewRadioImages.TabIndex = 0;
+          this.GridViewRadioImages.TabStop = true;
+          this.GridViewRadioImages.Text = "Images only";
+          this.GridViewRadioImages.UseVisualStyleBackColor = true;
+          // 
+          // GridViewRadioImgNum
+          // 
+          this.GridViewRadioImgNum.AutoSize = true;
+          this.GridViewRadioImgNum.Location = new System.Drawing.Point(6, 42);
+          this.GridViewRadioImgNum.Name = "GridViewRadioImgNum";
+          this.GridViewRadioImgNum.Size = new System.Drawing.Size(109, 17);
+          this.GridViewRadioImgNum.TabIndex = 1;
+          this.GridViewRadioImgNum.Text = "Images + number:";
+          this.GridViewRadioImgNum.UseVisualStyleBackColor = true;
+          // 
+          // GridViewMetaTypeCombo
+          // 
+          this.GridViewMetaTypeCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+          this.GridViewMetaTypeCombo.FormattingEnabled = true;
+          this.GridViewMetaTypeCombo.Location = new System.Drawing.Point(6, 65);
+          this.GridViewMetaTypeCombo.Name = "GridViewMetaTypeCombo";
+          this.GridViewMetaTypeCombo.Size = new System.Drawing.Size(118, 21);
+          this.GridViewMetaTypeCombo.TabIndex = 2;
+          // 
+          // GridDisplayPanelHolder
+          // 
+          this.GridDisplayPanelHolder.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                      | System.Windows.Forms.AnchorStyles.Left)
+                      | System.Windows.Forms.AnchorStyles.Right)));
+          this.GridDisplayPanelHolder.AutoScroll = true;
+          this.GridDisplayPanelHolder.Controls.Add(this.GridDisplayPanel);
+          this.GridDisplayPanelHolder.Location = new System.Drawing.Point(6, 6);
+          this.GridDisplayPanelHolder.Name = "GridDisplayPanelHolder";
+          this.GridDisplayPanelHolder.Size = new System.Drawing.Size(492, 364);
+          this.GridDisplayPanelHolder.TabIndex = 1;
+          // 
+          // GridDisplayPanel
+          // 
+          this.GridDisplayPanel.Location = new System.Drawing.Point(0, 0);
+          this.GridDisplayPanel.Name = "GridDisplayPanel";
+          this.GridDisplayPanel.Size = new System.Drawing.Size(200, 100);
+          this.GridDisplayPanel.TabIndex = 1;
+          // 
+          // groupBox2
+          // 
+          this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
+                      | System.Windows.Forms.AnchorStyles.Right)));
+          this.groupBox2.Controls.Add(this.WorldCoordLabel);
+          this.groupBox2.Controls.Add(this.label4);
+          this.groupBox2.Controls.Add(this.FlatCoordLabel);
+          this.groupBox2.Controls.Add(this.TexSquareLabel);
+          this.groupBox2.Controls.Add(this.label3);
+          this.groupBox2.Controls.Add(this.label2);
+          this.groupBox2.Location = new System.Drawing.Point(0, 415);
+          this.groupBox2.Name = "groupBox2";
+          this.groupBox2.Size = new System.Drawing.Size(636, 100);
+          this.groupBox2.TabIndex = 2;
+          this.groupBox2.TabStop = false;
+          this.groupBox2.Text = "Data";
           // 
           // label2
           // 
@@ -410,6 +315,129 @@ namespace MMEd
           this.WorldCoordLabel.TabIndex = 5;
           this.WorldCoordLabel.Text = "TBD";
           // 
+          // ViewTabImg
+          // 
+          this.ViewTabImg.Controls.Add(this.ImgPictureBox);
+          this.ViewTabImg.Location = new System.Drawing.Point(4, 22);
+          this.ViewTabImg.Name = "ViewTabImg";
+          this.ViewTabImg.Padding = new System.Windows.Forms.Padding(3);
+          this.ViewTabImg.Size = new System.Drawing.Size(636, 535);
+          this.ViewTabImg.TabIndex = 2;
+          this.ViewTabImg.Text = "Img";
+          this.ViewTabImg.UseVisualStyleBackColor = true;
+          // 
+          // ImgPictureBox
+          // 
+          this.ImgPictureBox.BackColor = System.Drawing.Color.White;
+          this.ImgPictureBox.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+          this.ImgPictureBox.Image = ((System.Drawing.Image)(resources.GetObject("ImgPictureBox.Image")));
+          this.ImgPictureBox.Location = new System.Drawing.Point(0, 0);
+          this.ImgPictureBox.Name = "ImgPictureBox";
+          this.ImgPictureBox.Size = new System.Drawing.Size(304, 254);
+          this.ImgPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+          this.ImgPictureBox.TabIndex = 0;
+          this.ImgPictureBox.TabStop = false;
+          // 
+          // ViewTabXML
+          // 
+          this.ViewTabXML.Controls.Add(this.XMLViewerCommitBtn);
+          this.ViewTabXML.Controls.Add(this.XMLTextBox);
+          this.ViewTabXML.Location = new System.Drawing.Point(4, 22);
+          this.ViewTabXML.Name = "ViewTabXML";
+          this.ViewTabXML.Padding = new System.Windows.Forms.Padding(3);
+          this.ViewTabXML.Size = new System.Drawing.Size(636, 535);
+          this.ViewTabXML.TabIndex = 1;
+          this.ViewTabXML.Text = "XML";
+          this.ViewTabXML.UseVisualStyleBackColor = true;
+          // 
+          // XMLTextBox
+          // 
+          this.XMLTextBox.AcceptsReturn = true;
+          this.XMLTextBox.AcceptsTab = true;
+          this.XMLTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                      | System.Windows.Forms.AnchorStyles.Left)
+                      | System.Windows.Forms.AnchorStyles.Right)));
+          this.XMLTextBox.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+          this.XMLTextBox.Location = new System.Drawing.Point(0, 0);
+          this.XMLTextBox.MaxLength = 0;
+          this.XMLTextBox.Multiline = true;
+          this.XMLTextBox.Name = "XMLTextBox";
+          this.XMLTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+          this.XMLTextBox.Size = new System.Drawing.Size(637, 471);
+          this.XMLTextBox.TabIndex = 0;
+          // 
+          // XMLViewerCommitBtn
+          // 
+          this.XMLViewerCommitBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+          this.XMLViewerCommitBtn.Location = new System.Drawing.Point(558, 477);
+          this.XMLViewerCommitBtn.Name = "XMLViewerCommitBtn";
+          this.XMLViewerCommitBtn.Size = new System.Drawing.Size(75, 31);
+          this.XMLViewerCommitBtn.TabIndex = 1;
+          this.XMLViewerCommitBtn.Text = "Commit";
+          this.XMLViewerCommitBtn.UseVisualStyleBackColor = true;
+          // 
+          // ViewTabSummary
+          // 
+          this.ViewTabSummary.Controls.Add(this.label1);
+          this.ViewTabSummary.Location = new System.Drawing.Point(4, 22);
+          this.ViewTabSummary.Name = "ViewTabSummary";
+          this.ViewTabSummary.Padding = new System.Windows.Forms.Padding(3);
+          this.ViewTabSummary.Size = new System.Drawing.Size(636, 535);
+          this.ViewTabSummary.TabIndex = 0;
+          this.ViewTabSummary.Text = "Summary";
+          this.ViewTabSummary.UseVisualStyleBackColor = true;
+          // 
+          // label1
+          // 
+          this.label1.AutoSize = true;
+          this.label1.Location = new System.Drawing.Point(6, 3);
+          this.label1.Name = "label1";
+          this.label1.Size = new System.Drawing.Size(175, 13);
+          this.label1.TabIndex = 0;
+          this.label1.Text = "Nothing here yet... (hint: open a file)";
+          // 
+          // ViewerTabControl
+          // 
+          this.ViewerTabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                      | System.Windows.Forms.AnchorStyles.Left)
+                      | System.Windows.Forms.AnchorStyles.Right)));
+          this.ViewerTabControl.Controls.Add(this.ViewTabSummary);
+          this.ViewerTabControl.Controls.Add(this.ViewTabXML);
+          this.ViewerTabControl.Controls.Add(this.ViewTabImg);
+          this.ViewerTabControl.Controls.Add(this.ViewTabGrid);
+          this.ViewerTabControl.Controls.Add(this.ViewTab3D);
+          this.ViewerTabControl.Controls.Add(this.ViewTabBump);
+          this.ViewerTabControl.Location = new System.Drawing.Point(3, 3);
+          this.ViewerTabControl.Name = "ViewerTabControl";
+          this.ViewerTabControl.SelectedIndex = 0;
+          this.ViewerTabControl.Size = new System.Drawing.Size(644, 561);
+          this.ViewerTabControl.TabIndex = 0;
+          this.ViewerTabControl.Selected += new System.Windows.Forms.TabControlEventHandler(this.ViewerTabControl_Selected);
+          this.ViewerTabControl.SelectedIndexChanged += new System.EventHandler(this.ViewerTabControl_SelectedIndexChanged);
+          // 
+          // ViewTabBump
+          // 
+          this.ViewTabBump.Controls.Add(this.BumpPictureBox);
+          this.ViewTabBump.Location = new System.Drawing.Point(4, 22);
+          this.ViewTabBump.Name = "ViewTabBump";
+          this.ViewTabBump.Padding = new System.Windows.Forms.Padding(3);
+          this.ViewTabBump.Size = new System.Drawing.Size(636, 535);
+          this.ViewTabBump.TabIndex = 5;
+          this.ViewTabBump.Text = "Bump";
+          this.ViewTabBump.UseVisualStyleBackColor = true;
+          // 
+          // BumpPictureBox
+          // 
+          this.BumpPictureBox.BackColor = System.Drawing.Color.White;
+          this.BumpPictureBox.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+          this.BumpPictureBox.Image = ((System.Drawing.Image)(resources.GetObject("BumpPictureBox.Image")));
+          this.BumpPictureBox.Location = new System.Drawing.Point(0, 0);
+          this.BumpPictureBox.Name = "BumpPictureBox";
+          this.BumpPictureBox.Size = new System.Drawing.Size(304, 254);
+          this.BumpPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+          this.BumpPictureBox.TabIndex = 0;
+          this.BumpPictureBox.TabStop = false;
+          // 
           // MainForm
           // 
           this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -426,21 +454,24 @@ namespace MMEd
           this.MainSplitter.Panel1.ResumeLayout(false);
           this.MainSplitter.Panel2.ResumeLayout(false);
           this.MainSplitter.ResumeLayout(false);
-          this.ViewerTabControl.ResumeLayout(false);
-          this.ViewTabSummary.ResumeLayout(false);
-          this.ViewTabSummary.PerformLayout();
-          this.ViewTabXML.ResumeLayout(false);
-          this.ViewTabXML.PerformLayout();
+          this.ViewTab3D.ResumeLayout(false);
+          this.ViewTabGrid.ResumeLayout(false);
+          this.groupBox1.ResumeLayout(false);
+          this.groupBox1.PerformLayout();
+          this.GridDisplayPanelHolder.ResumeLayout(false);
+          this.groupBox2.ResumeLayout(false);
+          this.groupBox2.PerformLayout();
           this.ViewTabImg.ResumeLayout(false);
           this.ViewTabImg.PerformLayout();
           ((System.ComponentModel.ISupportInitialize)(this.ImgPictureBox)).EndInit();
-          this.ViewTabGrid.ResumeLayout(false);
-          this.groupBox2.ResumeLayout(false);
-          this.groupBox2.PerformLayout();
-          this.GridDisplayPanelHolder.ResumeLayout(false);
-          this.groupBox1.ResumeLayout(false);
-          this.groupBox1.PerformLayout();
-          this.ViewTab3D.ResumeLayout(false);
+          this.ViewTabXML.ResumeLayout(false);
+          this.ViewTabXML.PerformLayout();
+          this.ViewTabSummary.ResumeLayout(false);
+          this.ViewTabSummary.PerformLayout();
+          this.ViewerTabControl.ResumeLayout(false);
+          this.ViewTabBump.ResumeLayout(false);
+          this.ViewTabBump.PerformLayout();
+          ((System.ComponentModel.ISupportInitialize)(this.BumpPictureBox)).EndInit();
           this.ResumeLayout(false);
           this.PerformLayout();
 
@@ -449,35 +480,37 @@ namespace MMEd
         #endregion
 
         private System.Windows.Forms.ToolStripMenuItem MnuFile;
-        private System.Windows.Forms.SplitContainer MainSplitter;
-        private System.Windows.Forms.TabPage ViewTabSummary;
-        public System.Windows.Forms.TabPage ViewTabXML;
-        private System.Windows.Forms.Label label1;
-        public System.Windows.Forms.TextBox XMLTextBox;
-        public System.Windows.Forms.PictureBox ImgPictureBox;
-        public System.Windows.Forms.TabPage ViewTabImg;
-        public System.Windows.Forms.Button XMLViewerCommitBtn;
-        public System.Windows.Forms.TreeView ChunkTreeView;
-        private System.Windows.Forms.GroupBox groupBox1;
-        public System.Windows.Forms.TabPage ViewTabGrid;
-        public System.Windows.Forms.Panel GridDisplayPanel;
-        private System.Windows.Forms.GroupBox groupBox2;
-        public System.Windows.Forms.ComboBox GridViewMetaTypeCombo;
-        public System.Windows.Forms.RadioButton GridViewRadioImgNum;
-        public System.Windows.Forms.RadioButton GridViewRadioImages;
-        public System.Windows.Forms.TabControl ViewerTabControl;
-        public System.Windows.Forms.Panel GridDisplayPanelHolder;
-        public System.Windows.Forms.TabPage ViewTab3D;
-        public GLTK.RenderingSurface Viewer3DRenderingSurface;
+      private System.Windows.Forms.SplitContainer MainSplitter;
+      public System.Windows.Forms.TreeView ChunkTreeView;
         private System.Windows.Forms.ToolStripMenuItem MnuiFileOpen;
         private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
       public System.Windows.Forms.MenuStrip mMenuStrip;
-      private System.Windows.Forms.Label label3;
-      private System.Windows.Forms.Label label2;
-      public System.Windows.Forms.Label FlatCoordLabel;
-      public System.Windows.Forms.Label TexSquareLabel;
+      public System.Windows.Forms.TabControl ViewerTabControl;
+      private System.Windows.Forms.TabPage ViewTabSummary;
+      private System.Windows.Forms.Label label1;
+      public System.Windows.Forms.TabPage ViewTabXML;
+      public System.Windows.Forms.Button XMLViewerCommitBtn;
+      public System.Windows.Forms.TextBox XMLTextBox;
+      public System.Windows.Forms.TabPage ViewTabImg;
+      public System.Windows.Forms.PictureBox ImgPictureBox;
+      public System.Windows.Forms.TabPage ViewTabGrid;
+      private System.Windows.Forms.GroupBox groupBox2;
       public System.Windows.Forms.Label WorldCoordLabel;
       private System.Windows.Forms.Label label4;
+      public System.Windows.Forms.Label FlatCoordLabel;
+      public System.Windows.Forms.Label TexSquareLabel;
+      private System.Windows.Forms.Label label3;
+      private System.Windows.Forms.Label label2;
+      public System.Windows.Forms.Panel GridDisplayPanelHolder;
+      public System.Windows.Forms.Panel GridDisplayPanel;
+      private System.Windows.Forms.GroupBox groupBox1;
+      public System.Windows.Forms.ComboBox GridViewMetaTypeCombo;
+      public System.Windows.Forms.RadioButton GridViewRadioImgNum;
+      public System.Windows.Forms.RadioButton GridViewRadioImages;
+      public System.Windows.Forms.TabPage ViewTab3D;
+      public GLTK.RenderingSurface Viewer3DRenderingSurface;
+      public System.Windows.Forms.TabPage ViewTabBump;
+      public System.Windows.Forms.PictureBox BumpPictureBox;
     }
 }
 

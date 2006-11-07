@@ -14,7 +14,7 @@ using MMEd.Util;
 
 namespace MMEd.Chunks
 {
-  public class BumpImageChunk : Chunk, Viewers.ImageViewer.IImageProvider
+  public class BumpImageChunk : Chunk, Viewers.BumpViewer.IBumpProvider, Viewers.ImageViewer.IImageProvider
   {
     int mIdx;
 

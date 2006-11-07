@@ -40,6 +40,7 @@ namespace MMEd
             //   odd
             ViewTabXML.Tag = XMLViewer.InitialiseViewer(this);
             ViewTabImg.Tag = ImageViewer.InitialiseViewer(this);
+            ViewTabBump.Tag = BumpViewer.InitialiseViewer(this);
             ViewTabGrid.Tag = GridViewer.InitialiseViewer(this);
             ViewTab3D.Tag = ThreeDeeViewer.InitialiseViewer(this);
 
