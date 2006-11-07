@@ -14,7 +14,7 @@ using MMEd.Util;
 
 namespace MMEd.Chunks
 {
-  public class BumpImageChunk : Chunk, Viewers.BumpViewer.IBumpProvider, Viewers.ImageViewer.IImageProvider
+  public class BumpImageChunk : Chunk, Viewers.ImageViewer.IImageProvider
   {
     int mIdx;
 
@@ -54,7 +54,37 @@ namespace MMEd.Chunks
       for (int x = 0; x < 8 * scale; x++)
         for (int y = 0; y < 8 * scale; y++)
           lBmp.SetPixel(x, y, palette[Data[8 * (x / scale) + y / scale]]); //(note x-y swap)
+
+      // Outline the squares in black
+      for (int x = 0; x < 8; x++)
+      {
+        for (int y = 0; y < 8 * scale; y++)
+        {
+          lBmp.SetPixel(x * scale, y, Color.Black);
+        }
+      }
+      for (int y = 0; y < 8; y++)
+      {
+        for (int x = 0; x < 8 * scale; x++)
+        {
+          lBmp.SetPixel(x, y * scale, Color.Black);
+        }
+      }
       return lBmp;
+    }
+
+    // Get the BumpTypeInfo for the supplied coordinates
+    public BumpTypeInfo GetInfo(int xiX, int xiY)
+    {
+      Byte lByte = Data[(8 * xiX) + xiY];
+
+      return (BumpTypeInfo)BumpTypeToBumpTypeInfoMap[(byte)lByte];
+    }
+
+    // Set the BumpTypeInfo for the supplied coordinates
+    public void SetInfo(int xiX, int xiY, BumpTypeInfo xiInfo)
+    {
+      Data[(8 * xiX) + xiY] = xiInfo.Val;
     }
 
     public static Hashtable BumpTypeToBumpTypeInfoMap = makeBumpTypeToBumpTypeInfoMap();
@@ -64,16 +94,54 @@ namespace MMEd.Chunks
       // Should this be in some kind of data file, for easy editing?
       // This will probably be fine, while everyone has VS
       Hashtable ht = new Hashtable();
-      BTF(ht, 0, 0x000000, "plain");
-      BTF(ht, 1, 0xcccccc, "wall");
-      BTF(ht, 2, 0xf8e8d8, "milk");
-      BTF(ht, 3, 0xa87020, "syrup");
-      BTF(ht, 4, 0xff0000, "ketchup");
-      BTF(ht, 5, 0x89cba0, "road border");
-      BTF(ht, 6, 0x89cbbf, "road border2");
-      BTF(ht, 7, 0x4551ec, "water");
+      BTF(ht, 0x00, 0x000000, "plain");
+      BTF(ht, 0x01, 0xcccccc, "wall");
+      BTF(ht, 0x02, 0xf8e8d8, "milk");
+      BTF(ht, 0x03, 0xa87020, "syrup");
+      BTF(ht, 0x04, 0xff0000, "ketchup");
+      BTF(ht, 0x05, 0x89cba0, "road border");
+      BTF(ht, 0x06, 0x89cbbf, "road border2");
+      BTF(ht, 0x07, 0x4551ec, "water");
+      BTF(ht, 0x08, 0xff00ff, "unknown");
+      BTF(ht, 0x09, 0xff00ff, "unknown");
+      BTF(ht, 0x0A, 0xff00ff, "unknown");
+      BTF(ht, 0x0B, 0xff00ff, "unknown");
+      BTF(ht, 0x0C, 0xff00ff, "unknown");
+      BTF(ht, 0x0D, 0xff00ff, "unknown");
+      BTF(ht, 0x0E, 0xff00ff, "unknown");
+      BTF(ht, 0x0F, 0xff00ff, "unknown");
+      BTF(ht, 0x10, 0xff00ff, "unknown");
+      BTF(ht, 0x11, 0xff00ff, "unknown");
+      BTF(ht, 0x12, 0xff00ff, "unknown");
+      BTF(ht, 0x13, 0xff00ff, "unknown");
+      BTF(ht, 0x14, 0xff00ff, "unknown");
+      BTF(ht, 0x15, 0xff00ff, "unknown");
       BTF(ht, 0x16, 0xffe400, "jump woosh");
+      BTF(ht, 0x17, 0xff00ff, "unknown");
+      BTF(ht, 0x18, 0xff00ff, "unknown");
+      BTF(ht, 0x19, 0xff00ff, "unknown");
+      BTF(ht, 0x1A, 0xff00ff, "unknown");
+      BTF(ht, 0x1B, 0xff00ff, "unknown");
+      BTF(ht, 0x1C, 0xff00ff, "unknown");
+      BTF(ht, 0x1D, 0xff00ff, "unknown");
+      BTF(ht, 0x1E, 0xff00ff, "unknown");
+      BTF(ht, 0x1F, 0xff00ff, "unknown");
+      BTF(ht, 0x20, 0xff00ff, "unknown");
+      BTF(ht, 0x21, 0xff00ff, "unknown");
+      BTF(ht, 0x22, 0xff00ff, "unknown");
       BTF(ht, 0x23, 0xc9b549, "sand");
+      BTF(ht, 0x24, 0xff00ff, "unknown");
+      BTF(ht, 0x25, 0xff00ff, "unknown");
+      BTF(ht, 0x26, 0xff00ff, "unknown");
+      BTF(ht, 0x27, 0xff00ff, "unknown");
+      BTF(ht, 0x28, 0xff00ff, "unknown");
+      BTF(ht, 0x29, 0xff00ff, "unknown");
+      BTF(ht, 0x2A, 0xff00ff, "unknown");
+      BTF(ht, 0x2B, 0xff00ff, "unknown");
+      BTF(ht, 0x2C, 0xff00ff, "unknown");
+      BTF(ht, 0x2D, 0xff00ff, "unknown");
+      BTF(ht, 0x2E, 0xff00ff, "unknown");
+      BTF(ht, 0x2F, 0xff00ff, "unknown");
       return ht;
     }
 

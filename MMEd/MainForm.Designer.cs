@@ -65,6 +65,7 @@ namespace MMEd
           this.panel1 = new System.Windows.Forms.Panel();
           this.VRAMPictureBox = new System.Windows.Forms.PictureBox();
           this.VRAMStatusStrip = new System.Windows.Forms.StatusStrip();
+          this.BumpCombo = new System.Windows.Forms.ComboBox();
           this.mMenuStrip.SuspendLayout();
           this.MainSplitter.Panel1.SuspendLayout();
           this.MainSplitter.Panel2.SuspendLayout();
@@ -425,6 +426,7 @@ namespace MMEd
           // 
           // ViewTabBump
           // 
+          this.ViewTabBump.Controls.Add(this.BumpCombo);
           this.ViewTabBump.Controls.Add(this.BumpPictureBox);
           this.ViewTabBump.Location = new System.Drawing.Point(4, 22);
           this.ViewTabBump.Name = "ViewTabBump";
@@ -486,6 +488,14 @@ namespace MMEd
           this.VRAMStatusStrip.Size = new System.Drawing.Size(636, 22);
           this.VRAMStatusStrip.TabIndex = 1;
           this.VRAMStatusStrip.Text = "statusStrip1";
+          // 
+          // BumpCombo
+          // 
+          this.BumpCombo.FormattingEnabled = true;
+          this.BumpCombo.Location = new System.Drawing.Point(347, 25);
+          this.BumpCombo.Name = "BumpCombo";
+          this.BumpCombo.Size = new System.Drawing.Size(121, 21);
+          this.BumpCombo.TabIndex = 1;
           // 
           // MainForm
           // 
@@ -569,6 +579,7 @@ namespace MMEd
       private System.Windows.Forms.Panel panel1;
       public System.Windows.Forms.PictureBox VRAMPictureBox;
       public System.Windows.Forms.StatusStrip VRAMStatusStrip;
+      public System.Windows.Forms.ComboBox BumpCombo;
     }
 }
 

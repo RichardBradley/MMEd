@@ -10,16 +10,11 @@ namespace MMEd.Viewers
 {
   public class BumpViewer : Viewer
   {
-    public interface IBumpProvider
-    {
-      Image ToImage();
-    }
-    
     private BumpViewer(MainForm xiMainForm) : base(xiMainForm) { }
 
     public override bool CanViewChunk(Chunk xiChunk)
     {
-        return xiChunk is Viewers.BumpViewer.IBumpProvider;
+      return xiChunk is BumpImageChunk;
     }
 
     // Create an instance of the viewer manager class
@@ -32,7 +27,7 @@ namespace MMEd.Viewers
 
     public override void SetSubject(Chunk xiChunk)
     {
-      if (!(xiChunk is BumpViewer.IBumpProvider)) xiChunk = null;
+      if (!(xiChunk is BumpImageChunk)) xiChunk = null;
       if (mLastSubject == xiChunk) return;
       if (xiChunk == null)
       {
@@ -40,7 +35,8 @@ namespace MMEd.Viewers
       }
       else
       {
-        Image im = ((BumpViewer.IBumpProvider)xiChunk).ToImage();
+        BumpImageChunk lBump = (BumpImageChunk)xiChunk;
+        Image im = lBump.ToImage();
         mMainForm.BumpPictureBox.Image = im;
         int scaleFactor =
             Math.Max(1, 128 / Math.Max(Math.Max(im.Width, im.Height), 1));
@@ -55,6 +51,7 @@ namespace MMEd.Viewers
           mMainForm.BumpPictureBox.SizeMode = PictureBoxSizeMode.AutoSize;
         }
 
+        mMainForm.BumpCombo.Text = lBump.GetInfo(0, 0).Description;
       }
       mLastSubject = xiChunk;
     }
