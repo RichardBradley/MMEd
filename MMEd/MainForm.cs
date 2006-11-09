@@ -45,6 +45,9 @@ namespace MMEd
             ViewTab3D.Tag = ThreeDeeViewer.InitialiseViewer(this);
             ViewTabVRAM.Tag = VRAMViewer.InitialiseViewer(this);
 
+            this.BumpViewPictureBox.Click += new System.EventHandler(((BumpViewer)ViewTabBump.Tag).BumpViewPictureBox_Click);
+            this.BumpEditPictureBox.Click += new System.EventHandler(((BumpViewer)ViewTabBump.Tag).BumpEditPictureBox_Click);
+
             //auto-load last level
             if (mLocalSettings.LastOpenedFile != null)
             {
@@ -216,20 +219,20 @@ namespace MMEd
 
         private void ViewerTabControl_SelectedIndexChanged(object sender, EventArgs e)
         {
-            TabPage lActiveViewerPage = ViewerTabControl.SelectedTab;
-            TreeNode lActiveNode = ChunkTreeView.SelectedNode;
-            Chunk lActiveChunk = lActiveNode == null ? null : (Chunk)lActiveNode.Tag;
-            foreach (Viewer lViewer in Viewer.GetViewers())
+          TabPage lActiveViewerPage = ViewerTabControl.SelectedTab;
+          TreeNode lActiveNode = ChunkTreeView.SelectedNode;
+          Chunk lActiveChunk = lActiveNode == null ? null : (Chunk)lActiveNode.Tag;
+          foreach (Viewer lViewer in Viewer.GetViewers())
+          {
+            if (lViewer.Tab == lActiveViewerPage)
             {
-                if (lViewer.Tab == lActiveViewerPage)
-                {
-                    lViewer.SetSubject(lActiveChunk);
-                }
-                else
-                {
-                    lViewer.SetSubject(null);
-                }
+              lViewer.SetSubject(lActiveChunk);
             }
+            else
+            {
+              lViewer.SetSubject(null);
+            }
+          }
         }
     }
 }

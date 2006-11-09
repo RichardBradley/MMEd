@@ -16,10 +16,57 @@ namespace MMEd.Chunks
 {
   public class BumpImageChunk : Chunk, Viewers.ImageViewer.IImageProvider
   {
-    int mIdx;
-
-    [Description("The data.")]
-    public byte[] Data;
+    public enum eBumpType
+    {
+      plain = 0x00,
+      wall = 0x01,
+      milk = 0x02,
+      syrup = 0x03,
+      ketchup = 0x04,
+      roadBorder = 0x05,
+      roadBorder2 = 0x06,
+      water = 0x07,
+      unknown08 = 0x08,
+      unknown09 = 0x09,
+      unknown0A = 0x0A,
+      unknown0B = 0x0B,
+      unknown0C = 0x0C,
+      unknown0D = 0x0D,
+      unknown0E = 0x0E,
+      unknown0F = 0x0F,
+      unknown10 = 0x10,
+      unknown11 = 0x11,
+      unknown12 = 0x12,
+      unknown13 = 0x13,
+      unknown14 = 0x14,
+      unknown15 = 0x15,
+      jumpWoosh = 0x16,
+      unknown17 = 0x17,
+      unknown18 = 0x18,
+      unknown19 = 0x19,
+      unknown1A = 0x1A,
+      unknown1B = 0x1B,
+      unknown1C = 0x1C,
+      unknown1D = 0x1D,
+      unknown1E = 0x1E,
+      unknown1F = 0x1F,
+      unknown20 = 0x20,
+      unknown21 = 0x21,
+      unknown22 = 0x22,
+      sand = 0x23,
+      unknown24 = 0x24,
+      unknown25 = 0x25,
+      unknown26 = 0x26,
+      unknown27 = 0x27,
+      unknown28 = 0x28,
+      unknown29 = 0x29,
+      unknown2A = 0x2A,
+      unknown2B = 0x2B,
+      unknown2C = 0x2C,
+      unknown2D = 0x2D,
+      unknown2E = 0x2E,
+      unknown2F = 0x2F,
+    }
 
     public BumpImageChunk() { }
     public BumpImageChunk(int idx, Stream inStr)
@@ -49,42 +96,60 @@ namespace MMEd.Chunks
 
     public Image ToImage()
     {
-      int scale = 8;
-      Bitmap lBmp = new Bitmap(8 * scale, 8 * scale);
-      for (int x = 0; x < 8 * scale; x++)
-        for (int y = 0; y < 8 * scale; y++)
-          lBmp.SetPixel(x, y, palette[Data[8 * (x / scale) + y / scale]]); //(note x-y swap)
+      palette = makePalette();
+      Bitmap lBmp = new Bitmap(8 * mScale, 8 * mScale);
+      for (int x = 0; x < 8 * mScale; x++)
+        for (int y = 0; y < 8 * mScale; y++)
+          lBmp.SetPixel(x, y, palette[Data[8 * (x / mScale) + y / mScale]]); //(note x-y swap)
 
       // Outline the squares in black
       for (int x = 0; x < 8; x++)
       {
-        for (int y = 0; y < 8 * scale; y++)
+        for (int y = 0; y < 8 * mScale; y++)
         {
-          lBmp.SetPixel(x * scale, y, Color.Black);
+          lBmp.SetPixel(x * mScale, y, Color.Black);
         }
       }
       for (int y = 0; y < 8; y++)
       {
-        for (int x = 0; x < 8 * scale; x++)
+        for (int x = 0; x < 8 * mScale; x++)
         {
-          lBmp.SetPixel(x, y * scale, Color.Black);
+          lBmp.SetPixel(x, y * mScale, Color.Black);
         }
+      }
+
+      // Outline selected pixel in white
+      for (int x = mX * mScale; x < (mX + 1) * mScale; ++x)
+      {
+        lBmp.SetPixel(x, mY * mScale, Color.White);
+        lBmp.SetPixel(x, ((mY + 1) * mScale) - 1, Color.White);
+      }
+      for (int y = mY * mScale; y < (mY + 1) * mScale; ++y)
+      {
+        lBmp.SetPixel(mX * mScale, y, Color.White);
+        lBmp.SetPixel(((mX + 1) * mScale) - 1, y, Color.White);
       }
       return lBmp;
     }
 
-    // Get the BumpTypeInfo for the supplied coordinates
-    public BumpTypeInfo GetInfo(int xiX, int xiY)
+    public void SetSelectedPixel(int xiX, int xiY)
     {
-      Byte lByte = Data[(8 * xiX) + xiY];
-
-      return (BumpTypeInfo)BumpTypeToBumpTypeInfoMap[(byte)lByte];
+      mX = xiX / mScale;
+      mY = xiY / mScale;
     }
 
-    // Set the BumpTypeInfo for the supplied coordinates
-    public void SetInfo(int xiX, int xiY, BumpTypeInfo xiInfo)
+    // Get the eBumpType for the supplied coordinates
+    public eBumpType GetPixelType(int xiX, int xiY)
     {
-      Data[(8 * xiX) + xiY] = xiInfo.Val;
+      // Brackets are needed so that int division happens first
+      return (eBumpType)Data[(8 * (xiX / mScale)) + (xiY / mScale)];
+    }
+
+    // Set the eBumpType for the supplied coordinates
+    public void SetPixelType(int xiX, int xiY, eBumpType xiType)
+    {
+      // Brackets are needed so that int division happens first
+      Data[(8 * (xiX / mScale)) + (xiY / mScale)] = (byte)xiType;
     }
 
     public static Hashtable BumpTypeToBumpTypeInfoMap = makeBumpTypeToBumpTypeInfoMap();
@@ -94,60 +159,60 @@ namespace MMEd.Chunks
       // Should this be in some kind of data file, for easy editing?
       // This will probably be fine, while everyone has VS
       Hashtable ht = new Hashtable();
-      BTF(ht, 0x00, 0x000000, "plain");
-      BTF(ht, 0x01, 0xcccccc, "wall");
-      BTF(ht, 0x02, 0xf8e8d8, "milk");
-      BTF(ht, 0x03, 0xa87020, "syrup");
-      BTF(ht, 0x04, 0xff0000, "ketchup");
-      BTF(ht, 0x05, 0x89cba0, "road border");
-      BTF(ht, 0x06, 0x89cbbf, "road border2");
-      BTF(ht, 0x07, 0x4551ec, "water");
-      BTF(ht, 0x08, 0xff00ff, "unknown");
-      BTF(ht, 0x09, 0xff00ff, "unknown");
-      BTF(ht, 0x0A, 0xff00ff, "unknown");
-      BTF(ht, 0x0B, 0xff00ff, "unknown");
-      BTF(ht, 0x0C, 0xff00ff, "unknown");
-      BTF(ht, 0x0D, 0xff00ff, "unknown");
-      BTF(ht, 0x0E, 0xff00ff, "unknown");
-      BTF(ht, 0x0F, 0xff00ff, "unknown");
-      BTF(ht, 0x10, 0xff00ff, "unknown");
-      BTF(ht, 0x11, 0xff00ff, "unknown");
-      BTF(ht, 0x12, 0xff00ff, "unknown");
-      BTF(ht, 0x13, 0xff00ff, "unknown");
-      BTF(ht, 0x14, 0xff00ff, "unknown");
-      BTF(ht, 0x15, 0xff00ff, "unknown");
-      BTF(ht, 0x16, 0xffe400, "jump woosh");
-      BTF(ht, 0x17, 0xff00ff, "unknown");
-      BTF(ht, 0x18, 0xff00ff, "unknown");
-      BTF(ht, 0x19, 0xff00ff, "unknown");
-      BTF(ht, 0x1A, 0xff00ff, "unknown");
-      BTF(ht, 0x1B, 0xff00ff, "unknown");
-      BTF(ht, 0x1C, 0xff00ff, "unknown");
-      BTF(ht, 0x1D, 0xff00ff, "unknown");
-      BTF(ht, 0x1E, 0xff00ff, "unknown");
-      BTF(ht, 0x1F, 0xff00ff, "unknown");
-      BTF(ht, 0x20, 0xff00ff, "unknown");
-      BTF(ht, 0x21, 0xff00ff, "unknown");
-      BTF(ht, 0x22, 0xff00ff, "unknown");
-      BTF(ht, 0x23, 0xc9b549, "sand");
-      BTF(ht, 0x24, 0xff00ff, "unknown");
-      BTF(ht, 0x25, 0xff00ff, "unknown");
-      BTF(ht, 0x26, 0xff00ff, "unknown");
-      BTF(ht, 0x27, 0xff00ff, "unknown");
-      BTF(ht, 0x28, 0xff00ff, "unknown");
-      BTF(ht, 0x29, 0xff00ff, "unknown");
-      BTF(ht, 0x2A, 0xff00ff, "unknown");
-      BTF(ht, 0x2B, 0xff00ff, "unknown");
-      BTF(ht, 0x2C, 0xff00ff, "unknown");
-      BTF(ht, 0x2D, 0xff00ff, "unknown");
-      BTF(ht, 0x2E, 0xff00ff, "unknown");
-      BTF(ht, 0x2F, 0xff00ff, "unknown");
+      BTF(ht, eBumpType.plain, 0x000000);
+      BTF(ht, eBumpType.wall, 0xcccccc);
+      BTF(ht, eBumpType.milk, 0xf8e8d8);
+      BTF(ht, eBumpType.syrup, 0xa87020);
+      BTF(ht, eBumpType.ketchup, 0xff0000);
+      BTF(ht, eBumpType.roadBorder, 0x89cba0);
+      BTF(ht, eBumpType.roadBorder2, 0x89cbbf);
+      BTF(ht, eBumpType.water, 0x4551ec);
+      BTF(ht, eBumpType.unknown08, 0xff00ff);
+      BTF(ht, eBumpType.unknown09, 0xff00ff);
+      BTF(ht, eBumpType.unknown0A, 0xff00ff);
+      BTF(ht, eBumpType.unknown0B, 0xff00ff);
+      BTF(ht, eBumpType.unknown0C, 0xff00ff);
+      BTF(ht, eBumpType.unknown0D, 0xff00ff);
+      BTF(ht, eBumpType.unknown0E, 0xff00ff);
+      BTF(ht, eBumpType.unknown0F, 0xff00ff);
+      BTF(ht, eBumpType.unknown10, 0xff00ff);
+      BTF(ht, eBumpType.unknown11, 0xff00ff);
+      BTF(ht, eBumpType.unknown12, 0xff00ff);
+      BTF(ht, eBumpType.unknown13, 0xff00ff);
+      BTF(ht, eBumpType.unknown14, 0xff00ff);
+      BTF(ht, eBumpType.unknown15, 0xff00ff);
+      BTF(ht, eBumpType.jumpWoosh, 0xffe400);
+      BTF(ht, eBumpType.unknown17, 0xff00ff);
+      BTF(ht, eBumpType.unknown18, 0xff00ff);
+      BTF(ht, eBumpType.unknown19, 0xff00ff);
+      BTF(ht, eBumpType.unknown1A, 0xff00ff);
+      BTF(ht, eBumpType.unknown1B, 0xff00ff);
+      BTF(ht, eBumpType.unknown1C, 0xff00ff);
+      BTF(ht, eBumpType.unknown1D, 0xff00ff);
+      BTF(ht, eBumpType.unknown1E, 0xff00ff);
+      BTF(ht, eBumpType.unknown1F, 0xff00ff);
+      BTF(ht, eBumpType.unknown20, 0xff00ff);
+      BTF(ht, eBumpType.unknown21, 0xff00ff);
+      BTF(ht, eBumpType.unknown22, 0xff00ff);
+      BTF(ht, eBumpType.sand, 0xc9b549);
+      BTF(ht, eBumpType.unknown24, 0xff00ff);
+      BTF(ht, eBumpType.unknown25, 0xff00ff);
+      BTF(ht, eBumpType.unknown26, 0xff00ff);
+      BTF(ht, eBumpType.unknown27, 0xff00ff);
+      BTF(ht, eBumpType.unknown28, 0xff00ff);
+      BTF(ht, eBumpType.unknown29, 0xff00ff);
+      BTF(ht, eBumpType.unknown2A, 0xff00ff);
+      BTF(ht, eBumpType.unknown2B, 0xff00ff);
+      BTF(ht, eBumpType.unknown2C, 0xff00ff);
+      BTF(ht, eBumpType.unknown2D, 0xff00ff);
+      BTF(ht, eBumpType.unknown2E, 0xff00ff);
+      BTF(ht, eBumpType.unknown2F, 0xff00ff);
       return ht;
     }
 
-    private static void BTF(Hashtable xiHt, byte xiVal, int xiColor, string xiDescription)
+    private static void BTF(Hashtable xiHt, eBumpType xiVal, int xiColor)
     {
-      xiHt[xiVal] = new BumpTypeInfo(xiVal, Color.FromArgb(xiColor | ~0x00ffffff), xiDescription);
+      xiHt[xiVal] = new BumpTypeInfo(xiVal, Color.FromArgb(xiColor | ~0x00ffffff));
     }
 
     private static Color[] palette = makePalette();
@@ -165,12 +230,13 @@ namespace MMEd.Chunks
 
     public class BumpTypeInfo
     {
-      public byte Val; public Color Color; public string Description;
-      public BumpTypeInfo(byte xiVal, Color xiColor, string xiDescription)
+      public eBumpType Val;
+      public Color Color;
+      
+      public BumpTypeInfo(eBumpType xiVal, Color xiColor)
       {
         Val = xiVal;
         Color = xiColor;
-        Description = xiDescription;
       }
       public BumpTypeInfo() { }
     }
@@ -179,5 +245,12 @@ namespace MMEd.Chunks
     {
       throw new Exception("The method or operation is not implemented.");
     }
+
+    int mIdx;
+    [Description("The data.")]
+    public byte[] Data;
+    private int mX;
+    private int mY;
+    private const int mScale = 16;
   }
 }

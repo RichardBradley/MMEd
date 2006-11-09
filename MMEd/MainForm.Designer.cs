@@ -60,12 +60,18 @@ namespace MMEd
           this.ViewTab3D = new System.Windows.Forms.TabPage();
           this.Viewer3DRenderingSurface = new GLTK.RenderingSurface();
           this.ViewTabBump = new System.Windows.Forms.TabPage();
-          this.BumpPictureBox = new System.Windows.Forms.PictureBox();
+          this.label8 = new System.Windows.Forms.Label();
+          this.label7 = new System.Windows.Forms.Label();
+          this.label6 = new System.Windows.Forms.Label();
+          this.label5 = new System.Windows.Forms.Label();
+          this.BumpTypeLabel = new System.Windows.Forms.Label();
+          this.BumpViewPictureBox = new System.Windows.Forms.PictureBox();
+          this.BumpCombo = new System.Windows.Forms.ComboBox();
+          this.BumpEditPictureBox = new System.Windows.Forms.PictureBox();
           this.ViewTabVRAM = new System.Windows.Forms.TabPage();
           this.panel1 = new System.Windows.Forms.Panel();
           this.VRAMPictureBox = new System.Windows.Forms.PictureBox();
           this.VRAMStatusStrip = new System.Windows.Forms.StatusStrip();
-          this.BumpCombo = new System.Windows.Forms.ComboBox();
           this.mMenuStrip.SuspendLayout();
           this.MainSplitter.Panel1.SuspendLayout();
           this.MainSplitter.Panel2.SuspendLayout();
@@ -81,7 +87,8 @@ namespace MMEd
           this.groupBox1.SuspendLayout();
           this.ViewTab3D.SuspendLayout();
           this.ViewTabBump.SuspendLayout();
-          ((System.ComponentModel.ISupportInitialize)(this.BumpPictureBox)).BeginInit();
+          ((System.ComponentModel.ISupportInitialize)(this.BumpViewPictureBox)).BeginInit();
+          ((System.ComponentModel.ISupportInitialize)(this.BumpEditPictureBox)).BeginInit();
           this.ViewTabVRAM.SuspendLayout();
           this.panel1.SuspendLayout();
           ((System.ComponentModel.ISupportInitialize)(this.VRAMPictureBox)).BeginInit();
@@ -426,8 +433,14 @@ namespace MMEd
           // 
           // ViewTabBump
           // 
+          this.ViewTabBump.Controls.Add(this.label8);
+          this.ViewTabBump.Controls.Add(this.label7);
+          this.ViewTabBump.Controls.Add(this.label6);
+          this.ViewTabBump.Controls.Add(this.label5);
+          this.ViewTabBump.Controls.Add(this.BumpTypeLabel);
+          this.ViewTabBump.Controls.Add(this.BumpViewPictureBox);
           this.ViewTabBump.Controls.Add(this.BumpCombo);
-          this.ViewTabBump.Controls.Add(this.BumpPictureBox);
+          this.ViewTabBump.Controls.Add(this.BumpEditPictureBox);
           this.ViewTabBump.Location = new System.Drawing.Point(4, 22);
           this.ViewTabBump.Name = "ViewTabBump";
           this.ViewTabBump.Padding = new System.Windows.Forms.Padding(3);
@@ -436,17 +449,85 @@ namespace MMEd
           this.ViewTabBump.Text = "Bump";
           this.ViewTabBump.UseVisualStyleBackColor = true;
           // 
-          // BumpPictureBox
+          // label8
           // 
-          this.BumpPictureBox.BackColor = System.Drawing.Color.White;
-          this.BumpPictureBox.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-          this.BumpPictureBox.Image = ((System.Drawing.Image)(resources.GetObject("BumpPictureBox.Image")));
-          this.BumpPictureBox.Location = new System.Drawing.Point(0, 0);
-          this.BumpPictureBox.Name = "BumpPictureBox";
-          this.BumpPictureBox.Size = new System.Drawing.Size(304, 254);
-          this.BumpPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-          this.BumpPictureBox.TabIndex = 0;
-          this.BumpPictureBox.TabStop = false;
+          this.label8.AutoSize = true;
+          this.label8.Location = new System.Drawing.Point(134, 284);
+          this.label8.Name = "label8";
+          this.label8.Size = new System.Drawing.Size(165, 13);
+          this.label8.TabIndex = 7;
+          this.label8.Text = "Click a pixel to view its bump type";
+          // 
+          // label7
+          // 
+          this.label7.AutoSize = true;
+          this.label7.Location = new System.Drawing.Point(131, 80);
+          this.label7.Name = "label7";
+          this.label7.Size = new System.Drawing.Size(325, 13);
+          this.label7.TabIndex = 6;
+          this.label7.Text = "Select a bump type then click the pixels you want to set to that type";
+          // 
+          // label6
+          // 
+          this.label6.AutoSize = true;
+          this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+          this.label6.Location = new System.Drawing.Point(3, 237);
+          this.label6.Name = "label6";
+          this.label6.Size = new System.Drawing.Size(148, 20);
+          this.label6.TabIndex = 5;
+          this.label6.Text = "View (Does work)";
+          // 
+          // label5
+          // 
+          this.label5.AutoSize = true;
+          this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+          this.label5.Location = new System.Drawing.Point(3, 15);
+          this.label5.Name = "label5";
+          this.label5.Size = new System.Drawing.Size(191, 20);
+          this.label5.TabIndex = 4;
+          this.label5.Text = "Edit (Doesn\'t work yet)";
+          // 
+          // BumpTypeLabel
+          // 
+          this.BumpTypeLabel.AutoSize = true;
+          this.BumpTypeLabel.Location = new System.Drawing.Point(134, 260);
+          this.BumpTypeLabel.Name = "BumpTypeLabel";
+          this.BumpTypeLabel.Size = new System.Drawing.Size(84, 13);
+          this.BumpTypeLabel.TabIndex = 3;
+          this.BumpTypeLabel.Text = "BumpTypeLabel";
+          // 
+          // BumpViewPictureBox
+          // 
+          this.BumpViewPictureBox.BackColor = System.Drawing.Color.White;
+          this.BumpViewPictureBox.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+          this.BumpViewPictureBox.InitialImage = null;
+          this.BumpViewPictureBox.Location = new System.Drawing.Point(0, 260);
+          this.BumpViewPictureBox.Name = "BumpViewPictureBox";
+          this.BumpViewPictureBox.Size = new System.Drawing.Size(128, 128);
+          this.BumpViewPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+          this.BumpViewPictureBox.TabIndex = 2;
+          this.BumpViewPictureBox.TabStop = false;
+          // 
+          // BumpCombo
+          // 
+          this.BumpCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+          this.BumpCombo.FormattingEnabled = true;
+          this.BumpCombo.Location = new System.Drawing.Point(134, 46);
+          this.BumpCombo.Name = "BumpCombo";
+          this.BumpCombo.Size = new System.Drawing.Size(121, 21);
+          this.BumpCombo.TabIndex = 1;
+          // 
+          // BumpEditPictureBox
+          // 
+          this.BumpEditPictureBox.BackColor = System.Drawing.Color.White;
+          this.BumpEditPictureBox.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+          this.BumpEditPictureBox.InitialImage = null;
+          this.BumpEditPictureBox.Location = new System.Drawing.Point(0, 43);
+          this.BumpEditPictureBox.Name = "BumpEditPictureBox";
+          this.BumpEditPictureBox.Size = new System.Drawing.Size(128, 128);
+          this.BumpEditPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+          this.BumpEditPictureBox.TabIndex = 0;
+          this.BumpEditPictureBox.TabStop = false;
           // 
           // ViewTabVRAM
           // 
@@ -489,14 +570,6 @@ namespace MMEd
           this.VRAMStatusStrip.TabIndex = 1;
           this.VRAMStatusStrip.Text = "statusStrip1";
           // 
-          // BumpCombo
-          // 
-          this.BumpCombo.FormattingEnabled = true;
-          this.BumpCombo.Location = new System.Drawing.Point(347, 25);
-          this.BumpCombo.Name = "BumpCombo";
-          this.BumpCombo.Size = new System.Drawing.Size(121, 21);
-          this.BumpCombo.TabIndex = 1;
-          // 
           // MainForm
           // 
           this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -530,7 +603,8 @@ namespace MMEd
           this.ViewTab3D.ResumeLayout(false);
           this.ViewTabBump.ResumeLayout(false);
           this.ViewTabBump.PerformLayout();
-          ((System.ComponentModel.ISupportInitialize)(this.BumpPictureBox)).EndInit();
+          ((System.ComponentModel.ISupportInitialize)(this.BumpViewPictureBox)).EndInit();
+          ((System.ComponentModel.ISupportInitialize)(this.BumpEditPictureBox)).EndInit();
           this.ViewTabVRAM.ResumeLayout(false);
           this.ViewTabVRAM.PerformLayout();
           this.panel1.ResumeLayout(false);
@@ -574,12 +648,18 @@ namespace MMEd
       public System.Windows.Forms.TabPage ViewTab3D;
       public GLTK.RenderingSurface Viewer3DRenderingSurface;
       public System.Windows.Forms.TabPage ViewTabBump;
-      public System.Windows.Forms.PictureBox BumpPictureBox;
+      public System.Windows.Forms.PictureBox BumpEditPictureBox;
       public System.Windows.Forms.TabPage ViewTabVRAM;
       private System.Windows.Forms.Panel panel1;
       public System.Windows.Forms.PictureBox VRAMPictureBox;
       public System.Windows.Forms.StatusStrip VRAMStatusStrip;
       public System.Windows.Forms.ComboBox BumpCombo;
+      public System.Windows.Forms.PictureBox BumpViewPictureBox;
+      public System.Windows.Forms.Label BumpTypeLabel;
+      private System.Windows.Forms.Label label5;
+      private System.Windows.Forms.Label label6;
+      private System.Windows.Forms.Label label8;
+      private System.Windows.Forms.Label label7;
     }
 }
 
