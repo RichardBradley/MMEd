@@ -20,7 +20,7 @@ namespace MMEd.Viewers
       : base(xiMainForm)
     {
       mMainForm.KeyPreview = true;
-      mMainForm.KeyPress += new KeyPressEventHandler(this.KeyPressHandle);
+      mMainForm.KeyPress += new KeyPressEventHandler(MainForm_KeyPress);
       mMainForm.FormClosing += new FormClosingEventHandler(mMainForm_FormClosing);
 
       mMainForm.ChunkTreeView.NodeMouseClick += new TreeNodeMouseClickEventHandler(ChunkTreeView_NodeMouseClick);
@@ -116,21 +116,13 @@ namespace MMEd.Viewers
       Camera lCamera = mViews[(RenderingSurface)sender].Camera;
       bool lCameraIsUpsideDown = lCamera.YAxis.Dot(Vector.ZAxis) < 0;
       double lDelta = -0.02 * (double)e.Delta;
-      if (lCamera.ProjectionMode == eProjectionMode.Orthographic)
+      Vector lStartPos = lCamera.Position.GetPositionVector();
+      Vector lMoveVec = MoveScale * lDelta * lCamera.ZAxis;
+      //don't move through the origin
+      if (lMoveVec.Dot(lStartPos) / lStartPos.LengthSquared > -1.0)
       {
-        lCamera.Move(MoveScale * lDelta * lCamera.ZAxis);
+        lCamera.Move(lMoveVec);
         ((RenderingSurface)sender).Invalidate();
-      }
-      else if (MovementMode == eMovementMode.InspectMode)
-      {
-        Vector lStartPos = lCamera.Position.GetPositionVector();
-        Vector lMoveVec = MoveScale * lDelta * lCamera.ZAxis;
-        //don't move through the origin
-        if (lMoveVec.Dot(lStartPos) / lStartPos.LengthSquared > -1.0)
-        {
-          lCamera.Move(lMoveVec);
-          ((RenderingSurface)sender).Invalidate();
-        }
       }
     }
 
@@ -154,24 +146,6 @@ namespace MMEd.Viewers
           switch (MovementMode)
           {
             case eMovementMode.FlyMode:
-              lCamera.Move(-0.1 * MoveScale * (lNewMousePoint.X - mLastMouseDown.X) * lCamera.XAxis);
-              lCamera.Move(0.1 * MoveScale * (lNewMousePoint.Y - mLastMouseDown.Y) * lCamera.ZAxis);
-              break;
-            default: throw new Exception("Unreachable case");
-          }
-        }
-      }
-      if (mDraggingButton == MouseButtons.Right)
-      {
-        if (lCamera.ProjectionMode == eProjectionMode.Orthographic)
-        {
-          lCamera.Move(0.1 * MoveScale * (lNewMousePoint.Y - mLastMouseDown.Y) * lCamera.ZAxis);
-        }
-        else
-        {
-          switch (MovementMode)
-          {
-            case eMovementMode.FlyMode:
               lCamera.Rotate(0.01 * (lNewMousePoint.X - mLastMouseDown.X), lCameraIsUpsideDown ? Vector.ZAxis : -Vector.ZAxis);
               lCamera.Rotate(0.01 * (lNewMousePoint.Y - mLastMouseDown.Y), lCamera.XAxis);
               break;
@@ -180,6 +154,22 @@ namespace MMEd.Viewers
               lCamera.RotateAboutWorldOrigin(0.01 * (lNewMousePoint.Y - mLastMouseDown.Y), lCamera.XAxis);
               break;
             default: throw new Exception("Unreachable case");
+          }
+        }
+      }
+      if (mDraggingButton == MouseButtons.Right && lCamera.ProjectionMode == eProjectionMode.Perspective)
+      {
+        if (lCamera.ProjectionMode == eProjectionMode.Orthographic)
+        {
+          lCamera.Move(-0.1 * MoveScale * (lNewMousePoint.X - mLastMouseDown.X) * lCamera.XAxis);
+          lCamera.Move(0.1 * MoveScale * (lNewMousePoint.Y - mLastMouseDown.Y) * lCamera.YAxis);
+        }
+        else
+        {
+          if (lCamera.ProjectionMode == eProjectionMode.Perspective && MovementMode == eMovementMode.FlyMode)
+          {
+            lCamera.Move(-0.1 * MoveScale * (lNewMousePoint.X - mLastMouseDown.X) * lCamera.XAxis);
+            lCamera.Move(0.1 * MoveScale * (lNewMousePoint.Y - mLastMouseDown.Y) * lCamera.ZAxis);
           }
         }
       }
@@ -207,21 +197,7 @@ namespace MMEd.Viewers
     {
       Camera lCamera = mViews[(RenderingSurface)sender].Camera;
 
-      bool lDragging = false;
-      if (lCamera.ProjectionMode == eProjectionMode.Orthographic)
-      {
-        lDragging = e.Button == MouseButtons.Right;
-      }
-      else if (MovementMode == eMovementMode.InspectMode)
-      {
-        lDragging = e.Button == MouseButtons.Right;
-      }
-      else
-      {
-        lDragging = (e.Button == MouseButtons.Left || e.Button == MouseButtons.Right);
-      }
-
-      if (lDragging)
+      if (Control.ModifierKeys == Keys.Control)
       {
         ((RenderingSurface)sender).Capture = true;
         mLastMouseDown = e.Location;
@@ -244,6 +220,48 @@ namespace MMEd.Viewers
       }
 
       ((RenderingSurface)sender).Focus();
+    }
+
+    void MainForm_KeyPress(object sender, KeyPressEventArgs e)
+    {
+      OwnedMesh lMesh = ActiveMesh as OwnedMesh;
+      if (lMesh == null)
+      {
+        return;
+      }
+
+      FlatChunk.ObjectEntry lObject = lMesh.Owner as FlatChunk.ObjectEntry;
+
+      if (lObject == null)
+      {
+        return;
+      }
+
+      switch (e.KeyChar)
+      {
+        case 'W':
+        case 'w':
+          lObject.OriginPosition.Y += 10;
+          break;
+
+        case 'S':
+        case 's':
+          lObject.OriginPosition.Y -= 10;
+          break;
+
+        case 'A':
+        case 'a':
+          lObject.OriginPosition.X -= 10;
+          break;
+
+        case 'D':
+        case 'd':
+          lObject.OriginPosition.X += 10;
+          break;
+      }
+
+      RebuildScene();
+      InvalidateAllViewers();
     }
 
     void mMainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -523,77 +541,5 @@ namespace MMEd.Viewers
 
     private Mesh mActiveMesh = null;
 
-    // a 2d move request, which will be turned into 3d camera
-    // movement, in a manner dependent on
-
-    private void KeyPressHandle(object sender, KeyPressEventArgs e)
-    {
-      if (mMainForm.ViewerTabControl.SelectedTab != Tab) return;
-      /* qqAIT
-      switch (e.KeyChar)
-      {
-        case 'W':
-        case 'w':
-          mCamera.Move(-1.0 * mCamera.ZAxis * MoveScale);
-          break;
-
-        case 'S':
-        case 's':
-          mCamera.Move(1.0 * mCamera.ZAxis * MoveScale);
-          break;
-
-        case 'A':
-        case 'a':
-          mCamera.Move(-1.0 * mCamera.XAxis * MoveScale);
-          break;
-
-        case 'D':
-        case 'd':
-          mCamera.Move(1.0 * mCamera.XAxis * MoveScale);
-          break;
-
-        case 'Q':
-        case 'q':
-          mCamera.Move(-1.0 * mCamera.ZAxis * MoveScale);
-          break;
-
-        case 'E':
-        case 'e':
-          mCamera.Move(1.0 * mCamera.ZAxis * MoveScale);
-          break;
-
-        case 'I':
-        case 'i':
-          mCamera.Rotate(-0.1, mCamera.XAxis);
-          break;
-
-        case 'K':
-        case 'k':
-          mCamera.Rotate(0.1, mCamera.XAxis);
-          break;
-
-        case 'J':
-        case 'j':
-          mCamera.Rotate(-0.1, mCamera.YAxis);
-          break;
-
-        case 'L':
-        case 'l':
-          mCamera.Rotate(0.1, mCamera.YAxis);
-          break;
-
-        case 'U':
-        case 'u':
-          mCamera.Rotate(-0.1, mCamera.ZAxis);
-          break;
-
-        case 'O':
-        case 'o':
-          mCamera.Rotate(0.1, mCamera.ZAxis);
-          break;
-      }
-
-      InvalidateViewer();*/
-    }
   }
 }

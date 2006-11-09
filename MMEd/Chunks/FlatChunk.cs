@@ -499,7 +499,7 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
           if (lObjt != null)
           {
             //qq hack!
-            Entity[] lEarr = (Entity[])lObjt.GetEntities(xiLevel, xiTextureMode, xiSelectedMetadata);
+            Entity[] lEarr = (Entity[])lObjt.GetEntities(xiLevel, xiTextureMode, xiSelectedMetadata, oe);
             if (lEarr.Length != 1) throw new Exception("hack failed!");
             Entity lE = lEarr[0];
 
