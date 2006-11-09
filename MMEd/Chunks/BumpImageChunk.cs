@@ -96,7 +96,6 @@ namespace MMEd.Chunks
 
     public Image ToImage()
     {
-      palette = makePalette();
       Bitmap lBmp = new Bitmap(8 * mScale, 8 * mScale);
       for (int x = 0; x < 8 * mScale; x++)
         for (int y = 0; y < 8 * mScale; y++)
@@ -105,16 +104,18 @@ namespace MMEd.Chunks
       // Outline the squares in black
       for (int x = 0; x < 8; x++)
       {
-        for (int y = 0; y < 8 * mScale; y++)
+        for (int y = 0; y < 8 * mScale; y += 2)
         {
           lBmp.SetPixel(x * mScale, y, Color.Black);
+          lBmp.SetPixel(x * mScale, y + 1, Color.White);
         }
       }
       for (int y = 0; y < 8; y++)
       {
-        for (int x = 0; x < 8 * mScale; x++)
+        for (int x = 0; x < 8 * mScale; x += 2)
         {
           lBmp.SetPixel(x, y * mScale, Color.Black);
+          lBmp.SetPixel(x + 1, y * mScale, Color.White);
         }
       }
 
@@ -219,10 +220,10 @@ namespace MMEd.Chunks
 
     private static Color[] makePalette()
     {
-      Color[] acc = new Color[256];
+      Color[] acc = new Color[64];
       for (int i = 0; i < acc.Length; i++)
       {
-        BumpTypeInfo bti = (BumpTypeInfo)BumpTypeToBumpTypeInfoMap[(byte)i];
+        BumpTypeInfo bti = (BumpTypeInfo)BumpTypeToBumpTypeInfoMap[(eBumpType)i];
         acc[i] = bti == null ? Color.Magenta : bti.Color;
       }
       return acc;

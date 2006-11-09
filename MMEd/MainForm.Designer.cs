@@ -51,6 +51,8 @@ namespace MMEd
           this.TexSquareLabel = new System.Windows.Forms.Label();
           this.label3 = new System.Windows.Forms.Label();
           this.label2 = new System.Windows.Forms.Label();
+          this.GridDisplayPanelHolder = new MMEd.Util.SmoothScrollingPanel();
+          this.GridDisplayPanel = new MMEd.Util.UserPaintDoubleBufferedPanel();
           this.groupBox1 = new System.Windows.Forms.GroupBox();
           this.GridViewMetaTypeCombo = new System.Windows.Forms.ComboBox();
           this.GridViewRadioImgNum = new System.Windows.Forms.RadioButton();
@@ -78,8 +80,6 @@ namespace MMEd
           this.RightHandSplit = new System.Windows.Forms.SplitContainer();
           this.Viewer3DRenderingSurfaceTopRight = new GLTK.RenderingSurface();
           this.Viewer3DRenderingSurfaceBottomRight = new GLTK.RenderingSurface();
-          this.GridDisplayPanelHolder = new MMEd.Util.SmoothScrollingPanel();
-          this.GridDisplayPanel = new MMEd.Util.UserPaintDoubleBufferedPanel();
           this.mMenuStrip.SuspendLayout();
           this.MainSplitter.Panel1.SuspendLayout();
           this.MainSplitter.Panel2.SuspendLayout();
@@ -91,6 +91,7 @@ namespace MMEd
           ((System.ComponentModel.ISupportInitialize)(this.ImgPictureBox)).BeginInit();
           this.ViewTabGrid.SuspendLayout();
           this.groupBox2.SuspendLayout();
+          this.GridDisplayPanelHolder.SuspendLayout();
           this.groupBox1.SuspendLayout();
           this.ViewTab3D.SuspendLayout();
           this.ViewTabBump.SuspendLayout();
@@ -109,7 +110,6 @@ namespace MMEd
           this.RightHandSplit.Panel1.SuspendLayout();
           this.RightHandSplit.Panel2.SuspendLayout();
           this.RightHandSplit.SuspendLayout();
-          this.GridDisplayPanelHolder.SuspendLayout();
           this.SuspendLayout();
           // 
           // mMenuStrip
@@ -365,6 +365,25 @@ namespace MMEd
           this.label2.TabIndex = 0;
           this.label2.Text = "Tex square:";
           // 
+          // GridDisplayPanelHolder
+          // 
+          this.GridDisplayPanelHolder.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                      | System.Windows.Forms.AnchorStyles.Left)
+                      | System.Windows.Forms.AnchorStyles.Right)));
+          this.GridDisplayPanelHolder.AutoScroll = true;
+          this.GridDisplayPanelHolder.Controls.Add(this.GridDisplayPanel);
+          this.GridDisplayPanelHolder.Location = new System.Drawing.Point(6, 6);
+          this.GridDisplayPanelHolder.Name = "GridDisplayPanelHolder";
+          this.GridDisplayPanelHolder.Size = new System.Drawing.Size(492, 364);
+          this.GridDisplayPanelHolder.TabIndex = 1;
+          // 
+          // GridDisplayPanel
+          // 
+          this.GridDisplayPanel.Location = new System.Drawing.Point(0, 0);
+          this.GridDisplayPanel.Name = "GridDisplayPanel";
+          this.GridDisplayPanel.Size = new System.Drawing.Size(200, 100);
+          this.GridDisplayPanel.TabIndex = 1;
+          // 
           // groupBox1
           // 
           this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -483,9 +502,9 @@ namespace MMEd
           this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
           this.label5.Location = new System.Drawing.Point(3, 15);
           this.label5.Name = "label5";
-          this.label5.Size = new System.Drawing.Size(191, 20);
+          this.label5.Size = new System.Drawing.Size(41, 20);
           this.label5.TabIndex = 4;
-          this.label5.Text = "Edit (Doesn\'t work yet)";
+          this.label5.Text = "Edit";
           // 
           // BumpTypeLabel
           // 
@@ -670,25 +689,6 @@ namespace MMEd
           this.Viewer3DRenderingSurfaceBottomRight.TabIndex = 0;
           this.Viewer3DRenderingSurfaceBottomRight.Text = "renderingSurface4";
           // 
-          // GridDisplayPanelHolder
-          // 
-          this.GridDisplayPanelHolder.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                      | System.Windows.Forms.AnchorStyles.Left)
-                      | System.Windows.Forms.AnchorStyles.Right)));
-          this.GridDisplayPanelHolder.AutoScroll = true;
-          this.GridDisplayPanelHolder.Controls.Add(this.GridDisplayPanel);
-          this.GridDisplayPanelHolder.Location = new System.Drawing.Point(6, 6);
-          this.GridDisplayPanelHolder.Name = "GridDisplayPanelHolder";
-          this.GridDisplayPanelHolder.Size = new System.Drawing.Size(492, 364);
-          this.GridDisplayPanelHolder.TabIndex = 1;
-          // 
-          // GridDisplayPanel
-          // 
-          this.GridDisplayPanel.Location = new System.Drawing.Point(0, 0);
-          this.GridDisplayPanel.Name = "GridDisplayPanel";
-          this.GridDisplayPanel.Size = new System.Drawing.Size(200, 100);
-          this.GridDisplayPanel.TabIndex = 1;
-          // 
           // MainForm
           // 
           this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -715,6 +715,7 @@ namespace MMEd
           this.ViewTabGrid.ResumeLayout(false);
           this.groupBox2.ResumeLayout(false);
           this.groupBox2.PerformLayout();
+          this.GridDisplayPanelHolder.ResumeLayout(false);
           this.groupBox1.ResumeLayout(false);
           this.groupBox1.PerformLayout();
           this.ViewTab3D.ResumeLayout(false);
@@ -737,7 +738,6 @@ namespace MMEd
           this.RightHandSplit.Panel1.ResumeLayout(false);
           this.RightHandSplit.Panel2.ResumeLayout(false);
           this.RightHandSplit.ResumeLayout(false);
-          this.GridDisplayPanelHolder.ResumeLayout(false);
           this.ResumeLayout(false);
           this.PerformLayout();
 

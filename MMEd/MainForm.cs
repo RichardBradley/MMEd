@@ -46,9 +46,6 @@ namespace MMEd
             ViewTabVRAM.Tag = VRAMViewer.InitialiseViewer(this);
             ViewTab3dEditor.Tag = ThreeDeeEditor.InitialiseViewer(this);
 
-            this.BumpViewPictureBox.Click += new System.EventHandler(((BumpViewer)ViewTabBump.Tag).BumpViewPictureBox_Click);
-            this.BumpEditPictureBox.Click += new System.EventHandler(((BumpViewer)ViewTabBump.Tag).BumpEditPictureBox_Click);
-
             //auto-load last level
             if (mLocalSettings.LastOpenedFile != null)
             {

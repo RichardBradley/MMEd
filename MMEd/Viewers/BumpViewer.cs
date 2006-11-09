@@ -10,7 +10,11 @@ namespace MMEd.Viewers
 {
   public class BumpViewer : Viewer
   {
-    private BumpViewer(MainForm xiMainForm) : base(xiMainForm) { }
+    private BumpViewer(MainForm xiMainForm) : base(xiMainForm)
+    {
+      mMainForm.BumpViewPictureBox.Click += new System.EventHandler(this.BumpViewPictureBox_Click);
+      mMainForm.BumpEditPictureBox.Click += new System.EventHandler(this.BumpEditPictureBox_Click);
+    }
 
     public override bool CanViewChunk(Chunk xiChunk)
     {
