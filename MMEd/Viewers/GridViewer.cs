@@ -26,7 +26,6 @@ namespace MMEd.Viewers
       mMainForm.GridViewRadioImages.CheckedChanged += new System.EventHandler(this.InvalidateGridDisplayEvent);
       mMainForm.GridViewRadioImgNum.CheckedChanged += new System.EventHandler(this.InvalidateGridDisplayEvent);
       mMainForm.GridViewMetaTypeCombo.SelectedIndexChanged += new System.EventHandler(this.InvalidateGridDisplayEvent);
-      mMainForm.GridDisplayPanel.MouseMove += new MouseEventHandler(this.InvalidateGridDisplayMouseEvent);
       mMainForm.GridDisplayPanel.MouseMove += new MouseEventHandler(this.GridDisplayMouseMove);
       mMainForm.GridDisplayPanel.MouseClick += new MouseEventHandler(this.GridDisplayMouseClick);
 
@@ -172,11 +171,6 @@ namespace MMEd.Viewers
       mMainForm.GridDisplayPanel.Invalidate();
     }
 
-    private void InvalidateGridDisplayMouseEvent(object sender, MouseEventArgs e)
-    {
-      mMainForm.GridDisplayPanel.Invalidate(new Rectangle(e.X - 100, e.Y - 100, 200, 200));
-    }
-
     private void GridDisplayMouseMove(object sender, MouseEventArgs e)
     {
       if (mSubject != null)
@@ -198,6 +192,9 @@ namespace MMEd.Viewers
             y * mSubject.ScaleY + mSubject.OriginPosition.Y,
             mSubject.OriginPosition.Z);
         }
+
+        //this seems a bit ott, but is needed for the red square highlight
+        mMainForm.GridDisplayPanel.Invalidate();
       }
     }
 

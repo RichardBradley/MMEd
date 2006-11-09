@@ -103,7 +103,13 @@
     <Compile Include="Tests\Libraries.cs" />
     <Compile Include="Tests\Serialisation.cs" />
     <Compile Include="Tests\Utils.cs" />
+    <Compile Include="Util\UserPaintDoubleBufferedPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Util\PropertyController.cs" />
+    <Compile Include="Util\SmoothScrollingPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Util\StreamUtils.cs" />
     <Compile Include="Util\Utils.cs" />
     <Compile Include="Viewer.cs" />
