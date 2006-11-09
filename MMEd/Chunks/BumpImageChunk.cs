@@ -57,7 +57,7 @@ namespace MMEd.Chunks
       unknown24 = 0x24,
       unknown25 = 0x25,
       unknown26 = 0x26,
-      unknown27 = 0x27,
+      unknown27 = 0x27, // Driving over this has no discernable effect in Rack & Roll.
       teleport1 = 0x28, // Teleport. Destination unknown.
       teleport2 = 0x29, // Teleport. Destination unknown.
       teleport3 = 0x2A, // Teleport. Destination unknown.
