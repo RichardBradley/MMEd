@@ -501,6 +501,9 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
             if (lEarr.Length != 1) throw new Exception("hack failed!"); //qq
             Entity lE = lEarr[0];
 
+            //hacky!
+            lE.Scale(1, 1, -1);
+
             if (oe.RotationVector.Norm() != 0)
             {
               //the rotation is z-y-x
@@ -510,6 +513,10 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
             }
 
             lE.Position = ThreeDeeViewer.Short3CoordToPoint(oe.OriginPosition);
+
+            //hacky!
+            lE.Scale(1, 1, -1);
+            
             lAcc.Add(lE);
           }
         }
