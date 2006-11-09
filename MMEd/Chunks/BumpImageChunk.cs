@@ -26,13 +26,13 @@ namespace MMEd.Chunks
       roadBorder = 0x05,
       roadBorder2 = 0x06,
       water = 0x07,
-      unknown08 = 0x08,
+      hole = 0x08, // A void or hole in the surface
       unknown09 = 0x09,
       unknown0A = 0x0A,
       unknown0B = 0x0B,
       unknown0C = 0x0C,
-      unknown0D = 0x0D,
-      unknown0E = 0x0E,
+      poolTrackEdge = 0x0D, // Edge of the track in a pool table course
+      poolPocket = 0x0E, // A pool pocket - death trap
       unknown0F = 0x0F,
       unknown10 = 0x10,
       unknown11 = 0x11,
@@ -58,12 +58,12 @@ namespace MMEd.Chunks
       unknown25 = 0x25,
       unknown26 = 0x26,
       unknown27 = 0x27,
-      unknown28 = 0x28,
-      unknown29 = 0x29,
-      unknown2A = 0x2A,
-      unknown2B = 0x2B,
-      unknown2C = 0x2C,
-      unknown2D = 0x2D,
+      teleport1 = 0x28, // Teleport. Destination unknown.
+      teleport2 = 0x29, // Teleport. Destination unknown.
+      teleport3 = 0x2A, // Teleport. Destination unknown.
+      teleport4 = 0x2B, // Teleport. Destination unknown.
+      teleport5 = 0x2C, // Teleport. Destination unknown.
+      splash = 0x2D, // A "splash" - death trap.
       unknown2E = 0x2E,
       unknown2F = 0x2F,
     }
@@ -168,13 +168,13 @@ namespace MMEd.Chunks
       BTF(ht, eBumpType.roadBorder, 0x89cba0);
       BTF(ht, eBumpType.roadBorder2, 0x89cbbf);
       BTF(ht, eBumpType.water, 0x4551ec);
-      BTF(ht, eBumpType.unknown08, 0xff00ff);
+      BTF(ht, eBumpType.hole, 0xffffff);
       BTF(ht, eBumpType.unknown09, 0xff00ff);
       BTF(ht, eBumpType.unknown0A, 0xff00ff);
       BTF(ht, eBumpType.unknown0B, 0xff00ff);
       BTF(ht, eBumpType.unknown0C, 0xff00ff);
-      BTF(ht, eBumpType.unknown0D, 0xff00ff);
-      BTF(ht, eBumpType.unknown0E, 0xff00ff);
+      BTF(ht, eBumpType.poolTrackEdge, 0x89cbde);
+      BTF(ht, eBumpType.poolPocket, 0xeeeeee);
       BTF(ht, eBumpType.unknown0F, 0xff00ff);
       BTF(ht, eBumpType.unknown10, 0xff00ff);
       BTF(ht, eBumpType.unknown11, 0xff00ff);
@@ -200,12 +200,12 @@ namespace MMEd.Chunks
       BTF(ht, eBumpType.unknown25, 0xff00ff);
       BTF(ht, eBumpType.unknown26, 0xff00ff);
       BTF(ht, eBumpType.unknown27, 0xff00ff);
-      BTF(ht, eBumpType.unknown28, 0xff00ff);
-      BTF(ht, eBumpType.unknown29, 0xff00ff);
-      BTF(ht, eBumpType.unknown2A, 0xff00ff);
-      BTF(ht, eBumpType.unknown2B, 0xff00ff);
-      BTF(ht, eBumpType.unknown2C, 0xff00ff);
-      BTF(ht, eBumpType.unknown2D, 0xff00ff);
+      BTF(ht, eBumpType.teleport1, 0xffaa00);
+      BTF(ht, eBumpType.teleport2, 0xffdd00);
+      BTF(ht, eBumpType.teleport3, 0xffbb00);
+      BTF(ht, eBumpType.teleport4, 0xffee00);
+      BTF(ht, eBumpType.teleport5, 0xffcc00);
+      BTF(ht, eBumpType.splash, 0x4444ff);
       BTF(ht, eBumpType.unknown2E, 0xff00ff);
       BTF(ht, eBumpType.unknown2F, 0xff00ff);
       return ht;

@@ -99,13 +99,13 @@ namespace MMEd.Viewers
       mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.roadBorder);
       mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.roadBorder2);
       mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.water);
-      mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.unknown08);
+      mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.hole);
       mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.unknown09);
       mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.unknown0A);
       mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.unknown0B);
       mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.unknown0C);
-      mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.unknown0D);
-      mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.unknown0E);
+      mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.poolTrackEdge);
+      mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.poolPocket);
       mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.unknown0F);
       mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.unknown10);
       mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.unknown11);
@@ -131,12 +131,12 @@ namespace MMEd.Viewers
       mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.unknown25);
       mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.unknown26);
       mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.unknown27);
-      mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.unknown28);
-      mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.unknown29);
-      mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.unknown2A);
-      mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.unknown2B);
-      mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.unknown2C);
-      mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.unknown2D);
+      mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.teleport1);
+      mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.teleport2);
+      mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.teleport3);
+      mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.teleport4);
+      mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.teleport5);
+      mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.splash);
       mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.unknown2E);
       mMainForm.BumpCombo.Items.Add(BumpImageChunk.eBumpType.unknown2F);
 
