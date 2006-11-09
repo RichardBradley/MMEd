@@ -6,43 +6,6 @@ namespace GLTK
 {
   public class Scene
   {
-    public Scene(AbstractRenderer xiRenderer)
-    {
-      xiRenderer.NextFrame += new AbstractRenderer.NextFrameEventHandler(Renderer_NextFrame);
-    }
-
-    void Renderer_NextFrame(AbstractRenderer xiSender, EventArgs xiArgs)
-    {
-      xiSender.Clear();
-      xiSender.ResetLights();
-      
-      xiSender.SetCamera(mCamera);
-
-      foreach (Light lLight in mLights)
-      {
-        if (lLight.On)
-        {
-          xiSender.SetLight(lLight);
-        }
-      }
-
-      foreach (Entity lObject in mObjects)
-      {
-        xiSender.PushTransform(lObject.Transform);
-        foreach (Mesh lMesh in lObject.Meshes)
-        {
-          xiSender.RenderMesh(lMesh);
-        }
-        xiSender.PopTransform();
-      }
-    }
-
-    public Camera Camera
-    {
-      get { return mCamera; }
-      set { mCamera = value; }
-    }
-
     public void AddRange(IEnumerable<Entity> xiCollection)
     {
         mObjects.AddRange(xiCollection);
@@ -98,8 +61,23 @@ namespace GLTK
       }
     }
 
+    internal List<Entity> Objects
+    {
+      get
+      {
+        return mObjects;
+      }
+    }
+
+    internal List<Light> Lights
+    {
+      get
+      {
+        return mLights;
+      }
+    }
+
     private List<Light> mLights = new List<Light>();
     private List<Entity> mObjects = new List<Entity>();
-    private Camera mCamera = new Camera();
   }
 }

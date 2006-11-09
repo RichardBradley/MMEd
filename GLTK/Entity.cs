@@ -148,6 +148,31 @@ namespace GLTK
       set { mMeshes = value; }
     }
 
+    public Cubiod GetBoundingBox()
+    {
+      Cubiod lRet = new Cubiod();
+      lRet.XMin = double.MaxValue;
+      lRet.YMin = double.MaxValue;
+      lRet.ZMin = double.MaxValue;
+      lRet.XMax = double.MinValue;
+      lRet.YMax = double.MinValue;
+      lRet.ZMax = double.MinValue;
+
+      foreach (Mesh lMesh in Meshes)
+      {
+        foreach (Vertex lVertex in lMesh.Vertices)
+        {
+          if (lVertex.Position.x < lRet.XMin) lRet.XMin = lVertex.Position.x;
+          if (lVertex.Position.x > lRet.XMax) lRet.XMax = lVertex.Position.x;
+          if (lVertex.Position.y < lRet.YMin) lRet.YMin = lVertex.Position.y;
+          if (lVertex.Position.y > lRet.YMax) lRet.YMax = lVertex.Position.y;
+          if (lVertex.Position.z < lRet.ZMin) lRet.ZMin = lVertex.Position.z;
+          if (lVertex.Position.z > lRet.ZMax) lRet.ZMax = lVertex.Position.z;
+        }
+      }
+      return lRet;
+    }
+
     private List<Mesh> mMeshes = new List<Mesh>();
     private int mOperationCount = 0;
     private Matrix mTransform = Matrix.Identity;

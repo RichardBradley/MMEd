@@ -7,13 +7,14 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using MMEd.Util;
 using MMEd.Viewers;
+using MMEd.Viewers.ThreeDee;
 using GLTK;
 
 // Represents a PS TMD object
 
 namespace MMEd.Chunks
 {
-  public class TMDChunk : Chunk, ThreeDeeViewer.IEntityProvider
+  public class TMDChunk : Chunk, IEntityProvider
   {
     public enum TMDFlags
     {
@@ -196,12 +197,12 @@ namespace MMEd.Chunks
       }
     }
 
-    public IEnumerable<GLTK.Entity> GetEntities(AbstractRenderer xiRenderer, Level xiLevel, ThreeDeeViewer.eTextureMode xiTextureMode, FlatChunk.TexMetaDataEntries xiSelectedMetadata)
+    public IEnumerable<GLTK.Entity> GetEntities(Level xiLevel, eTextureMode xiTextureMode, FlatChunk.TexMetaDataEntries xiSelectedMetadata)
     {
-      return GetEntities(xiRenderer, xiLevel, xiTextureMode, xiSelectedMetadata, this);
+      return GetEntities(xiLevel, xiTextureMode, xiSelectedMetadata, this);
     }
 
-    public IEnumerable<GLTK.Entity> GetEntities(AbstractRenderer xiRenderer, Level xiLevel, ThreeDeeViewer.eTextureMode xiTextureMode, FlatChunk.TexMetaDataEntries xiSelectedMetadata, object xiMeshOwner)
+    public IEnumerable<GLTK.Entity> GetEntities(Level xiLevel, eTextureMode xiTextureMode, FlatChunk.TexMetaDataEntries xiSelectedMetadata, object xiMeshOwner)
     {
       Entity lAcc = new Entity();
       Mesh lColouredMesh = null;
@@ -251,7 +252,7 @@ namespace MMEd.Chunks
                 throw new Exception("Object refers to multiple texture pages!");
               }
               lTexPageId = lThisFacePageId;
-              lTexturedMesh.Texture = xiRenderer.ImageToTextureId(xiLevel.GetTexturePageById(lTexPageId)); 
+              lTexturedMesh.Texture = AbstractRenderer.ImageToTextureId(xiLevel.GetTexturePageById(lTexPageId)); 
             }
             lMesh = lTexturedMesh;
           }
@@ -267,12 +268,12 @@ namespace MMEd.Chunks
 
           if (f.mVertexIds.Length == 3)
           {
-            lMesh.AddTriangle(lVBuff[0], lVBuff[1], lVBuff[2]);
+            lMesh.AddFace(lVBuff[0], lVBuff[1], lVBuff[2]);
           }
           else //4
           {
-            lMesh.AddTriangle(lVBuff[0], lVBuff[1], lVBuff[2]);
-            lMesh.AddTriangle(lVBuff[0], lVBuff[2], lVBuff[3]);
+            lMesh.AddFace(lVBuff[0], lVBuff[1], lVBuff[2]);
+            lMesh.AddFace(lVBuff[0], lVBuff[2], lVBuff[3]);
           }
         }
       }

@@ -7,6 +7,7 @@ using System.Drawing;
 using MMEd.Util;
 using MMEd.Viewers;
 using GLTK;
+using MMEd.Viewers.ThreeDee;
 using Point = GLTK.Point;
 
 // A Flat from within the SHET
@@ -14,7 +15,7 @@ using Point = GLTK.Point;
 
 namespace MMEd.Chunks
 {
-  public class FlatChunk : Chunk, ThreeDeeViewer.IEntityProvider
+  public class FlatChunk : Chunk, IEntityProvider
   {
     // The values in this enum are valid Idxs for the third 
     // dimension of the TexMetaData array
@@ -365,7 +366,7 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
       throw new Exception("The method or operation is not implemented.");
     }
 
-    public IEnumerable<GLTK.Entity> GetEntities(AbstractRenderer xiRenderer, Level xiLevel, ThreeDeeViewer.eTextureMode xiTextureMode, FlatChunk.TexMetaDataEntries xiSelectedMetadata)
+    public IEnumerable<GLTK.Entity> GetEntities(Level xiLevel, eTextureMode xiTextureMode, FlatChunk.TexMetaDataEntries xiSelectedMetadata)
     {
       //qq hack:
       if (this.TreeNode.Checked)
@@ -384,7 +385,7 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
       Font lNumberFont = null;
       Brush lNumberFGBrush = null, lNumberBGBrush = null;
       Pen lWaypointPen = null, lKeyWaypointPen = null;
-      if (xiTextureMode == ThreeDeeViewer.eTextureMode.NormalTexturesWithMetadata)
+      if (xiTextureMode == eTextureMode.NormalTexturesWithMetadata)
       {
         lNumberFont = new Font(FontFamily.GenericMonospace, 10);
         lNumberFGBrush = new SolidBrush(Color.Black);
@@ -398,12 +399,12 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
         for (int y = 0; y < Height; y++)
         {
           Mesh lSquare = new OwnedMesh(this);
-          lSquare.AddTriangle(
+          lSquare.AddFace(
           new Vertex(new Point(x, y, 0), 0, 0),
           new Vertex(new Point(x + 1, y, 0), 1, 0),
           new Vertex(new Point(x + 1, y + 1, 0), 1, 1));
 
-          lSquare.AddTriangle(
+          lSquare.AddFace(
             new Vertex(new Point(x, y, 0), 0, 0),
             new Vertex(new Point(x + 1, y + 1, 0), 1, 1),
             new Vertex(new Point(x, y + 1, 0), 0, 1));
@@ -420,7 +421,7 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
             {
               //some TIMs can't be loaded yet: they're null
               Bitmap lTexture = lTIM.ToBitmap();
-              if (xiTextureMode == ThreeDeeViewer.eTextureMode.NormalTexturesWithMetadata
+              if (xiTextureMode == eTextureMode.NormalTexturesWithMetadata
                   && TexMetaData != null)
               {
                 byte lVal = TexMetaData[x][y][(int)xiSelectedMetadata];
@@ -460,12 +461,12 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
                   }
                 }
               }
-              else if (xiTextureMode == ThreeDeeViewer.eTextureMode.BumpmapTextures)
+              else if (xiTextureMode == eTextureMode.BumpmapTextures)
               {
                 throw new Exception("TODO");
               }
 
-              lSquare.Texture = xiRenderer.ImageToTextureId(lTexture);
+              lSquare.Texture = AbstractRenderer.ImageToTextureId(lTexture);
             }
           }
 
@@ -497,8 +498,9 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
           TMDChunk lObjt = xiLevel.GetObjtById(oe.ObjtType);
           if (lObjt != null)
           {
-            Entity[] lEarr = (Entity[])lObjt.GetEntities(xiRenderer, xiLevel, xiTextureMode, xiSelectedMetadata, oe);
-            if (lEarr.Length != 1) throw new Exception("hack failed!"); //qq
+            //qq hack!
+            Entity[] lEarr = (Entity[])lObjt.GetEntities(xiLevel, xiTextureMode, xiSelectedMetadata);
+            if (lEarr.Length != 1) throw new Exception("hack failed!");
             Entity lE = lEarr[0];
 
             //hacky!

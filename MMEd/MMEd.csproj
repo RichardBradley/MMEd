@@ -113,9 +113,16 @@
     <Compile Include="Util\StreamUtils.cs" />
     <Compile Include="Util\Utils.cs" />
     <Compile Include="Viewer.cs" />
+    <Compile Include="Viewers\MMEdView.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Viewers\ThreeDeeEditor.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Viewers\VRAMViewer.cs" />
     <Compile Include="Viewers\BumpViewer.cs" />
     <Compile Include="Viewers\OwnedMesh.cs" />
+    <Compile Include="Viewers\ThreeDeeCommon.cs" />
     <Compile Include="Viewers\ThreeDeeViewer.cs" />
     <Compile Include="Viewers\GridViewer.cs" />
     <Compile Include="Viewers\ImageViewer.cs" />

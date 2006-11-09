@@ -6,6 +6,12 @@ using Tao.OpenGl;
 
 namespace GLTK
 {
+  public enum eProjectionMode
+  {
+    Orthographic,
+    Perspective
+  }
+
   public class Camera : Entity
   {
     public Camera()
@@ -37,9 +43,16 @@ namespace GLTK
       set { mFarClip = value; }
     }
 
+    public eProjectionMode ProjectionMode
+    {
+      get { return mProjectionMode; }
+      set { mProjectionMode = value; }
+    }
+
     private double mFov = 45;
     private double mNearClip = 0.1;
     private double mFarClip = 100;
+    private eProjectionMode mProjectionMode = eProjectionMode.Perspective;
   }
 }
 

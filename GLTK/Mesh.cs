@@ -6,24 +6,58 @@ namespace GLTK
 {
   public enum RenderMode
   {
-    Points,
-    Wireframe,
-    Filled,
-    Textured
+    Undefined =0,
+    Points = 1,
+    Wireframe = 2,
+    Filled = 3,
+    Textured = 4
+  }
+
+  public enum PolygonMode
+  {
+    Triangles,
+    Lines,
+    Quads
   }
 
   public class Mesh
   {
+    public Mesh()
+    {
+    }
+
+    public Mesh(PolygonMode xiMode)
+    {
+      mPolygonMode = xiMode;
+    }
+
     public List<Vertex> Vertices
     {
       get { return mVertices; }
     }
 
-    public void AddTriangle(Vertex v1, Vertex v2, Vertex v3)
+    public void AddFace(params Vertex[] xiVertices)
     {
-      mVertices.Add(v1);
-      mVertices.Add(v2);
-      mVertices.Add(v3);
+      int lExpectedLength = 0;
+      switch (mPolygonMode)
+      {
+        case PolygonMode.Lines:
+          lExpectedLength  = 2;
+          break;
+        case PolygonMode.Triangles:
+          lExpectedLength = 3;
+          break;
+        case PolygonMode.Quads:
+          lExpectedLength = 4;
+          break;
+      }
+
+      if (xiVertices.Length != lExpectedLength)
+      {
+        throw new Exception("Incorrect number of vertices");
+      }
+
+      mVertices.AddRange(xiVertices);
     }
 
     public int Texture
@@ -38,8 +72,14 @@ namespace GLTK
       set { mRenderMode = value; }
     }
 
+    public PolygonMode PolygonMode
+    {
+      get { return mPolygonMode; }
+    }
+
     List<Vertex> mVertices = new List<Vertex>();
     int mTexture = 0;
     RenderMode mRenderMode = RenderMode.Textured;
+    PolygonMode mPolygonMode = PolygonMode.Triangles;
   }
 }

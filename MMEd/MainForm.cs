@@ -44,6 +44,7 @@ namespace MMEd
             ViewTabGrid.Tag = GridViewer.InitialiseViewer(this);
             ViewTab3D.Tag = ThreeDeeViewer.InitialiseViewer(this);
             ViewTabVRAM.Tag = VRAMViewer.InitialiseViewer(this);
+            ViewTab3dEditor.Tag = ThreeDeeEditor.InitialiseViewer(this);
 
             this.BumpViewPictureBox.Click += new System.EventHandler(((BumpViewer)ViewTabBump.Tag).BumpViewPictureBox_Click);
             this.BumpEditPictureBox.Click += new System.EventHandler(((BumpViewer)ViewTabBump.Tag).BumpEditPictureBox_Click);
@@ -234,5 +235,16 @@ namespace MMEd
             }
           }
         }
+
+      /*qqAIT
+      private void splitContainer3_SplitterMoved(object sender, SplitterEventArgs e)
+      {
+        LeftHandSplit.SplitterDistance = e.SplitY;
+      }
+
+      private void splitContainer2_SplitterMoved(object sender, SplitterEventArgs e)
+      {
+        RightHandSplit.SplitterDistance = e.SplitY;
+      }*/
     }
 }

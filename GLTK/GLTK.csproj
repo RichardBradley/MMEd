@@ -57,6 +57,7 @@
   <ItemGroup>
     <Compile Include="AbstractRenderer.cs" />
     <Compile Include="Camera.cs" />
+    <Compile Include="Cubiod.cs" />
     <Compile Include="DeviceContextEventArgs.cs" />
     <Compile Include="Entity.cs" />
     <Compile Include="ImmediateModeRenderer.cs" />
@@ -70,8 +71,10 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Scene.cs" />
+    <Compile Include="ScopedLock.cs" />
     <Compile Include="Vector.cs" />
     <Compile Include="Vertex.cs" />
+    <Compile Include="View.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

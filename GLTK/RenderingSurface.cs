@@ -14,40 +14,44 @@ namespace GLTK
   {
     public RenderingSurface()
     {
-      this.SetStyle(ControlStyles.AllPaintingInWmPaint, true);
-      this.SetStyle(ControlStyles.Opaque, true);
-      this.SetStyle(ControlStyles.UserPaint, true);
-      this.SetStyle(ControlStyles.ResizeRedraw, true);
-
-      try
+      if (!DesignMode)
       {
-        Gdi.PIXELFORMATDESCRIPTOR lPixelFormatDescription = GetPixelFormat();
+        this.SetStyle(ControlStyles.AllPaintingInWmPaint, true);
+        this.SetStyle(ControlStyles.Opaque, true);
+        this.SetStyle(ControlStyles.UserPaint, true);
+        this.SetStyle(ControlStyles.ResizeRedraw, true);
 
-        mDeviceContext = User.GetDC(Handle);
-        if (mDeviceContext == IntPtr.Zero)
+        try
         {
-          throw new Exception("Could not get device context");
-        }
+          Gdi.PIXELFORMATDESCRIPTOR lPixelFormatDescription = GetPixelFormat();
 
-        int lPixelFormat = Gdi.ChoosePixelFormat(mDeviceContext, ref lPixelFormatDescription);
-        if (Gdi.ChoosePixelFormat(mDeviceContext, ref lPixelFormatDescription) == 0)
-        {
-          throw new Exception("Could not find pixel format");
-        }
+          mDeviceContext = User.GetDC(Handle);
+          if (mDeviceContext == IntPtr.Zero)
+          {
+            throw new Exception("Could not get device context");
+          }
 
-        if (!Gdi.SetPixelFormat(mDeviceContext, lPixelFormat, ref lPixelFormatDescription))
-        {
-          throw new Exception("Could not set pixel format");
+          int lPixelFormat = Gdi.ChoosePixelFormat(mDeviceContext, ref lPixelFormatDescription);
+          if (Gdi.ChoosePixelFormat(mDeviceContext, ref lPixelFormatDescription) == 0)
+          {
+            throw new Exception("Could not find pixel format");
+          }
+
+          if (!Gdi.SetPixelFormat(mDeviceContext, lPixelFormat, ref lPixelFormatDescription))
+          {
+            throw new Exception("Could not set pixel format");
+          }
         }
-      }
-      catch
-      {
-        Release();
+        catch
+        {
+          Release();
+        }
       }
     }
 
     protected override void OnParentChanged(EventArgs e)
     {
+      //qq this doesn't work in all cases - need to find a better way of detecting app closing
       base.OnParentChanged(e);
       Form lForm = FindForm();
       if (lForm != null)
@@ -56,10 +60,23 @@ namespace GLTK
       }
     }
 
-     protected override void OnPaint(PaintEventArgs e)
+    protected override void OnPaint(PaintEventArgs e)
     {
       base.OnPaint(e);
-      Gdi.SwapBuffers(mDeviceContext);
+
+      if (!DesignMode)
+      {
+        Gdi.SwapBuffers(mDeviceContext);
+      }
+      else
+      {
+        e.Graphics.Clear(System.Drawing.Color.Black);
+      }
+    }
+
+    public bool IsInDesignMode
+    {
+      get { return DesignMode; }
     }
 
     protected override void OnPaintBackground(PaintEventArgs pevent)

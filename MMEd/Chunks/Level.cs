@@ -6,6 +6,7 @@ using System.Collections;
 using System.ComponentModel;
 using MMEd.Util;
 using MMEd.Viewers;
+using MMEd.Viewers.ThreeDee;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using GLTK;
@@ -20,7 +21,7 @@ namespace MMEd.Chunks
   [XmlInclude(typeof(NamedImageGroup)), XmlInclude(typeof(TIMChunk)),
   XmlInclude(typeof(OddImageChunk)), XmlInclude(typeof(BumpImageChunk)),
   XmlInclude(typeof(TMDChunk)), XmlInclude(typeof(TypedRawDataChunk))]
-  public class Level : Chunk, Viewers.ThreeDeeViewer.IEntityProvider
+  public class Level : Chunk, Viewers.ThreeDee.IEntityProvider
   {
     [Description("Four int32s at the start of the file, meaning unknown")]
     public int[] Header;
@@ -276,13 +277,13 @@ namespace MMEd.Chunks
       }
     }
 
-    public IEnumerable<GLTK.Entity> GetEntities(AbstractRenderer xiRenderer, Level xiLevel, ThreeDeeViewer.eTextureMode xiTextureMode, FlatChunk.TexMetaDataEntries xiSelectedMetadata)
+    public IEnumerable<GLTK.Entity> GetEntities(Level xiLevel, eTextureMode xiTextureMode, FlatChunk.TexMetaDataEntries xiSelectedMetadata)
     {
       List<Entity> lAcc = new List<Entity>();
 
       foreach (FlatChunk fl in SHET.Flats)
       {
-        lAcc.AddRange(fl.GetEntities(xiRenderer, xiLevel, xiTextureMode, xiSelectedMetadata));
+        lAcc.AddRange(fl.GetEntities(xiLevel, xiTextureMode, xiSelectedMetadata));
       }
 
       return lAcc;
