@@ -123,9 +123,12 @@ namespace GLTK
       ScopedLock lLock = ScopedLock.Lock(mRenderingContext);
       try
       {
-        if (!Wgl.wglMakeCurrent(mSurface.DeviceContext, mRenderingContext))
+        if (Wgl.wglGetCurrentContext() != mRenderingContext)
         {
-          throw new Exception("Could not set the rendering context");
+          if (!Wgl.wglMakeCurrent(mSurface.DeviceContext, mRenderingContext))
+          {
+            throw new Exception("Could not set the rendering context");
+          }
         }
       }
       catch
@@ -164,7 +167,6 @@ namespace GLTK
         Gl.glDepthFunc(Gl.GL_LEQUAL);
         Gl.glHint(Gl.GL_PERSPECTIVE_CORRECTION_HINT, Gl.GL_NICEST);
         Gl.glColorMaterial(Gl.GL_FRONT_AND_BACK, Gl.GL_AMBIENT_AND_DIFFUSE);
-        Gl.glBlendFunc(Gl.GL_SRC_ALPHA, Gl.GL_ONE);
       }
     }
 
@@ -195,6 +197,15 @@ namespace GLTK
       {
         Gl.glClear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
       }
+
+      ResetCounters();
+    }
+
+    public void ResetCounters()
+    {
+      mMeshCount = 0;
+      mVertexCount = 0;
+      mRenderTime = 0;
     }
 
     public void ClearDepthBuffer()
@@ -542,7 +553,12 @@ namespace GLTK
         ++mPickIndex;
       }
 
+      DateTime lStart = DateTime.Now;
       RenderMeshInternal(xiMesh, xiOptions);
+
+      mRenderTime += (DateTime.Now - lStart).Milliseconds;
+      ++mMeshCount;
+      mVertexCount += xiMesh.Vertices.Count;
     }
 
     protected abstract void RenderMeshInternal(Mesh xiMesh, RenderOptions xiOptions);
@@ -557,6 +573,21 @@ namespace GLTK
     {
       get { return mDefaultRenderMode; }
       set { mDefaultRenderMode = value; }
+    }
+
+    public int VertexCount
+    {
+      get { return mVertexCount; }
+    }
+
+    public int MeshCount
+    {
+      get { return mMeshCount; }
+    }
+
+    public int RenderTime
+    {
+      get { return mRenderTime; }
     }
 
     private RenderMode mFixedRenderMode = RenderMode.Undefined;
@@ -578,5 +609,9 @@ namespace GLTK
     private double mPickY;
 
     private int mNextLight = 0;
+
+    private int mVertexCount = 0;
+    private int mMeshCount = 0;
+    private int mRenderTime = 0;
   }
 }
