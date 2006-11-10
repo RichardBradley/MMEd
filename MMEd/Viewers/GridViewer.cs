@@ -4,6 +4,7 @@ using System.Text;
 using MMEd;
 using MMEd.Chunks;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Windows.Forms;
 
 
@@ -36,13 +37,15 @@ namespace MMEd.Viewers
       mMainForm.GridViewRadioEditMeta.CheckedChanged += new EventHandler(this.ModeChanged);
 
       mMainForm.ViewerTabControl.KeyPress += new KeyPressEventHandler(this.ViewerTabControl_KeyPress);
+
+      InitialiseTransparencyAttributes();
     }
 
     private void GridDisplayPanel_Paint(object sender, PaintEventArgs e)
     {
       if (mSubject == null) return;
 
-      bool lDrawBumpNotTex = mMainForm.GridViewRadioEditBump.Checked 
+      bool lDrawBump = mMainForm.GridViewRadioEditBump.Checked
           || mMainForm.GridViewRadioViewBump.Checked;
       bool lDrawOdds = mMainForm.GridViewRadioViewOdds.Checked;
 
@@ -73,6 +76,12 @@ namespace MMEd.Viewers
         {
           try
           {
+            // Draw the main texture for the square.
+            e.Graphics.DrawImageUnscaled(
+                mMainForm.Level.GetTileById(mSubject.TextureIds[x][y]).ToBitmap(),
+                x * mSubjectTileWidth,
+                y * mSubjectTileHeight);
+
             if (lDrawOdds)
             {
               Rectangle lDest = new Rectangle(
@@ -81,30 +90,27 @@ namespace MMEd.Viewers
                   mSubjectTileWidth,
                   mSubjectTileHeight);
               OddImageChunk bic = mMainForm.Level.GetOddById(mSubject.TexMetaData[x][y][lDrawNumType]);
-              if (bic == null)
+
+              // If we don't have an odd to draw here, bic is null
+              // and nothing is drawn - just leave the base texture as-is.
+              if (bic != null)
               {
-                e.Graphics.FillRectangle(new SolidBrush(Color.Black), lDest);
-              }
-              else
-              {
-                e.Graphics.DrawImage(bic.ToImage(), lDest);
+                DrawTransparentImage(e, bic.ToImage(), lDest);
               }
             }
-            else if (lDrawBumpNotTex)
+            else if (lDrawBump)
             {
+              // Draw the bump map on top as a transparent image.
               Rectangle lDest = new Rectangle(
-                  x * mSubjectTileWidth,
-                  y * mSubjectTileHeight,
-                  mSubjectTileWidth,
-                  mSubjectTileHeight);
+                    x * mSubjectTileWidth,
+                    y * mSubjectTileHeight,
+                    mSubjectTileWidth,
+                    mSubjectTileHeight);
               BumpImageChunk bic = mMainForm.Level.GetBumpById(mSubject.TexMetaData[x][y][(int)FlatChunk.TexMetaDataEntries.Bumpmap]);
-              if (bic == null)
+
+              if (bic != null)
               {
-                e.Graphics.FillRectangle(new SolidBrush(Color.Black), lDest);
-              }
-              else
-              {
-                e.Graphics.DrawImage(bic.ToImage(), lDest);
+                DrawTransparentImage(e, bic.ToImage(), lDest);
               }
             }
             else
@@ -156,6 +162,39 @@ namespace MMEd.Viewers
       }
     }
 
+    private void InitialiseTransparencyAttributes()
+    {
+      // Define a colour matrix. This allows transformations
+      // of the bitmap data using matrix operations. The
+      // rows correspond to RGB + alpha and one other; here
+      // the alpha is set to 50%.
+      float[][] lMatrixDefinition = 
+                  { 
+                    new float[] {1, 0, 0, 0, 0},
+                    new float[] {0, 1, 0, 0, 0},
+                    new float[] {0, 0, 1, 0, 0},
+                    new float[] {0, 0, 0, 0.5f, 0}, 
+                    new float[] {0, 0, 0, 0, 1}
+                  };
+      ColorMatrix lMatrix = new ColorMatrix(lMatrixDefinition);
+      mTransparencyAttributes.SetColorMatrix(lMatrix,
+        ColorMatrixFlag.Default,
+        ColorAdjustType.Bitmap);
+    }
+
+    private void DrawTransparentImage(PaintEventArgs e, Image xiImage, Rectangle xiDest)
+    {
+      e.Graphics.DrawImage(
+        xiImage,
+        xiDest,
+        0, // These 5 params define which part of the source image to use - all of it.
+        0,
+        xiImage.Width,
+        xiImage.Height,
+        GraphicsUnit.Pixel,
+        mTransparencyAttributes);
+    }
+
     public override bool CanViewChunk(Chunk xiChunk)
     {
       return xiChunk is FlatChunk;
@@ -201,9 +240,9 @@ namespace MMEd.Viewers
 
         //init the selected image display boxes
         const int PADDING = 5, IMG_X_OFF = 32;
-        object[] keys =new object[] { MouseButtons.Left, MouseButtons.Right, '1', '2', '3', '4', 'q', 'w', 'e', 'r' };
+        object[] keys = new object[] { MouseButtons.Left, MouseButtons.Right, '1', '2', '3', '4', 'q', 'w', 'e', 'r' };
         mMainForm.GridViewSelPanel.Size = new Size(IMG_X_OFF + PADDING + 64, (64 + PADDING) * keys.Length);
-        for (int i=0; i<keys.Length; i++)
+        for (int i = 0; i < keys.Length; i++)
         {
           object key = keys[i];
           if (!mKeyOrMouseToSelPicBoxDict.ContainsKey(key))
@@ -278,7 +317,7 @@ namespace MMEd.Viewers
         bool lIsTex = mMainForm.GridViewRadioEditTex.Checked;
         mMainForm.GridViewPalettePanel.Controls.Clear();
         mMainForm.GridViewPalettePanel.SuspendLayout();
-        Point lNextPbTL = new Point(0,0);
+        Point lNextPbTL = new Point(0, 0);
         IEnumerator<object> lKeys = mKeyOrMouseToSelPicBoxDict.Keys.GetEnumerator();
         PictureBox lPalPB = null;
         for (int i = 0; i < 256; i++)
@@ -301,7 +340,7 @@ namespace MMEd.Viewers
                 new Size(lNextPbTL.X + 64 + PADDING,
                          lNextPbTL.Y + 64);
               mMainForm.GridViewPalettePanel.Controls.Add(lPalPB);
-              lPalPB.Bounds = new Rectangle(lNextPbTL, new Size(64,64));
+              lPalPB.Bounds = new Rectangle(lNextPbTL, new Size(64, 64));
               lPalPB.SizeMode = PictureBoxSizeMode.StretchImage;
               lPalPB.Tag = (byte)i;
               lPalPB.MouseClick += new MouseEventHandler(PaletteImageMouseClick);
@@ -319,7 +358,7 @@ namespace MMEd.Viewers
         }
       }
       mMainForm.GridViewPalettePanel.ResumeLayout();
-      mMainForm.GridViewSelImageGroupBox.Visible = 
+      mMainForm.GridViewSelImageGroupBox.Visible =
         mMainForm.GridViewRadioEditTex.Checked
         || mMainForm.GridViewRadioEditBump.Checked;
       InvalidateGridDisplay();
@@ -362,7 +401,7 @@ namespace MMEd.Viewers
               val.ToString(), //Default value
               -1, //X coord
               -1);// Y coord
-              
+
             if (lReply != null && lReply != "")
             {
               val = short.Parse(lReply);
@@ -409,7 +448,7 @@ namespace MMEd.Viewers
         PictureBox lSel = mKeyOrMouseToSelPicBoxDict[xiKey];
         lSel.Tag = xiNewVal.Tag;
         lSel.Image = xiNewVal.Image;
-        lSel.Size = new Size(64,64);
+        lSel.Size = new Size(64, 64);
       }
     }
 
@@ -450,12 +489,14 @@ namespace MMEd.Viewers
             InvalidateGridDisplay();
             return;
           }
-         
+
           Point lClientPt = c.PointToClient(lMousePt);
           c = c.GetChildAtPoint(lClientPt);
         }
       }
     }
+
+    private ImageAttributes mTransparencyAttributes = new ImageAttributes();
   }
 }
 
