@@ -366,6 +366,18 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
       throw new Exception("The method or operation is not implemented.");
     }
 
+    private short GetTerrainHeightSafe(int x, int y)
+    {
+      if (x < 0 || x >= Width || y < 0 || y >= Height)
+      {
+        return 0;
+      }
+      else
+      {
+        return TerrainHeight[x][y];
+      }
+    }
+
     public IEnumerable<GLTK.Entity> GetEntities(Level xiLevel, eTextureMode xiTextureMode, FlatChunk.TexMetaDataEntries xiSelectedMetadata)
     {
       //qq hack:
@@ -400,14 +412,14 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
         {
           Mesh lSquare = new OwnedMesh(this);
           lSquare.AddFace(
-          new Vertex(new Point(x, y, 0), 0, 0),
-          new Vertex(new Point(x + 1, y, 0), 1, 0),
-          new Vertex(new Point(x + 1, y + 1, 0), 1, 1));
+          new Vertex(new Point(x, y, -GetTerrainHeightSafe(x, y)), 0, 0),
+          new Vertex(new Point(x + 1, y, -GetTerrainHeightSafe(x+1, y)), 1, 0),
+          new Vertex(new Point(x + 1, y + 1, -GetTerrainHeightSafe(x+1, y+1)), 1, 1));
 
           lSquare.AddFace(
-            new Vertex(new Point(x, y, 0), 0, 0),
-            new Vertex(new Point(x + 1, y + 1, 0), 1, 1),
-            new Vertex(new Point(x, y + 1, 0), 0, 1));
+            new Vertex(new Point(x, y, -GetTerrainHeightSafe(x, y)), 0, 0),
+            new Vertex(new Point(x + 1, y + 1, -GetTerrainHeightSafe(x + 1, y + 1)), 1, 1),
+            new Vertex(new Point(x, y + 1, -GetTerrainHeightSafe(x, y+1)), 0, 1));
 
           if (this.TreeNode.Checked) //(inactive)
           {
