@@ -60,6 +60,18 @@ namespace MMEd.Chunks
       return null;
     }
 
+    public BumpImageChunk GetBumpById(int xiId)
+    {
+      if (xiId < SHET.BumpImages.mChildren.Length)
+      {
+        return (BumpImageChunk)SHET.BumpImages.mChildren[xiId];
+      }
+      else
+      {
+        return null;
+      }
+    }
+
     public TMDChunk GetObjtById(int xiId)
     {
       if (OBJT == null) return null;

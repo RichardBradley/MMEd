@@ -16,6 +16,10 @@ namespace MMEd.Chunks
 {
   public class BumpImageChunk : Chunk, Viewers.ImageViewer.IImageProvider
   {
+    //qq It would be really good if this list could be merged
+    //   with the list in makeBumpTypeToBumpTypeInfoMap, to reduce
+    //   duplication of info. Is it possible to annotate Enum entries with
+    //   attributes?
     public enum eBumpType
     {
       plain = 0x00,
@@ -94,63 +98,42 @@ namespace MMEd.Chunks
       outStr.Write(Data, 0, Data.Length);
     }
 
+    Bitmap mBitmapCache;
     public Image ToImage()
     {
-      Bitmap lBmp = new Bitmap(8 * mScale, 8 * mScale);
-      for (int x = 0; x < 8 * mScale; x++)
-        for (int y = 0; y < 8 * mScale; y++)
-          lBmp.SetPixel(x, y, palette[Data[8 * (x / mScale) + y / mScale]]); //(note x-y swap)
-
-      // Outline the squares in black
-      for (int x = 0; x < 8; x++)
-      {
-        for (int y = 0; y < 8 * mScale; y += 2)
+        if (mBitmapCache == null)
         {
-          lBmp.SetPixel(x * mScale, y, Color.Black);
-          lBmp.SetPixel(x * mScale, y + 1, Color.White);
+            mBitmapCache = ToBitmapUncached();
         }
-      }
-      for (int y = 0; y < 8; y++)
-      {
-        for (int x = 0; x < 8 * mScale; x += 2)
-        {
-          lBmp.SetPixel(x, y * mScale, Color.Black);
-          lBmp.SetPixel(x + 1, y * mScale, Color.White);
-        }
-      }
-
-      // Outline selected pixel in white
-      for (int x = mX * mScale; x < (mX + 1) * mScale; ++x)
-      {
-        lBmp.SetPixel(x, mY * mScale, Color.White);
-        lBmp.SetPixel(x, ((mY + 1) * mScale) - 1, Color.White);
-      }
-      for (int y = mY * mScale; y < (mY + 1) * mScale; ++y)
-      {
-        lBmp.SetPixel(mX * mScale, y, Color.White);
-        lBmp.SetPixel(((mX + 1) * mScale) - 1, y, Color.White);
-      }
-      return lBmp;
+        return mBitmapCache;
     }
 
-    public void SetSelectedPixel(int xiX, int xiY)
+    public Bitmap ToBitmapUncached()
     {
-      mX = xiX / mScale;
-      mY = xiY / mScale;
+      Bitmap lBmp = new Bitmap(8 * SCALE, 8 * SCALE);
+      Graphics g = Graphics.FromImage(lBmp);
+      for (int x = 0; x < 8; x++)
+        for (int y = 0; y < 8; y++) 
+        {
+            Brush b = new SolidBrush(mPalette[Data[8 * x + y]]); //(note x-y swap)
+            g.FillRectangle(b, x*SCALE, y*SCALE, SCALE, SCALE);
+        }
+      return lBmp;
     }
 
     // Get the eBumpType for the supplied coordinates
     public eBumpType GetPixelType(int xiX, int xiY)
     {
       // Brackets are needed so that int division happens first
-      return (eBumpType)Data[(8 * (xiX / mScale)) + (xiY / mScale)];
+      return (eBumpType)Data[8 * xiX + xiY];
     }
 
     // Set the eBumpType for the supplied coordinates
     public void SetPixelType(int xiX, int xiY, eBumpType xiType)
     {
       // Brackets are needed so that int division happens first
-      Data[(8 * (xiX / mScale)) + (xiY / mScale)] = (byte)xiType;
+      Data[8 * xiX + xiY] = (byte)xiType;
+      mBitmapCache = null;
     }
 
     public static Hashtable BumpTypeToBumpTypeInfoMap = makeBumpTypeToBumpTypeInfoMap();
@@ -216,7 +199,7 @@ namespace MMEd.Chunks
       xiHt[xiVal] = new BumpTypeInfo(xiVal, Color.FromArgb(xiColor | ~0x00ffffff));
     }
 
-    private static Color[] palette = makePalette();
+    private static Color[] mPalette = makePalette();
 
     private static Color[] makePalette()
     {
@@ -250,8 +233,6 @@ namespace MMEd.Chunks
     int mIdx;
     [Description("The data.")]
     public byte[] Data;
-    private int mX;
-    private int mY;
-    private const int mScale = 16;
+    public const int SCALE = 16;
   }
 }

@@ -228,10 +228,26 @@ namespace MMEd.Chunks
 
     public Bitmap ToBitmap()
     {
-      if (mBitmapCache != null)
+      if (mBitmapCache == null)
       {
-        return mBitmapCache;
+        try
+        {
+          mBitmapCache = CreateBitmapUnmanaged4bpp();
+        }
+        catch (Exception e)
+        {
+          //I seem to get a fair number of GDI+ exceptions from the
+          //unmanaged call. Don't really know why.
+          Console.Error.WriteLine(e);
+          mBitmapCache = CreateBitmapManaged();
+        }
       }
+      return mBitmapCache;
+    }
+
+    //creates a bitmap using managed code only
+    private Bitmap CreateBitmapManaged()
+    {
       Bitmap acc = new Bitmap(ImageWidth, ImageHeight, PixelFormat.Format32bppArgb);
       for (int y = 0; y < ImageHeight; y++)
       {
@@ -245,8 +261,54 @@ namespace MMEd.Chunks
           acc.SetPixel(x + 1, y, right);
         }
       }
-      mBitmapCache = acc;
       return acc;
+    }
+
+    //creates a bitmap by writing a BMP stream and
+    //calling an unmanaged function to load it
+    private Bitmap CreateBitmapUnmanaged4bpp()
+    {
+      //create a BMP stream
+      int lFileSize = 54 + 16 * 4 + ImageData.Length;
+      MemoryStream mem = new MemoryStream(lFileSize);
+      BinaryWriter bout = new BinaryWriter(mem);
+      bout.Write((byte)'B'); //bfType[1]
+      bout.Write((byte)'M'); //bfType[2]
+      bout.Write(lFileSize); //bfSize
+      bout.Write((int)0); //bfReserved1, bfReserved2
+      bout.Write(54 + 16 * 4); //bfOffBits
+      bout.Write(40); //biSize
+      bout.Write((int)ImageWidth);//biWidth
+      bout.Write((int)ImageHeight);//biHeight
+      bout.Write((short)0);//biPlanes
+      bout.Write((short)4);//biBitCount
+      bout.Write((int)0);//biCompression
+      bout.Write((int)0);//biSizeImage (0 is valid when no compression)
+      bout.Write((int)0);//biXPelsPerMeter
+      bout.Write((int)0);//biYPelsPerMeter
+      bout.Write((int)0);//biClrUsed (0 = derived from biBitCount)
+      bout.Write((int)0);//biClrImportant
+      foreach (int c in Palette)
+      {
+        bout.Write((int)(c & 0xffffff));
+      }
+
+      int h = ImageHeight;
+      int w = ImageWidth / 2;
+
+      for (int y = h-1; y >= 0; y--)
+      {
+        for (int x = 0; x < w; x++)
+        {
+          byte b = ImageData[y * w + x];
+          bout.Write((byte)(((b >> 4) & 0xf) | ((b << 4) & 0xf0)));
+        }
+      }
+
+      if (mem.Length != lFileSize) throw new Exception();
+      mem.Seek(0, SeekOrigin.Begin);
+
+      return new Bitmap(mem);
     }
 
     Bitmap mBitmapCache;
