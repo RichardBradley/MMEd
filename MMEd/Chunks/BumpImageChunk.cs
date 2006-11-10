@@ -31,13 +31,13 @@ namespace MMEd.Chunks
       roadBorder2 = 0x06,
       water = 0x07,
       hole = 0x08, // A void or hole in the surface
-      lilyPad = 0x09,
+      lilyPad = 0x09, // NB This doesn't do much on a random pool course
       grassStalk = 0x0A,
       unknown0B = 0x0B,
-      unknown0C = 0x0C,
+      unknown0C = 0x0C, // This is present in Rack & Roll, but driving over it has no discernable effect
       roadBorderPool = 0x0D, // Edge of the track in a pool table course
       poolPocket = 0x0E, // A pool pocket - death trap
-      unknown0F = 0x0F,
+      lowSurvivalHeight = 0x0F, // Driving off the edge of this means you die even if you don't fall very far. (Also without it, the edge of the Rack & Roll table sometimes appears over the car rather than under it)
       unknown10 = 0x10,
       clearGoo = 0x11,
       powderSpill = 0x12,
@@ -54,7 +54,7 @@ namespace MMEd.Chunks
       microGooMiddle = 0x1D,
       exitMicroscope = 0x1E,
       unknown1F = 0x1F,
-      jumpWhoosh2 = 0x20,
+      jumpWhoosh2 = 0x20, // Allegedly like jumpWhoosh. But appears to have a "one-way" property in some cases, and energetic attempts to violate this result in a "splash"
       enterTeleport = 0x21,
       unknown22 = 0x22,
       sand = 0x23,
@@ -152,31 +152,31 @@ namespace MMEd.Chunks
       BTF(ht, eBumpType.roadBorder2, 0x89cbbf);
       BTF(ht, eBumpType.water, 0x4551ec);
       BTF(ht, eBumpType.hole, 0xffffff);
-      BTF(ht, eBumpType.lilyPad, 0xff00ff);
-      BTF(ht, eBumpType.grassStalk, 0xff00ff);
+      BTF(ht, eBumpType.lilyPad, 0x33ff33);
+      BTF(ht, eBumpType.grassStalk, 0x00ff00);
       BTF(ht, eBumpType.unknown0B, 0xff00ff);
       BTF(ht, eBumpType.unknown0C, 0xff00ff);
       BTF(ht, eBumpType.roadBorderPool, 0x89cbde);
       BTF(ht, eBumpType.poolPocket, 0xeeeeee);
-      BTF(ht, eBumpType.unknown0F, 0xff00ff);
+      BTF(ht, eBumpType.lowSurvivalHeight, 0x00dddd);
       BTF(ht, eBumpType.unknown10, 0xff00ff);
-      BTF(ht, eBumpType.clearGoo, 0xff00ff);
-      BTF(ht, eBumpType.powderSpill, 0xff00ff);
-      BTF(ht, eBumpType.greenGoo, 0xff00ff);
-      BTF(ht, eBumpType.redGoo, 0xff00ff);
-      BTF(ht, eBumpType.roadBorderLab, 0xff00ff);
+      BTF(ht, eBumpType.clearGoo, 0xffeedd);
+      BTF(ht, eBumpType.powderSpill, 0x3333ff);
+      BTF(ht, eBumpType.greenGoo, 0x33ff33);
+      BTF(ht, eBumpType.redGoo, 0xff3333);
+      BTF(ht, eBumpType.roadBorderLab, 0x89cbfd);
       BTF(ht, eBumpType.jumpWoosh, 0xffe400);
       BTF(ht, eBumpType.unknown17, 0xff00ff);
       BTF(ht, eBumpType.unknown18, 0xff00ff);
-      BTF(ht, eBumpType.enterTestTube, 0xff00ff);
+      BTF(ht, eBumpType.enterTestTube, 0xff9900);
       BTF(ht, eBumpType.unknown1A, 0xff00ff);
       BTF(ht, eBumpType.unknown1B, 0xff00ff);
-      BTF(ht, eBumpType.microGooEdge, 0xff00ff);
-      BTF(ht, eBumpType.microGooMiddle, 0xff00ff);
-      BTF(ht, eBumpType.exitMicroscope, 0xff00ff);
+      BTF(ht, eBumpType.microGooEdge, 0xaaaa00);
+      BTF(ht, eBumpType.microGooMiddle, 0x888800);
+      BTF(ht, eBumpType.exitMicroscope, 0xff7700);
       BTF(ht, eBumpType.unknown1F, 0xff00ff);
-      BTF(ht, eBumpType.jumpWhoosh2, 0xff00ff);
-      BTF(ht, eBumpType.enterTeleport, 0xff00ff);
+      BTF(ht, eBumpType.jumpWhoosh2, 0xfff400);
+      BTF(ht, eBumpType.enterTeleport, 0xff8800);
       BTF(ht, eBumpType.unknown22, 0xff00ff);
       BTF(ht, eBumpType.sand, 0xc9b549);
       BTF(ht, eBumpType.unknown24, 0xff00ff);
