@@ -327,7 +327,7 @@ namespace MMEd.Viewers
         lTR.Camera.LookAt(new GLTK.Point(3 * MoveScale, 3 * MoveScale, 0), new GLTK.Vector(0, 0, 1));
 
         MMEdView lTL = mViews[mMainForm.Viewer3DRenderingSurfaceTopLeft];
-        lTL.Camera.Position = new GLTK.Point(0, 0, 5000);
+        lTL.Camera.Position = new GLTK.Point(0, 0, -5000);
         lTL.Camera.LookAt(new GLTK.Point(0, 0, 0), GLTK.Vector.XAxis);
 
         MMEdView lBL = mViews[mMainForm.Viewer3DRenderingSurfaceBottomLeft];
