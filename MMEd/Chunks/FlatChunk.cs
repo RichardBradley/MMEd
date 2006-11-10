@@ -472,7 +472,7 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
 
                 if (lVal != 0)
                 {
-                  lTexture = (Bitmap)lTexture.Clone();
+                  lTexture = new Bitmap(lTexture); //should make it non-indexed, too                  
 
                   Graphics g = Graphics.FromImage(lTexture);
 
