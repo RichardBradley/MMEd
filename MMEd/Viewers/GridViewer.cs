@@ -183,7 +183,7 @@ namespace MMEd.Viewers
         //init the selected image display boxes
         const int PADDING = 5, IMG_X_OFF = 32;
         object[] keys =new object[] { MouseButtons.Left, MouseButtons.Right, '1', '2', '3', '4', 'q', 'w', 'e', 'r' };
-        mMainForm.GridViewSelPanel.Size = new Size(IMG_X_OFF + PADDING + mSubjectTileWidth, (mSubjectTileHeight + PADDING) * keys.Length);
+        mMainForm.GridViewSelPanel.Size = new Size(IMG_X_OFF + PADDING + 64, (64 + PADDING) * keys.Length);
         for (int i=0; i<keys.Length; i++)
         {
           object key = keys[i];
@@ -258,6 +258,7 @@ namespace MMEd.Viewers
       {
         bool lIsTex = mMainForm.GridViewRadioEditTex.Checked;
         mMainForm.GridViewPalettePanel.Controls.Clear();
+        mMainForm.GridViewPalettePanel.SuspendLayout();
         Point lNextPbTL = new Point(0,0);
         IEnumerator<object> lKeys = mKeyOrMouseToSelPicBoxDict.Keys.GetEnumerator();
         PictureBox lPalPB = null;
@@ -298,6 +299,7 @@ namespace MMEd.Viewers
           SetSelImage(lKeys.Current, lPalPB);
         }
       }
+      mMainForm.GridViewPalettePanel.ResumeLayout();
       mMainForm.GridViewSelImageGroupBox.Visible = 
         mMainForm.GridViewRadioEditTex.Checked
         || mMainForm.GridViewRadioEditBump.Checked;
@@ -388,7 +390,7 @@ namespace MMEd.Viewers
         PictureBox lSel = mKeyOrMouseToSelPicBoxDict[xiKey];
         lSel.Tag = xiNewVal.Tag;
         lSel.Image = xiNewVal.Image;
-        lSel.Size = lSel.Image.Size;
+        lSel.Size = new Size(64,64);
       }
     }
 
