@@ -204,7 +204,7 @@ namespace MMEd.Chunks
 
     public IEnumerable<GLTK.Entity> GetEntities(Level xiLevel, eTextureMode xiTextureMode, FlatChunk.TexMetaDataEntries xiSelectedMetadata, object xiMeshOwner)
     {
-      Entity lAcc = new Entity();
+      MMEdEntity lAcc = new MMEdEntity(xiMeshOwner);
       Mesh lColouredMesh = null;
       Mesh lTexturedMesh = null;
       int lTexPageId = int.MinValue;

@@ -29,7 +29,8 @@ namespace MMEd.Viewers
       {
         foreach (Mesh lMesh in xiObject.Meshes)
         {
-          if (lMesh == mViewer.ActiveMesh)
+          OwnedMesh lOm = lMesh as OwnedMesh;
+          if (lOm != null && lOm.Owner == mViewer.ActiveObject)
           {
             mActiveEntity = xiObject;
             break;

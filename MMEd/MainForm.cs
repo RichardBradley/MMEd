@@ -233,6 +233,17 @@ namespace MMEd
           }
         }
 
+      protected override bool  ProcessCmdKey(ref Message msg, Keys keyData)
+      {
+        if (DialogKey != null)
+        {
+          DialogKey(this, new KeyEventArgs(keyData));
+        }
+        return base.ProcessCmdKey(ref msg, keyData);
+      }
+
+      public event KeyEventHandler DialogKey;
+
       /*qqAIT
       private void splitContainer3_SplitterMoved(object sender, SplitterEventArgs e)
       {

@@ -20,16 +20,12 @@ namespace MMEd.Viewers
       : base(xiMainForm)
     {
       mMainForm.KeyPreview = true;
-      mMainForm.KeyPress += new KeyPressEventHandler(MainForm_KeyPress);
+      mMainForm.DialogKey +=new KeyEventHandler(MainForm_KeyDown);
       mMainForm.FormClosing += new FormClosingEventHandler(mMainForm_FormClosing);
 
       mMainForm.ChunkTreeView.NodeMouseClick += new TreeNodeMouseClickEventHandler(ChunkTreeView_NodeMouseClick);
 
-      mScene = new Scene();
-
-      mLight = new Light();
-      mLight.DiffuseIntensity = 0.1;
-      mLight.SpecularIntensity = 0.02;
+      mScene = new MMEdScene();
 
       Camera lCameraBottomLeft = new Camera(80, 0.1, 1e10);
       lCameraBottomLeft.ProjectionMode = eProjectionMode.Orthographic;
@@ -50,10 +46,6 @@ namespace MMEd.Viewers
       //
       PropertyController lMoveCtrl = new PropertyController(this, "MovementMode", "OnMovementModeChange");
       mOptionsMenu.DropDownItems.AddRange(lMoveCtrl.CreateMenuItems());
-      mOptionsMenu.DropDownItems.Add(new ToolStripSeparator());
-      //
-      PropertyController lLightCtrl = new PropertyController(this, "LightingMode", "OnLightingModeChange");
-      mOptionsMenu.DropDownItems.AddRange(lLightCtrl.CreateMenuItems());
       mOptionsMenu.DropDownItems.Add(new ToolStripSeparator());
       //
       PropertyController lNormCtrl = new PropertyController(this, "DrawNormalsMode", "OnDrawNormalsModeChange");
@@ -77,8 +69,8 @@ namespace MMEd.Viewers
       xiSurface.MouseDown += new MouseEventHandler(Viewer3DRenderingSurface_MouseDown);
       xiSurface.MouseUp += new MouseEventHandler(Viewer3DRenderingSurface_MouseUp);
       xiSurface.MouseMove += new MouseEventHandler(Viewer3DRenderingSurface_MouseMove);
-      xiSurface.GotFocus += new EventHandler(Viewer3DRenderingSurface_GotFocus);
       xiSurface.MouseWheel += new MouseEventHandler(Viewer3DRenderingSurface_MouseWheel);
+      xiSurface.GotFocus += new EventHandler(Viewer3DRenderingSurface_GotFocus);
 
       ImmediateModeRenderer lRenderer = new ImmediateModeRenderer();
       lRenderer.FixedRenderMode = xiFixedRenderMode;
@@ -91,20 +83,11 @@ namespace MMEd.Viewers
 
     void Viewer3DRenderingSurface_GotFocus(object sender, EventArgs e)
     {
-      RenderingSurface lSurface = sender as RenderingSurface;
-
-      if (mActiveSurface != null)
-      {
-        mActiveSurface.BackColor = Color.FromKnownColor(KnownColor.Control);
-      }
-
-      mActiveSurface = lSurface;
-      lSurface.Parent.BackColor = Color.Red;
+      mActiveSurface = sender as RenderingSurface;
     }
 
-    private RenderingSurface mActiveSurface = null;
+    RenderingSurface mActiveSurface = null;
 
-    Light mLight;
     void ChunkTreeView_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
     {
       RebuildScene();
@@ -131,17 +114,31 @@ namespace MMEd.Viewers
       if (!mDraggingView || mSubject == null) return;
       System.Drawing.Point lNewMousePoint = e.Location;
 
-      Camera lCamera = mViews[(RenderingSurface)sender].Camera;
+      RenderingSurface lSender = sender as RenderingSurface;
+      Camera lCamera = mViews[lSender].Camera;
 
       bool lCameraIsUpsideDown = lCamera.YAxis.Dot(Vector.ZAxis) < 0;
       if (mDraggingButton == MouseButtons.Left)
       {
-        if (lCamera.ProjectionMode == eProjectionMode.Orthographic)
+        if (Control.ModifierKeys == Keys.Alt)
         {
-          lCamera.Move(-0.1 * MoveScale * (lNewMousePoint.X - mLastMouseDown.X) * lCamera.XAxis);
-          lCamera.Move(0.1 * MoveScale * (lNewMousePoint.Y - mLastMouseDown.Y) * lCamera.YAxis);
+          FlatChunk.ObjectEntry lObject = ActiveObject as FlatChunk.ObjectEntry;
+          if (lObject != null)
+          {
+            Vector lDelta = ((lNewMousePoint.X - mLastMouseDown.X) * lCamera.XAxis)
+              + ((lNewMousePoint.Y - mLastMouseDown.Y) * lCamera.YAxis);
+            lObject.OriginPosition.X += (short)(lDelta.x);
+            lObject.OriginPosition.Y += (short)(lDelta.y);
+            lObject.OriginPosition.Z += (short)(lDelta.z);
+            RebuildObject(lObject);
+            InvalidateAllViewers();
+            return;
+          }
         }
-        else
+        else if (Control.ModifierKeys == Keys.Shift)
+        {
+        }
+        else if (lCamera.ProjectionMode == eProjectionMode.Perspective)
         {
           switch (MovementMode)
           {
@@ -157,30 +154,33 @@ namespace MMEd.Viewers
           }
         }
       }
-      if (mDraggingButton == MouseButtons.Right && lCamera.ProjectionMode == eProjectionMode.Perspective)
+      if (mDraggingButton == MouseButtons.Right)
       {
-        if (lCamera.ProjectionMode == eProjectionMode.Orthographic)
+        if (Control.ModifierKeys == Keys.Alt)
         {
-          lCamera.Move(-0.1 * MoveScale * (lNewMousePoint.X - mLastMouseDown.X) * lCamera.XAxis);
-          lCamera.Move(0.1 * MoveScale * (lNewMousePoint.Y - mLastMouseDown.Y) * lCamera.YAxis);
+        }
+        else if (Control.ModifierKeys == Keys.Shift)
+        {
         }
         else
         {
-          if (lCamera.ProjectionMode == eProjectionMode.Perspective && MovementMode == eMovementMode.FlyMode)
+          if (lCamera.ProjectionMode == eProjectionMode.Orthographic)
           {
             lCamera.Move(-0.1 * MoveScale * (lNewMousePoint.X - mLastMouseDown.X) * lCamera.XAxis);
-            lCamera.Move(0.1 * MoveScale * (lNewMousePoint.Y - mLastMouseDown.Y) * lCamera.ZAxis);
+            lCamera.Move(0.1 * MoveScale * (lNewMousePoint.Y - mLastMouseDown.Y) * lCamera.YAxis);
+          }
+          else
+          {
+            if (lCamera.ProjectionMode == eProjectionMode.Perspective && MovementMode == eMovementMode.FlyMode)
+            {
+              lCamera.Move(-0.1 * MoveScale * (lNewMousePoint.X - mLastMouseDown.X) * lCamera.XAxis);
+              lCamera.Move(0.1 * MoveScale * (lNewMousePoint.Y - mLastMouseDown.Y) * lCamera.ZAxis);
+            }
           }
         }
       }
-      if (LightingMode == eLightingMode.Headlight)
-      {
-        //qq this replaces the matrix, rather than changes the values,
-        // but that's OK for now
-        mLight.Transform = lCamera.Transform;
-      }
       mLastMouseDown = lNewMousePoint;
-      ((RenderingSurface)sender).Invalidate();
+      lSender.Invalidate();
     }
 
     void Viewer3DRenderingSurface_MouseUp(object sender, MouseEventArgs e)
@@ -197,70 +197,70 @@ namespace MMEd.Viewers
     {
       Camera lCamera = mViews[(RenderingSurface)sender].Camera;
 
-      if (Control.ModifierKeys == Keys.Control)
+      if (Control.ModifierKeys != Keys.Control)
       {
         ((RenderingSurface)sender).Capture = true;
         mLastMouseDown = e.Location;
         mDraggingButton = e.Button;
         mDraggingView = true;
       }
-      else if (e.Button == MouseButtons.Left && sender == mActiveSurface)
+      else if (e.Button == MouseButtons.Left)
       {
-        Mesh lMesh = mViews[(RenderingSurface)sender].Renderer.Pick(e.X, e.Y);
+        OwnedMesh lMesh = mViews[(RenderingSurface)sender].Renderer.Pick(e.X, e.Y) as OwnedMesh;
         if (lMesh != null)
         {
-          if (lMesh is OwnedMesh && ((OwnedMesh)lMesh).Owner is Chunk)
-          {
-            OwnedMesh om = (OwnedMesh)lMesh;
-            Chunk c = (Chunk)om.Owner;
-            //            MessageBox.Show(c.Name);
-          }
-          ActiveMesh = lMesh;
+          ActiveObject = lMesh.Owner;
         }
       }
 
       ((RenderingSurface)sender).Focus();
     }
 
-    void MainForm_KeyPress(object sender, KeyPressEventArgs e)
+    void MainForm_KeyDown(object sender, KeyEventArgs e)
     {
-      OwnedMesh lMesh = ActiveMesh as OwnedMesh;
-      if (lMesh == null)
-      {
-        return;
-      }
-
-      FlatChunk.ObjectEntry lObject = lMesh.Owner as FlatChunk.ObjectEntry;
-
+      FlatChunk.ObjectEntry lObject = ActiveObject as FlatChunk.ObjectEntry;
       if (lObject == null)
       {
         return;
       }
 
-      switch (e.KeyChar)
+      if (mActiveSurface == null)
       {
-        case 'W':
-        case 'w':
-          lObject.OriginPosition.Y += 10;
-          break;
-
-        case 'S':
-        case 's':
-          lObject.OriginPosition.Y -= 10;
-          break;
-
-        case 'A':
-        case 'a':
-          lObject.OriginPosition.X -= 10;
-          break;
-
-        case 'D':
-        case 'd':
-          lObject.OriginPosition.X += 10;
-          break;
+        return;
       }
 
-      RebuildScene();
+      Camera lCamera = mViews[mActiveSurface].Camera;
+
+      Vector lDelta;
+      switch (e.KeyCode)
+      {
+        case Keys.Up:
+          lDelta = lCamera.YAxis;
+          break;
+
+        case Keys.Down:
+          lDelta = -lCamera.YAxis;
+          break;
+
+        case Keys.Right:
+          lDelta = lCamera.XAxis;
+          break;
+
+        case Keys.Left:
+          lDelta = -lCamera.XAxis;
+          break;
+
+        default:
+          return;
+      }
+
+      lDelta *= 5;
+
+      lObject.OriginPosition.X += (short)(lDelta.x);
+      lObject.OriginPosition.Y += (short)(lDelta.y);
+      lObject.OriginPosition.Z += (short)(lDelta.z);
+
+      RebuildObject(lObject);
       InvalidateAllViewers();
     }
 
@@ -300,7 +300,7 @@ namespace MMEd.Viewers
 
     private IEntityProvider mSubject = null;
 
-    Scene mScene;
+    MMEdScene mScene;
     Dictionary<RenderingSurface, MMEdView> mViews = new Dictionary<RenderingSurface, MMEdView>();
 
     ToolStripMenuItem mOptionsMenu;
@@ -343,7 +343,6 @@ namespace MMEd.Viewers
         {
           if (mSubject is TMDChunk)
           {
-            LightingMode = eLightingMode.None; //qq
             MovementMode = eMovementMode.InspectMode;
             DrawNormalsMode = eDrawNormalsMode.HideNormals;
             TextureMode = eTextureMode.NormalTextures;
@@ -351,17 +350,11 @@ namespace MMEd.Viewers
           }
           else
           {
-            LightingMode = eLightingMode.None;
             MovementMode = eMovementMode.FlyMode;
             DrawNormalsMode = eDrawNormalsMode.HideNormals;
             TextureMode = eTextureMode.NormalTextures;
             SelectedMetadata = FlatChunk.TexMetaDataEntries.Waypoint;
           }
-        }
-
-        if (MovementMode == eMovementMode.InspectMode)
-        {
-          //qqAIT mLight.Transform = mCamera.Transform;
         }
 
         mMainForm.ChunkTreeView.CheckBoxes = (mSubject is Level);
@@ -380,6 +373,15 @@ namespace MMEd.Viewers
       mScene.Clear();
       if (mSubject != null)
         mScene.AddRange(mSubject.GetEntities(mMainForm.Level, TextureMode, SelectedMetadata));
+    }
+
+    private void RebuildObject(FlatChunk.ObjectEntry xiObject)
+    {
+      if (mSubject is Level)
+      {
+        mScene.RemoveMMEdObject(xiObject);
+        mScene.AddObject(xiObject.GetEntity(mSubject as Level, TextureMode, SelectedMetadata));
+      }
     }
 
     public static GLTK.Point Short3CoordToPoint(Short3Coord xiVal)
@@ -436,38 +438,6 @@ namespace MMEd.Viewers
 
     #endregion
 
-    #region LightingMode property
-
-    private eLightingMode mLightingMode;
-    public eLightingMode LightingMode
-    {
-      get { return mLightingMode; }
-      set
-      {/* qqAIT
-        switch (value)
-        {
-          case eLightingMode.None:
-            mRendererTopRight.DisableLighting();
-            break;
-          case eLightingMode.Headlight:
-            mRendererTopRight.EnableLighting();
-            mRendererTopRight.ResetLights();
-            mLight.Transform = mCamera.Transform;
-            mScene.AddLight(mLight);
-            break;
-          case eLightingMode.OverheadLight:
-            MessageBox.Show("OverheadLight mode not supported yet");
-            return;
-        }
-        mLightingMode = value;
-        if (OnLightingModeChange != null) OnLightingModeChange(this, null);
-        InvalidateViewer();*/
-      }
-    }
-    public event EventHandler OnLightingModeChange;
-
-    #endregion
-
     #region TextureMode property
 
     private eTextureMode mTextureMode;
@@ -519,27 +489,24 @@ namespace MMEd.Viewers
       }
     }
 
-    public Mesh ActiveMesh
+    public object ActiveObject
     {
-      get { return mActiveMesh; }
+      get
+      {
+        return mActiveObject;
+      }
       set
       {
-        if (value != mActiveMesh)
+        if (mActiveObject != value)
         {
-          mActiveMesh = value;
-          if (OnActiveMeshChange != null)
-          {
-            OnActiveMeshChange(value, EventArgs.Empty);
-          }
-
+          mActiveObject = value;
           InvalidateAllViewers();
         }
       }
     }
 
-    public event EventHandler OnActiveMeshChange;
 
-    private Mesh mActiveMesh = null;
+    private object mActiveObject = null;
 
   }
 }

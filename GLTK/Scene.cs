@@ -6,12 +6,12 @@ namespace GLTK
 {
   public class Scene
   {
-    public void AddRange(IEnumerable<Entity> xiCollection)
+    public virtual void AddRange(IEnumerable<Entity> xiCollection)
     {
         mObjects.AddRange(xiCollection);
     }
 
-    public void AddObject(Entity xiObject)
+    public virtual void AddObject(Entity xiObject)
     {
       if (!mObjects.Contains(xiObject))
       {
@@ -19,7 +19,7 @@ namespace GLTK
       }
     }
 
-    public void RemoveObject(Entity xiObject)
+    public virtual void RemoveObject(Entity xiObject)
     {
       if (mObjects.Contains(xiObject))
       {

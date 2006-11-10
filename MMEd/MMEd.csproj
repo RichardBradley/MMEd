@@ -113,6 +113,8 @@
     <Compile Include="Util\StreamUtils.cs" />
     <Compile Include="Util\Utils.cs" />
     <Compile Include="Viewer.cs" />
+    <Compile Include="Viewers\MMEdEntity.cs" />
+    <Compile Include="Viewers\MMEdScene.cs" />
     <Compile Include="Viewers\MMEdView.cs">
       <SubType>Code</SubType>
     </Compile>

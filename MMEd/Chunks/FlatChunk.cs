@@ -322,6 +322,38 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
         StreamUtils.WriteByteFlag(bout, IsSolid);
         bout.Write(ShortUnknown);
       }
+
+      public Entity GetEntity(Level xiLevel, eTextureMode xiTextureMode, TexMetaDataEntries xiSelectedMetadata)
+      {
+        TMDChunk lObjt = xiLevel.GetObjtById(this.ObjtType);
+        if (lObjt != null)
+        {
+          //qq hack!
+          Entity[] lEarr = (Entity[])lObjt.GetEntities(xiLevel, xiTextureMode, xiSelectedMetadata, this);
+          if (lEarr.Length != 1) throw new Exception("hack failed!");
+          Entity lE = lEarr[0];
+
+          //hacky!
+          lE.Scale(1, 1, -1);
+
+          if (this.RotationVector.Norm() != 0)
+          {
+            //the rotation is z-y-x
+            lE.RotateAboutWorldOrigin(-this.RotationVector.Z / 1024.0 * Math.PI / 2.0, Vector.ZAxis);
+            lE.RotateAboutWorldOrigin(-this.RotationVector.Y / 1024.0 * Math.PI / 2.0, Vector.YAxis);
+            lE.RotateAboutWorldOrigin(-this.RotationVector.X / 1024.0 * Math.PI / 2.0, Vector.XAxis);
+          }
+
+          lE.Position = ThreeDeeViewer.Short3CoordToPoint(this.OriginPosition);
+
+          //hacky!
+          lE.Scale(1, 1, -1);
+
+          return lE;
+        }
+
+        return null;
+      }
     }
 
     public class WeaponEntry
@@ -392,7 +424,7 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
 
       /////////////////////////////////////////////////////
       // The surface
-      Entity lSurface = new Entity();
+      Entity lSurface = new MMEdEntity(this);
 
       Font lNumberFont = null;
       Brush lNumberFGBrush = null, lNumberBGBrush = null;
@@ -507,30 +539,10 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
       {
         foreach (ObjectEntry oe in Objects)
         {
-          TMDChunk lObjt = xiLevel.GetObjtById(oe.ObjtType);
-          if (lObjt != null)
+          Entity lE = oe.GetEntity(xiLevel, xiTextureMode, xiSelectedMetadata);
+
+          if (lE != null)
           {
-            //qq hack!
-            Entity[] lEarr = (Entity[])lObjt.GetEntities(xiLevel, xiTextureMode, xiSelectedMetadata, oe);
-            if (lEarr.Length != 1) throw new Exception("hack failed!");
-            Entity lE = lEarr[0];
-
-            //hacky!
-            lE.Scale(1, 1, -1);
-
-            if (oe.RotationVector.Norm() != 0)
-            {
-              //the rotation is z-y-x
-              lE.RotateAboutWorldOrigin(-oe.RotationVector.Z / 1024.0 * Math.PI / 2.0, Vector.ZAxis);
-              lE.RotateAboutWorldOrigin(-oe.RotationVector.Y / 1024.0 * Math.PI / 2.0, Vector.YAxis);
-              lE.RotateAboutWorldOrigin(-oe.RotationVector.X / 1024.0 * Math.PI / 2.0, Vector.XAxis);
-            }
-
-            lE.Position = ThreeDeeViewer.Short3CoordToPoint(oe.OriginPosition);
-
-            //hacky!
-            lE.Scale(1, 1, -1);
-            
             lAcc.Add(lE);
           }
         }
