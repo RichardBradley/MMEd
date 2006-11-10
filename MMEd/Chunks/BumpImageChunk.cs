@@ -35,7 +35,7 @@ namespace MMEd.Chunks
       grassStalk = 0x0A,
       unknown0B = 0x0B,
       unknown0C = 0x0C,
-      poolTrackEdge = 0x0D, // Edge of the track in a pool table course
+      roadBorderPool = 0x0D, // Edge of the track in a pool table course
       poolPocket = 0x0E, // A pool pocket - death trap
       unknown0F = 0x0F,
       unknown10 = 0x10,
@@ -156,7 +156,7 @@ namespace MMEd.Chunks
       BTF(ht, eBumpType.grassStalk, 0xff00ff);
       BTF(ht, eBumpType.unknown0B, 0xff00ff);
       BTF(ht, eBumpType.unknown0C, 0xff00ff);
-      BTF(ht, eBumpType.poolTrackEdge, 0x89cbde);
+      BTF(ht, eBumpType.roadBorderPool, 0x89cbde);
       BTF(ht, eBumpType.poolPocket, 0xeeeeee);
       BTF(ht, eBumpType.unknown0F, 0xff00ff);
       BTF(ht, eBumpType.unknown10, 0xff00ff);

@@ -30,6 +30,7 @@ namespace MMEd.Viewers
 
       mMainForm.GridViewRadioImages.CheckedChanged += new EventHandler(this.ModeChanged);
       mMainForm.GridViewRadioViewBump.CheckedChanged += new EventHandler(this.ModeChanged);
+      mMainForm.GridViewRadioViewOdds.CheckedChanged += new EventHandler(this.ModeChanged);
       mMainForm.GridViewRadioEditTex.CheckedChanged += new EventHandler(this.ModeChanged);
       mMainForm.GridViewRadioEditBump.CheckedChanged += new EventHandler(this.ModeChanged);
       mMainForm.GridViewRadioEditMeta.CheckedChanged += new EventHandler(this.ModeChanged);
@@ -43,6 +44,7 @@ namespace MMEd.Viewers
 
       bool lDrawBumpNotTex = mMainForm.GridViewRadioEditBump.Checked 
           || mMainForm.GridViewRadioViewBump.Checked;
+      bool lDrawOdds = mMainForm.GridViewRadioViewOdds.Checked;
 
       bool lEditMetaMode = mMainForm.GridViewRadioEditMeta.Checked;
       int lDrawNumType =
@@ -71,30 +73,47 @@ namespace MMEd.Viewers
         {
           try
           {
-              if (lDrawBumpNotTex)
+            if (lDrawOdds)
+            {
+              Rectangle lDest = new Rectangle(
+                  x * mSubjectTileWidth,
+                  y * mSubjectTileHeight,
+                  mSubjectTileWidth,
+                  mSubjectTileHeight);
+              OddImageChunk bic = mMainForm.Level.GetOddById(mSubject.TexMetaData[x][y][lDrawNumType]);
+              if (bic == null)
               {
-                  Rectangle lDest = new Rectangle(
-                      x * mSubjectTileWidth,
-                      y * mSubjectTileHeight,
-                      mSubjectTileWidth,
-                      mSubjectTileHeight);
-                  BumpImageChunk bic = mMainForm.Level.GetBumpById(mSubject.TexMetaData[x][y][(int)FlatChunk.TexMetaDataEntries.Bumpmap]);
-                  if (bic == null)
-                  {
-                      e.Graphics.FillRectangle(new SolidBrush(Color.Black), lDest);
-                  }
-                  else
-                  {
-                      e.Graphics.DrawImage(bic.ToImage(), lDest);
-                  }
+                e.Graphics.FillRectangle(new SolidBrush(Color.Black), lDest);
               }
               else
               {
-                  e.Graphics.DrawImageUnscaled(
-                      mMainForm.Level.GetTileById(mSubject.TextureIds[x][y]).ToBitmap(),
-                      x * mSubjectTileWidth,
-                      y * mSubjectTileHeight);
+                e.Graphics.DrawImage(bic.ToImage(), lDest);
               }
+            }
+            else if (lDrawBumpNotTex)
+            {
+              Rectangle lDest = new Rectangle(
+                  x * mSubjectTileWidth,
+                  y * mSubjectTileHeight,
+                  mSubjectTileWidth,
+                  mSubjectTileHeight);
+              BumpImageChunk bic = mMainForm.Level.GetBumpById(mSubject.TexMetaData[x][y][(int)FlatChunk.TexMetaDataEntries.Bumpmap]);
+              if (bic == null)
+              {
+                e.Graphics.FillRectangle(new SolidBrush(Color.Black), lDest);
+              }
+              else
+              {
+                e.Graphics.DrawImage(bic.ToImage(), lDest);
+              }
+            }
+            else
+            {
+              e.Graphics.DrawImageUnscaled(
+                  mMainForm.Level.GetTileById(mSubject.TextureIds[x][y]).ToBitmap(),
+                  x * mSubjectTileWidth,
+                  y * mSubjectTileHeight);
+            }
 
             if (lEditMetaMode)
             {

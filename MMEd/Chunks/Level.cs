@@ -72,6 +72,18 @@ namespace MMEd.Chunks
       }
     }
 
+    public OddImageChunk GetOddById(int xiId)
+    {
+      if (xiId < SHET.OddImages.mChildren.Length)
+      {
+        return (OddImageChunk)SHET.OddImages.mChildren[xiId];
+      }
+      else
+      {
+        return null;
+      }
+    }
+
     public TMDChunk GetObjtById(int xiId)
     {
       if (OBJT == null) return null;
