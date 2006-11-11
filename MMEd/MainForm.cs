@@ -39,6 +39,7 @@ namespace MMEd
             //qq there must be a better way of doing this, it seems a bit
             //   odd
             ViewTabXML.Tag = XMLViewer.InitialiseViewer(this);
+            ViewTabFlat.Tag = FlatViewer.InitialiseViewer(this);
             ViewTabImg.Tag = ImageViewer.InitialiseViewer(this);
             ViewTabBump.Tag = BumpViewer.InitialiseViewer(this);
             ViewTabGrid.Tag = GridViewer.InitialiseViewer(this);

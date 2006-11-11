@@ -42,6 +42,8 @@ namespace MMEd
           this.ViewTabXML = new System.Windows.Forms.TabPage();
           this.XMLViewerCommitBtn = new System.Windows.Forms.Button();
           this.XMLTextBox = new System.Windows.Forms.TextBox();
+          this.ViewTabFlat = new System.Windows.Forms.TabPage();
+          this.FlatPanel = new Util.FlatEditorPanel();
           this.ViewTabImg = new System.Windows.Forms.TabPage();
           this.ImgPictureBox = new System.Windows.Forms.PictureBox();
           this.ViewTabGrid = new System.Windows.Forms.TabPage();
@@ -99,6 +101,7 @@ namespace MMEd
           this.ViewerTabControl.SuspendLayout();
           this.ViewTabSummary.SuspendLayout();
           this.ViewTabXML.SuspendLayout();
+          this.ViewTabFlat.SuspendLayout();
           this.ViewTabImg.SuspendLayout();
           ((System.ComponentModel.ISupportInitialize)(this.ImgPictureBox)).BeginInit();
           this.ViewTabGrid.SuspendLayout();
@@ -204,6 +207,7 @@ namespace MMEd
                       | System.Windows.Forms.AnchorStyles.Right)));
           this.ViewerTabControl.Controls.Add(this.ViewTabSummary);
           this.ViewerTabControl.Controls.Add(this.ViewTabXML);
+          this.ViewerTabControl.Controls.Add(this.ViewTabFlat);
           this.ViewerTabControl.Controls.Add(this.ViewTabImg);
           this.ViewerTabControl.Controls.Add(this.ViewTabGrid);
           this.ViewerTabControl.Controls.Add(this.ViewTab3D);
@@ -275,6 +279,27 @@ namespace MMEd
           this.XMLTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
           this.XMLTextBox.Size = new System.Drawing.Size(637, 471);
           this.XMLTextBox.TabIndex = 0;
+          // 
+          // ViewTabFlat
+          // 
+          this.ViewTabFlat.Controls.Add(this.FlatPanel);
+          this.ViewTabFlat.Location = new System.Drawing.Point(4, 22);
+          this.ViewTabFlat.Name = "ViewTabFlat";
+          this.ViewTabFlat.Padding = new System.Windows.Forms.Padding(3);
+          this.ViewTabFlat.Size = new System.Drawing.Size(636, 535);
+          this.ViewTabFlat.TabIndex = 1;
+          this.ViewTabFlat.Text = "Flat";
+          this.ViewTabFlat.UseVisualStyleBackColor = true;
+          // 
+          // FlatPanel
+          // 
+          this.FlatPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                      | System.Windows.Forms.AnchorStyles.Left)
+                      | System.Windows.Forms.AnchorStyles.Right)));
+          this.FlatPanel.Location = new System.Drawing.Point(0, 0);
+          this.FlatPanel.Name = "FlatPanel";
+          this.FlatPanel.Size = new System.Drawing.Size(636, 535);
+          this.FlatPanel.TabIndex = 0;
           // 
           // ViewTabImg
           // 
@@ -825,6 +850,8 @@ namespace MMEd
           this.ViewTabSummary.PerformLayout();
           this.ViewTabXML.ResumeLayout(false);
           this.ViewTabXML.PerformLayout();
+          this.ViewTabFlat.ResumeLayout(false);
+          this.ViewTabFlat.PerformLayout();
           this.ViewTabImg.ResumeLayout(false);
           this.ViewTabImg.PerformLayout();
           ((System.ComponentModel.ISupportInitialize)(this.ImgPictureBox)).EndInit();
@@ -882,6 +909,8 @@ namespace MMEd
         public System.Windows.Forms.TabPage ViewTabXML;
         public System.Windows.Forms.Button XMLViewerCommitBtn;
         public System.Windows.Forms.TextBox XMLTextBox;
+      public System.Windows.Forms.TabPage ViewTabFlat;
+      public Util.FlatEditorPanel FlatPanel;
         public System.Windows.Forms.TabPage ViewTabImg;
         public System.Windows.Forms.PictureBox ImgPictureBox;
         public System.Windows.Forms.TabPage ViewTabGrid;

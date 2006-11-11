@@ -85,6 +85,10 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Util\FlatEditorPanel.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>FlatEditorPanel.cs</DependentUpon>
+    </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
@@ -103,6 +107,12 @@
     <Compile Include="Tests\Libraries.cs" />
     <Compile Include="Tests\Serialisation.cs" />
     <Compile Include="Tests\Utils.cs" />
+    <Compile Include="Util\FlatEditorPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Util\FlatEditorPanel.Designer.cs">
+      <DependentUpon>FlatEditorPanel.cs</DependentUpon>
+    </Compile>
     <Compile Include="Util\UserPaintDoubleBufferedPanel.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -113,6 +123,7 @@
     <Compile Include="Util\StreamUtils.cs" />
     <Compile Include="Util\Utils.cs" />
     <Compile Include="Viewer.cs" />
+    <Compile Include="Viewers\FlatViewer.cs" />
     <Compile Include="Viewers\MMEdEntity.cs" />
     <Compile Include="Viewers\MMEdScene.cs" />
     <Compile Include="Viewers\MMEdView.cs">
