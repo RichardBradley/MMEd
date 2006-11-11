@@ -47,7 +47,6 @@ namespace MMEd.Util
       this.HeightTextBox = new System.Windows.Forms.TextBox();
       this.ScaleXTextBox = new System.Windows.Forms.TextBox();
       this.ScaleYTextBox = new System.Windows.Forms.TextBox();
-      this.CommitButton = new System.Windows.Forms.Button();
       this.tableLayoutPanel1.SuspendLayout();
       this.SuspendLayout();
       // 
@@ -204,7 +203,6 @@ namespace MMEd.Util
       // 
       // WidthTextBox
       // 
-      this.WidthTextBox.Enabled = false;
       this.WidthTextBox.Location = new System.Drawing.Point(59, 107);
       this.WidthTextBox.Name = "WidthTextBox";
       this.WidthTextBox.Size = new System.Drawing.Size(42, 20);
@@ -212,7 +210,6 @@ namespace MMEd.Util
       // 
       // HeightTextBox
       // 
-      this.HeightTextBox.Enabled = false;
       this.HeightTextBox.Location = new System.Drawing.Point(107, 107);
       this.HeightTextBox.Name = "HeightTextBox";
       this.HeightTextBox.Size = new System.Drawing.Size(42, 20);
@@ -232,21 +229,10 @@ namespace MMEd.Util
       this.ScaleYTextBox.Size = new System.Drawing.Size(42, 20);
       this.ScaleYTextBox.TabIndex = 17;
       // 
-      // CommitButton
-      // 
-      this.CommitButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.CommitButton.Location = new System.Drawing.Point(311, 413);
-      this.CommitButton.Name = "CommitButton";
-      this.CommitButton.Size = new System.Drawing.Size(87, 31);
-      this.CommitButton.TabIndex = 5;
-      this.CommitButton.Text = "Commit";
-      this.CommitButton.UseVisualStyleBackColor = true;
-      // 
       // FlatEditorPanel
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.Controls.Add(this.CommitButton);
       this.Controls.Add(this.tableLayoutPanel1);
       this.Name = "FlatEditorPanel";
       this.Size = new System.Drawing.Size(405, 450);
@@ -265,7 +251,6 @@ namespace MMEd.Util
     private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
     private System.Windows.Forms.Label label6;
     private System.Windows.Forms.Label label5;
-    internal System.Windows.Forms.Button CommitButton;
     internal System.Windows.Forms.TextBox OriginXTextBox;
     internal System.Windows.Forms.TextBox OriginYTextBox;
     internal System.Windows.Forms.TextBox OriginZTextBox;

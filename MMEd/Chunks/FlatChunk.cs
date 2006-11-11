@@ -117,6 +117,51 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
     [Description("no idea")]
     public byte[] TrailingData;
 
+    ///========================================================================
+    ///  Method : Resize
+    /// 
+    /// <summary>
+    /// 	Resize the FlatChunk
+    /// </summary>
+    /// <param name="xiNewWidth"></param>
+    /// <param name="xiNewHeight"></param>
+    /// <returns>
+    ///   The increase in file size, in bytes (12 bytes per square - 2 texture,
+    ///   2 height and 8 meta data.
+    /// </returns>
+    ///========================================================================
+    public int Resize(short xiNewWidth, short xiNewHeight)
+    {
+      int lExtraSquares = (xiNewWidth * xiNewHeight) - (Width * Height);
+
+      short[][] lOldTextureIds = TextureIds;
+      short[][] lOldTerrainHeight = TerrainHeight;
+      Byte[][][] lOldTexMetaData = TexMetaData;
+
+      Width = xiNewWidth;
+      Height = xiNewHeight;
+
+      TextureIds = new short[Width][];
+      TerrainHeight = new short[Width][];
+      TexMetaData = new Byte[Width][][];
+
+      for (int x = 0; x < Width; x++)
+      {
+        TextureIds[x] = new short[Height];
+        TerrainHeight[x] = new short[Height];
+        TexMetaData[x] = new Byte[Height][];
+
+        for (int y = 0; y < Height; y++)
+        {
+          TextureIds[x][y] = (x < lOldTextureIds.Length && y < lOldTextureIds[x].Length) ? lOldTextureIds[x][y] : lOldTextureIds[0][0];
+          TerrainHeight[x][y] = (x < lOldTerrainHeight.Length && y < lOldTerrainHeight[x].Length) ? lOldTerrainHeight[x][y] : lOldTerrainHeight[0][0];
+          TexMetaData[x][y] = (x < lOldTexMetaData.Length && y < lOldTexMetaData[x].Length) ? lOldTexMetaData[x][y] : lOldTexMetaData[0][0];
+        }
+      }
+
+      return lExtraSquares * 12;
+    }
+
     public void Deserialise(BinaryReader bin)
     {
       //header

@@ -33,7 +33,7 @@ namespace MMEd.Chunks
       hole = 0x08, // A void or hole in the surface
       lilyPad = 0x09, // NB This doesn't do much on a random pool course
       grassStalk = 0x0A,
-      unknown0B = 0x0B,
+      jumpWoosh3 = 0x0B, // A super speedup if you're going fast enough (found on the jump between tables in Rack)
       unknown0C = 0x0C, // This is present in Rack & Roll, but driving over it has no discernable effect
       roadBorderPool = 0x0D, // Edge of the track in a pool table course
       poolPocket = 0x0E, // A pool pocket - death trap
@@ -159,7 +159,7 @@ namespace MMEd.Chunks
       BTF(ht, eBumpType.hole, 0xffffff);
       BTF(ht, eBumpType.lilyPad, 0x33ff33);
       BTF(ht, eBumpType.grassStalk, 0x00ff00);
-      BTF(ht, eBumpType.unknown0B, 0xff00ff);
+      BTF(ht, eBumpType.jumpWoosh3, 0xffd400);
       BTF(ht, eBumpType.unknown0C, 0xff00ff);
       BTF(ht, eBumpType.roadBorderPool, 0x89cbde);
       BTF(ht, eBumpType.poolPocket, 0xeeeeee);

@@ -24,7 +24,7 @@ namespace MMEd.Viewers
     private FlatViewer(MainForm xiMainForm)
       : base(xiMainForm)
     {
-      Panel.CommitButton.Click += new System.EventHandler(this.CommitButton_Click);
+      mMainForm.FlatViewerCommitBtn.Click += new System.EventHandler(this.CommitButton_Click);
     }
 
     public void CommitButton_Click(object xiSender, EventArgs xiArgs)
@@ -36,7 +36,7 @@ namespace MMEd.Viewers
       }
 
       //=======================================================================
-      // Save values
+      // Save simple values
       //=======================================================================
       mSubject.DeclaredName = Panel.NameTextBox.Text;
       mSubject.OriginPosition.X = short.Parse(Panel.OriginXTextBox.Text);
@@ -47,6 +47,25 @@ namespace MMEd.Viewers
       mSubject.RotationVector.Z = short.Parse(Panel.RotationZTextBox.Text);
       mSubject.ScaleX = short.Parse(Panel.ScaleXTextBox.Text);
       mSubject.ScaleY = short.Parse(Panel.ScaleYTextBox.Text);
+
+      //=======================================================================
+      // Change width and height, if appropriate
+      //=======================================================================
+      short lNewWidth = short.Parse(Panel.WidthTextBox.Text);
+      short lNewHeight = short.Parse(Panel.HeightTextBox.Text);
+
+      if (mSubject.Width != lNewWidth || mSubject.Height != lNewHeight)
+      {
+        int lSizeIncrease = mSubject.Resize(lNewWidth, lNewHeight);
+        mMainForm.Level.SHET.TrailingZeroByteCount -= lSizeIncrease;
+
+        if (mMainForm.Level.SHET.TrailingZeroByteCount < 0)
+        {
+          MessageBox.Show("WARNING: You do not currently have enough spare space at the end of your level file. " +
+            "You will need to remove some data from the file before you can save to disk.", 
+            "Resizing Flat", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        }
+      }
     }
 
     // FlatChunks can be viewed

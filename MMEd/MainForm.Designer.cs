@@ -43,6 +43,7 @@ namespace MMEd
           this.XMLViewerCommitBtn = new System.Windows.Forms.Button();
           this.XMLTextBox = new System.Windows.Forms.TextBox();
           this.ViewTabFlat = new System.Windows.Forms.TabPage();
+          this.FlatViewerCommitBtn = new System.Windows.Forms.Button();
           this.FlatPanel = new Util.FlatEditorPanel();
           this.ViewTabImg = new System.Windows.Forms.TabPage();
           this.ImgPictureBox = new System.Windows.Forms.PictureBox();
@@ -282,6 +283,7 @@ namespace MMEd
           // 
           // ViewTabFlat
           // 
+          this.ViewTabFlat.Controls.Add(this.FlatViewerCommitBtn);
           this.ViewTabFlat.Controls.Add(this.FlatPanel);
           this.ViewTabFlat.Location = new System.Drawing.Point(4, 22);
           this.ViewTabFlat.Name = "ViewTabFlat";
@@ -291,6 +293,16 @@ namespace MMEd
           this.ViewTabFlat.Text = "Flat";
           this.ViewTabFlat.UseVisualStyleBackColor = true;
           // 
+          // FlatViewerCommitBtn
+          // 
+          this.FlatViewerCommitBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+          this.FlatViewerCommitBtn.Location = new System.Drawing.Point(558, 477);
+          this.FlatViewerCommitBtn.Name = "FlatViewerCommitBtn";
+          this.FlatViewerCommitBtn.Size = new System.Drawing.Size(75, 31);
+          this.FlatViewerCommitBtn.TabIndex = 1;
+          this.FlatViewerCommitBtn.Text = "Commit";
+          this.FlatViewerCommitBtn.UseVisualStyleBackColor = true;
+          // 
           // FlatPanel
           // 
           this.FlatPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
@@ -298,8 +310,9 @@ namespace MMEd
                       | System.Windows.Forms.AnchorStyles.Right)));
           this.FlatPanel.Location = new System.Drawing.Point(0, 0);
           this.FlatPanel.Name = "FlatPanel";
-          this.FlatPanel.Size = new System.Drawing.Size(636, 535);
+          this.FlatPanel.Size = new System.Drawing.Size(637, 471);
           this.FlatPanel.TabIndex = 0;
+          this.FlatPanel.AutoScroll = true;
           // 
           // ViewTabImg
           // 
@@ -910,6 +923,7 @@ namespace MMEd
         public System.Windows.Forms.Button XMLViewerCommitBtn;
         public System.Windows.Forms.TextBox XMLTextBox;
       public System.Windows.Forms.TabPage ViewTabFlat;
+      public System.Windows.Forms.Button FlatViewerCommitBtn;
       public Util.FlatEditorPanel FlatPanel;
         public System.Windows.Forms.TabPage ViewTabImg;
         public System.Windows.Forms.PictureBox ImgPictureBox;
