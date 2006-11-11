@@ -121,6 +121,11 @@ namespace MMEd.Chunks
       return lBmp;
     }
 
+    public static Color GetColorForBumpType(eBumpType xiVal)
+    {
+      return mPalette[(int)xiVal];
+    }
+
     // Get the eBumpType for the supplied coordinates
     public eBumpType GetPixelType(int xiX, int xiY)
     {
@@ -228,6 +233,11 @@ namespace MMEd.Chunks
     public override void ReplaceChild(Chunk xiFrom, Chunk xiTo)
     {
       throw new Exception("The method or operation is not implemented.");
+    }
+
+    public void CopyFrom(BumpImageChunk xiFrom)
+    {
+      Array.Copy(xiFrom.Data, this.Data, Data.Length);
     }
 
     int mIdx;

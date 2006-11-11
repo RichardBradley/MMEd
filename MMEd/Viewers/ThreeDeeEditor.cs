@@ -44,19 +44,19 @@ namespace MMEd.Viewers
       //add view mode menus:
       mOptionsMenu = new ToolStripMenuItem("3D");
       //
-      PropertyController lMoveCtrl = new PropertyController(this, "MovementMode", "OnMovementModeChange");
+      PropertyController lMoveCtrl = new PropertyController(this, "MovementMode");
       mOptionsMenu.DropDownItems.AddRange(lMoveCtrl.CreateMenuItems());
       mOptionsMenu.DropDownItems.Add(new ToolStripSeparator());
       //
-      PropertyController lNormCtrl = new PropertyController(this, "DrawNormalsMode", "OnDrawNormalsModeChange");
+      PropertyController lNormCtrl = new PropertyController(this, "DrawNormalsMode");
       mOptionsMenu.DropDownItems.AddRange(lNormCtrl.CreateMenuItems());
       mOptionsMenu.DropDownItems.Add(new ToolStripSeparator());
       //
-      PropertyController lTexModeCtrl = new PropertyController(this, "TextureMode", "OnTextureModeChange");
+      PropertyController lTexModeCtrl = new PropertyController(this, "TextureMode");
       mOptionsMenu.DropDownItems.AddRange(lTexModeCtrl.CreateMenuItems());
       mOptionsMenu.DropDownItems.Add(new ToolStripSeparator());
       //
-      PropertyController lSelMetaCtrl = new PropertyController(this, "SelectedMetadata", "OnSelectedMetadataChange");
+      PropertyController lSelMetaCtrl = new PropertyController(this, "SelectedMetadata");
       mOptionsMenu.DropDownItems.Add(lSelMetaCtrl.CreateToolStripComboBox());
       mOptionsMenu.DropDownItems.Add(new ToolStripSeparator());
       //
@@ -420,11 +420,11 @@ namespace MMEd.Viewers
             }
           }
         }
-        if (OnMovementModeChange != null) OnMovementModeChange(this, null);
+        if (OnMovementModeChanged != null) OnMovementModeChanged(this, null);
         InvalidateAllViewers();
       }
     }
-    public event EventHandler OnMovementModeChange;
+    public event EventHandler OnMovementModeChanged;
 
     #endregion
 
@@ -437,11 +437,11 @@ namespace MMEd.Viewers
       set
       {
         mDrawNormalsMode = value;
-        if (OnDrawNormalsModeChange != null) OnDrawNormalsModeChange(this, null);
+        if (OnDrawNormalsModeChanged != null) OnDrawNormalsModeChanged(this, null);
         InvalidateAllViewers();
       }
     }
-    public event EventHandler OnDrawNormalsModeChange;
+    public event EventHandler OnDrawNormalsModeChanged;
 
     #endregion
 
@@ -459,12 +459,12 @@ namespace MMEd.Viewers
           return;
         }
         mTextureMode = value;
-        if (OnTextureModeChange != null) OnTextureModeChange(this, null);
+        if (OnTextureModeChanged != null) OnTextureModeChanged(this, null);
         RebuildScene();
         InvalidateAllViewers();
       }
     }
-    public event EventHandler OnTextureModeChange;
+    public event EventHandler OnTextureModeChanged;
 
     #endregion
 
@@ -478,13 +478,13 @@ namespace MMEd.Viewers
       set
       {
         mSelectedMetadata = value;
-        if (OnSelectedMetadataChange != null) OnSelectedMetadataChange(this, null);
+        if (OnSelectedMetadataChanged != null) OnSelectedMetadataChanged(this, null);
         RebuildScene();
         InvalidateAllViewers();
       }
     }
 
-    public event EventHandler OnSelectedMetadataChange;
+    public event EventHandler OnSelectedMetadataChanged;
 
     #endregion
 

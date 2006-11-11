@@ -40,23 +40,23 @@ namespace MMEd.Viewers
       //add view mode menus:
       mOptionsMenu = new ToolStripMenuItem("3D");
       //
-      PropertyController lMoveCtrl = new PropertyController(this, "MovementMode", "OnMovementModeChange");
+      PropertyController lMoveCtrl = new PropertyController(this, "MovementMode");
       mOptionsMenu.DropDownItems.AddRange(lMoveCtrl.CreateMenuItems());
       mOptionsMenu.DropDownItems.Add(new ToolStripSeparator());
       //
-      PropertyController lLightCtrl = new PropertyController(this, "LightingMode", "OnLightingModeChange");
+      PropertyController lLightCtrl = new PropertyController(this, "LightingMode");
       mOptionsMenu.DropDownItems.AddRange(lLightCtrl.CreateMenuItems());
       mOptionsMenu.DropDownItems.Add(new ToolStripSeparator());
       //
-      PropertyController lNormCtrl = new PropertyController(this, "DrawNormalsMode", "OnDrawNormalsModeChange");
+      PropertyController lNormCtrl = new PropertyController(this, "DrawNormalsMode");
       mOptionsMenu.DropDownItems.AddRange(lNormCtrl.CreateMenuItems());
       mOptionsMenu.DropDownItems.Add(new ToolStripSeparator());
       //
-      PropertyController lTexModeCtrl = new PropertyController(this, "TextureMode", "OnTextureModeChange");
+      PropertyController lTexModeCtrl = new PropertyController(this, "TextureMode");
       mOptionsMenu.DropDownItems.AddRange(lTexModeCtrl.CreateMenuItems());
       mOptionsMenu.DropDownItems.Add(new ToolStripSeparator());
       //
-      PropertyController lSelMetaCtrl = new PropertyController(this, "SelectedMetadata", "OnSelectedMetadataChange");
+      PropertyController lSelMetaCtrl = new PropertyController(this, "SelectedMetadata");
       mOptionsMenu.DropDownItems.Add(lSelMetaCtrl.CreateToolStripComboBox());
       mOptionsMenu.DropDownItems.Add(new ToolStripSeparator());
       //
@@ -292,11 +292,11 @@ namespace MMEd.Viewers
         {
           mCamera.LookAt(GLTK.Point.Origin, mCamera.YAxis);
         }
-        if (OnMovementModeChange != null) OnMovementModeChange(this, null);
+        if (OnMovementModeChanged != null) OnMovementModeChanged(this, null);
         InvalidateViewer();
       }
     }
-    public event EventHandler OnMovementModeChange;
+    public event EventHandler OnMovementModeChanged;
 
     #endregion
 
@@ -309,11 +309,11 @@ namespace MMEd.Viewers
       set
       {
         mDrawNormalsMode = value;
-        if (OnDrawNormalsModeChange != null) OnDrawNormalsModeChange(this, null);
+        if (OnDrawNormalsModeChanged != null) OnDrawNormalsModeChanged(this, null);
         InvalidateViewer();
       }
     }
-    public event EventHandler OnDrawNormalsModeChange;
+    public event EventHandler OnDrawNormalsModeChanged;
 
     #endregion
 
@@ -341,11 +341,11 @@ namespace MMEd.Viewers
             return;
         }
         mLightingMode = value;
-        if (OnLightingModeChange != null) OnLightingModeChange(this, null);
+        if (OnLightingModeChanged != null) OnLightingModeChanged(this, null);
         InvalidateViewer();
       }
     }
-    public event EventHandler OnLightingModeChange;
+    public event EventHandler OnLightingModeChanged;
 
     #endregion
 
@@ -363,12 +363,12 @@ namespace MMEd.Viewers
           return;
         }
         mTextureMode = value;
-        if (OnTextureModeChange != null) OnTextureModeChange(this, null);
+        if (OnTextureModeChanged != null) OnTextureModeChanged(this, null);
         RebuildScene();
         InvalidateViewer();
       }
     }
-    public event EventHandler OnTextureModeChange;
+    public event EventHandler OnTextureModeChanged;
 
     #endregion
 
@@ -382,13 +382,13 @@ namespace MMEd.Viewers
       set
       {
         mSelectedMetadata = value;
-        if (OnSelectedMetadataChange != null) OnSelectedMetadataChange(this, null);
+        if (OnSelectedMetadataChanged != null) OnSelectedMetadataChanged(this, null);
         RebuildScene();
         InvalidateViewer();
       }
     }
 
-    public event EventHandler OnSelectedMetadataChange;
+    public event EventHandler OnSelectedMetadataChanged;
 
     #endregion
 

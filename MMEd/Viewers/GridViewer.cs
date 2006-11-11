@@ -48,6 +48,7 @@ namespace MMEd.Viewers
         lNumberOffY = mSubjectTileHeight / 2;
       }
 
+      // main drawing loop; iterate over tex squares:
       for (int x = (e.ClipRectangle.Left / mSubjectTileWidth);
           x < (e.ClipRectangle.Right / mSubjectTileWidth) + 1
           && x < mSubject.Width; x++)
@@ -58,61 +59,65 @@ namespace MMEd.Viewers
         {
           try
           {
-            // Draw the main texture for the square.
+            // Draw the main texture for the square (all views)
             e.Graphics.DrawImageUnscaled(
                 mMainForm.Level.GetTileById(mSubject.TextureIds[x][y]).ToBitmap(),
                 x * mSubjectTileWidth,
                 y * mSubjectTileHeight);
 
-            if (ViewMode == eViewMode.ViewOdds)
+            switch (ViewMode)
             {
-              Rectangle lDest = new Rectangle(
-                  x * mSubjectTileWidth,
-                  y * mSubjectTileHeight,
-                  mSubjectTileWidth,
-                  mSubjectTileHeight);
-              OddImageChunk bic = mMainForm.Level.GetOddById(mSubject.TexMetaData[x][y][(int)SelectedMeta]);
-
-              // If we don't have an odd to draw here, bic is null
-              // and nothing is drawn - just leave the base texture as-is.
-              if (bic != null)
-              {
-                DrawTransparentImage(e, bic.ToImage(), lDest);
-              }
-            }
-            else if (ViewMode == eViewMode.EditBump || ViewMode == eViewMode.ViewBump)
-            {
-              // Draw the bump map on top as a transparent image.
-              Rectangle lDest = new Rectangle(
+              case eViewMode.ViewOdds:
+                Rectangle lOddDest = new Rectangle(
                     x * mSubjectTileWidth,
                     y * mSubjectTileHeight,
                     mSubjectTileWidth,
                     mSubjectTileHeight);
-              BumpImageChunk bic = mMainForm.Level.GetBumpById(mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.Bumpmap]);
+                OddImageChunk oic = mMainForm.Level.GetOddById(mSubject.TexMetaData[x][y][(int)SelectedMeta]);
 
-              if (bic != null)
-              {
-                DrawTransparentImage(e, bic.ToImage(), lDest);
-              }
-            }
+                // If we don't have an odd to draw here, bic is null
+                // and nothing is drawn - just leave the base texture as-is.
+                if (oic != null)
+                {
+                  DrawTransparentImage(e, oic.ToImage(), lOddDest);
+                }
+                break;
 
-            if (ViewMode == eViewMode.EditMetadata)
-            {
-              string text = string.Format("{0:x}", mSubject.TexMetaData[x][y][(int)SelectedMeta]);
+              case eViewMode.ViewBump:
+              case eViewMode.EditBumpSquares:
+              case eViewMode.EditBumpPixels:
+                // Draw the bump map on top as a transparent image.
+                Rectangle lBumpDest = new Rectangle(
+                    x * mSubjectTileWidth,
+                    y * mSubjectTileHeight,
+                    mSubjectTileWidth,
+                    mSubjectTileHeight);
+                BumpImageChunk bic = mMainForm.Level.GetBumpById(mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.Bumpmap]);
 
-              SizeF size = e.Graphics.MeasureString(text, lNumberFont);
+                if (bic != null)
+                {
+                  DrawTransparentImage(e, bic.ToImage(), lBumpDest);
+                }
+                break;
 
-              float xf = x * mSubjectTileWidth + lNumberOffX - size.Width / 2;
-              float yf = y * mSubjectTileHeight + lNumberOffY - size.Height / 2;
+              case eViewMode.EditMetadata:
+                //draw the selected metadata on as text
+                string text = string.Format("{0}", mSubject.TexMetaData[x][y][(int)SelectedMeta]);
 
-              e.Graphics.FillRectangle(lNumberBGBrush, xf, yf, size.Width, size.Height);
+                SizeF size = e.Graphics.MeasureString(text, lNumberFont);
 
-              e.Graphics.DrawString(
-                  text,
-                  lNumberFont,
-                  lNumberFGBrush,
-                  xf,
-                  yf);
+                float xf = x * mSubjectTileWidth + lNumberOffX - size.Width / 2;
+                float yf = y * mSubjectTileHeight + lNumberOffY - size.Height / 2;
+
+                e.Graphics.FillRectangle(lNumberBGBrush, xf, yf, size.Width, size.Height);
+
+                e.Graphics.DrawString(
+                    text,
+                    lNumberFont,
+                    lNumberFGBrush,
+                    xf,
+                    yf);
+                break;
             }
           }
           catch (NullReferenceException err)
@@ -123,18 +128,36 @@ namespace MMEd.Viewers
       }
 
       //highlight editable square
-      if (ViewMode == eViewMode.EditBump 
-        || ViewMode == eViewMode.EditMetadata
-        || ViewMode == eViewMode.EditTextures)
+      Rectangle lHighlightRect = new Rectangle();
+      Point lMousePos = mMainForm.GridDisplayPanel.PointToClient(Cursor.Position);
+      switch(ViewMode)
       {
-        Point lMousePos = mMainForm.GridDisplayPanel.PointToClient(Cursor.Position);
-        //assume graphics clip will take care of clipping
-        e.Graphics.DrawRectangle(
-            new Pen(Color.Red, 2.0f),
+        case eViewMode.EditBumpSquares:
+        case eViewMode.EditMetadata:
+        case eViewMode.EditTextures:
+          lHighlightRect = new Rectangle(
             lMousePos.X / mSubjectTileWidth * mSubjectTileWidth,
             lMousePos.Y / mSubjectTileHeight * mSubjectTileHeight,
             mSubjectTileWidth,
             mSubjectTileHeight);
+          break;
+        case eViewMode.EditBumpPixels:
+          int lBumpPixWidth = mSubjectTileWidth / 8;
+          int lBumpPixHeight = mSubjectTileHeight / 8;
+          lHighlightRect = new Rectangle(
+            lMousePos.X / lBumpPixWidth * lBumpPixWidth,
+            lMousePos.Y / lBumpPixHeight * lBumpPixHeight,
+            mSubjectTileWidth / 8,
+            mSubjectTileHeight / 8);
+          break;
+      }
+
+      if (lHighlightRect.Width > 0)
+      {
+        //assume graphics clip will take care of clipping
+        e.Graphics.DrawRectangle(
+            new Pen(Color.Red, 2.0f),
+            lHighlightRect);
       }
     }
 
@@ -193,10 +216,8 @@ namespace MMEd.Viewers
     int mSubjectTileWidth;
     int mSubjectTileHeight;
 
-
     public override void SetSubject(Chunk xiChunk)
     {
-
       if (!(xiChunk is FlatChunk)) xiChunk = null;
       if (mSubject == xiChunk) return;
       mSubject = (FlatChunk)xiChunk;
@@ -244,7 +265,6 @@ namespace MMEd.Viewers
         }
       }
       ViewMode = eViewMode.ViewOnly;
-      ModeChanged(null, null);
     }
 
     public override System.Windows.Forms.TabPage Tab
@@ -288,10 +308,6 @@ namespace MMEd.Viewers
       }
     }
 
-    private void ModeChanged(object sender, EventArgs e)
-    {
-    }
-
     void PaletteImageMouseClick(object sender, MouseEventArgs e)
     {
       SetSelImage(e.Button, (PictureBox)sender);
@@ -303,54 +319,118 @@ namespace MMEd.Viewers
       {
         int x = e.X / mSubjectTileWidth;
         int y = e.Y / mSubjectTileHeight;
-        if (ViewMode == eViewMode.EditMetadata)
+
+        switch (ViewMode)
         {
-          //edit meta data mode
-          if (mSubject.TexMetaData != null
-             && x < mSubject.TexMetaData.Length
-             && y < mSubject.TexMetaData[x].Length)
-          {
-            short val;
-
-            val = mSubject.TexMetaData[x][y][(int)SelectedMeta];
-
-            string lReply = Microsoft.VisualBasic.Interaction.InputBox(
-              string.Format("Value at ({0},{1}) is {2} (0x{2:x}). New value:", x, y, val),
-              "MMEd",
-              val.ToString(), //Default value
-              -1, //X coord
-              -1);// Y coord
-
-            if (lReply != null && lReply != "")
+          case eViewMode.EditMetadata:
+            //edit meta data mode
+            if (mSubject.TexMetaData != null
+               && x < mSubject.TexMetaData.Length
+               && y < mSubject.TexMetaData[x].Length)
             {
-              val = short.Parse(lReply);
+              short val;
 
-              mSubject.TexMetaData[x][y][(int)SelectedMeta] = (byte)val;
+              val = mSubject.TexMetaData[x][y][(int)SelectedMeta];
+
+              string lReply = Microsoft.VisualBasic.Interaction.InputBox(
+                string.Format("Value at ({0},{1}) is {2} (0x{2:x}). New value:", x, y, val),
+                "MMEd",
+                val.ToString(), //Default value
+                -1, //X coord
+                -1);// Y coord
+
+              if (lReply != null && lReply != "")
+              {
+                val = short.Parse(lReply);
+
+                mSubject.TexMetaData[x][y][(int)SelectedMeta] = (byte)val;
+
+                InvalidateGridDisplay();
+              }
+            }
+            break;
+
+          case eViewMode.EditTextures:
+            //edit textures mode
+            if (mKeyOrMouseToSelPicBoxDict.ContainsKey(e.Button))
+            {
+              PictureBox lSel = mKeyOrMouseToSelPicBoxDict[e.Button];
+              mSubject.TextureIds[x][y] = (byte)lSel.Tag;
+              InvalidateGridDisplay();
+            }
+            break;
+
+          case eViewMode.EditBumpSquares:
+            //edit bump mode
+            if (mKeyOrMouseToSelPicBoxDict.ContainsKey(e.Button))
+            {
+              PictureBox lSel = mKeyOrMouseToSelPicBoxDict[e.Button];
+              mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.Bumpmap] = (byte)lSel.Tag;
+              InvalidateGridDisplay();
+            }
+            break;
+
+          case eViewMode.EditBumpPixels:
+            //edit bump mode
+            if (mKeyOrMouseToSelPicBoxDict.ContainsKey(e.Button))
+            {
+              PictureBox lSel = mKeyOrMouseToSelPicBoxDict[e.Button];
+              byte lNewVal = (byte)lSel.Tag;
+              int lBumpPxX = (e.X % mSubjectTileWidth) / (mSubjectTileWidth / 8);
+              int lBumpPxY = (e.Y % mSubjectTileHeight) / (mSubjectTileHeight / 8);
+
+              UpdateBumpPixel(x, y, lBumpPxX, lBumpPxY, (BumpImageChunk.eBumpType)lNewVal);
 
               InvalidateGridDisplay();
             }
-          }
+            break;
         }
-        else if (ViewMode == eViewMode.EditTextures)
-        {
-          //edit textures mode
-          if (mKeyOrMouseToSelPicBoxDict.ContainsKey(e.Button))
+      }
+    }
+
+    private void UpdateBumpPixel(
+      int xiTexX,  //the x-offset of the tex square in the grid
+      int xiTexY,
+      int xiBumpPxX, //the x-offset of the bump pixel in the square
+      int xiBumpPxY,
+      BumpImageChunk.eBumpType xiNewVal)
+    {
+      byte lBumpImageIdx = mSubject.TexMetaData[xiTexX][xiTexY][(int)eTexMetaDataEntries.Bumpmap];
+
+      //how to update the bump pix depends on how many tex squares
+      //use that bump pix
+      switch (mBumpImageUsageCountArray[lBumpImageIdx])
+      {
+        case 0:
+
+          throw new Exception("Interal error: unreachable statement!");
+
+        case 1:
+          BumpImageChunk bic = mMainForm.Level.GetBumpById(lBumpImageIdx);
+          bic.SetPixelType(xiBumpPxX, xiBumpPxY, xiNewVal);
+          break;
+
+        default: // i.e. > 1
+          //find the first bump image > 0 which isn't in use
+          for (int lNewBumpImageIdx = 1; lNewBumpImageIdx < mBumpImageUsageCountArray.Length; lNewBumpImageIdx++)
           {
-            PictureBox lSel = mKeyOrMouseToSelPicBoxDict[e.Button];
-            mSubject.TextureIds[x][y] = (byte)lSel.Tag;
-            InvalidateGridDisplay();
+            if (mBumpImageUsageCountArray[lNewBumpImageIdx] == 0)
+            {
+              BumpImageChunk newBump = mMainForm.Level.GetBumpById(lNewBumpImageIdx);
+              BumpImageChunk oldBump = mMainForm.Level.GetBumpById(lBumpImageIdx);
+              newBump.CopyFrom(oldBump);
+              newBump.SetPixelType(xiBumpPxX, xiBumpPxY, xiNewVal);
+              mSubject.TexMetaData[xiTexX][xiTexY][(int)eTexMetaDataEntries.Bumpmap]
+               = (byte)lNewBumpImageIdx;
+              mBumpImageUsageCountArray[lBumpImageIdx]--;
+              mBumpImageUsageCountArray[lNewBumpImageIdx]++;
+              return;
+            }
           }
-        }
-        else if (ViewMode == eViewMode.EditBump)
-        {
-          //edit bump mode
-          if (mKeyOrMouseToSelPicBoxDict.ContainsKey(e.Button))
-          {
-            PictureBox lSel = mKeyOrMouseToSelPicBoxDict[e.Button];
-            mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.Bumpmap] = (byte)lSel.Tag;
-            InvalidateGridDisplay();
-          }
-        }
+          MessageBox.Show(@"The requested change cannot be performed:
+There are no free bump images which are not already in use!
+Try running ""Reindex bump"" on the level (select the top node in the chunk tree) [qq TODO!]");
+          break;
       }
     }
 
@@ -370,7 +450,9 @@ namespace MMEd.Viewers
     private void ViewerTabControl_KeyPress(object sender, KeyPressEventArgs e)
     {
       if (mMainForm.ViewerTabControl.SelectedTab == this.Tab
-         && (ViewMode == eViewMode.EditTextures || ViewMode == eViewMode.EditBump)
+         && (ViewMode == eViewMode.EditTextures 
+           || ViewMode == eViewMode.EditBumpSquares
+           || ViewMode == eViewMode.EditBumpPixels)
          && mKeyOrMouseToSelPicBoxDict.ContainsKey(e.KeyChar))
       {
         //drill down the child heirarchy
@@ -403,9 +485,17 @@ namespace MMEd.Viewers
             {
               mSubject.TextureIds[x][y] = (byte)lSel.Tag;
             }
-            else if (ViewMode == eViewMode.EditBump)
+            else if (ViewMode == eViewMode.EditBumpSquares)
             {
               mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.Bumpmap] = (byte)lSel.Tag;
+            }
+            else if (ViewMode == eViewMode.EditBumpPixels)
+            {
+             byte lNewVal = (byte)lSel.Tag;
+              int lBumpPxX = (p.X % mSubjectTileWidth) / (mSubjectTileWidth / 8);
+              int lBumpPxY = (p.Y % mSubjectTileHeight) / (mSubjectTileHeight / 8);
+
+              UpdateBumpPixel(x, y, lBumpPxX, lBumpPxY, (BumpImageChunk.eBumpType)lNewVal);
             }
             InvalidateGridDisplay();
             return;
@@ -425,7 +515,8 @@ namespace MMEd.Viewers
       ViewBump,
       ViewOdds,
       EditTextures,
-      EditBump,
+      EditBumpSquares,
+      EditBumpPixels,
       EditMetadata
     }
 
@@ -436,65 +527,163 @@ namespace MMEd.Viewers
       set
       {
         const int PADDING = 5;
-        mViewMode = value;
-        if (ViewMode == eViewMode.EditTextures || ViewMode == eViewMode.EditBump)
+
+        if ((mSubject == null || mSubject.TexMetaData == null)
+         && (value == eViewMode.EditBumpPixels
+          || value == eViewMode.EditBumpSquares
+          || value == eViewMode.EditMetadata
+          || value == eViewMode.ViewBump))
         {
-          mMainForm.GridViewPalettePanel.SuspendLayout();
-          mMainForm.GridViewPalettePanel.Controls.Clear();
+          value = eViewMode.ViewOnly; //reject change!
+        }
+
+        mViewMode = value;
+
+        // update the editing palette
+        //
+        mMainForm.GridViewPalettePanel.SuspendLayout();
+        mMainForm.GridViewPalettePanel.Controls.Clear();
+        if (ViewMode == eViewMode.EditTextures 
+          || ViewMode == eViewMode.EditBumpSquares
+          || ViewMode == eViewMode.EditBumpPixels)
+        {
           Point lNextPbTL = new Point(0, 0);
           IEnumerator<object> lKeys = mKeyOrMouseToSelPicBoxDict.Keys.GetEnumerator();
           PictureBox lPalPB = null;
+
+          //create shared GDI objects outside of loop:
+          Font lFont = null;
+          Brush lNameFGBrush = null, lNameBGBrush = null;
+          if (ViewMode == eViewMode.EditBumpPixels)
+          {
+            lFont = new Font(FontFamily.GenericSansSerif, 8);
+            lNameBGBrush = new SolidBrush(Color.White);
+            lNameFGBrush = new SolidBrush(Color.Black);
+          }
+
+          //loop over allowed values
           for (int i = 0; i < 256; i++)
           {
-            //fetch im
-            Chunk c = (ViewMode == eViewMode.EditTextures)
-              ? (Chunk)mMainForm.Level.GetTileById(i)
-              : (Chunk)mMainForm.Level.GetBumpById(i);
+            Image im = null;
 
-            if (c != null && c is ImageViewer.IImageProvider)
+            //fetch or create the appropriate palette image for the byte value "i"
+            if (ViewMode == eViewMode.EditTextures)
             {
-              Image im = ((ImageViewer.IImageProvider)c).ToImage();
-              if (ViewMode == eViewMode.EditBump ||
-                 (im.Width == this.mSubjectTileWidth
-                   && im.Height == this.mSubjectTileHeight))
+              TIMChunk c = mMainForm.Level.GetTileById(i);
+              if (c != null) im = c.ToImage();
+              if (im.Width != this.mSubjectTileWidth
+               || im.Height != this.mSubjectTileHeight)
               {
-                lPalPB = new PictureBox();
-                lPalPB.Image = im;
-                mMainForm.GridViewPalettePanel.Size =
-                  new Size(lNextPbTL.X + 64 + PADDING,
-                           lNextPbTL.Y + 64);
-                mMainForm.GridViewPalettePanel.Controls.Add(lPalPB);
-                lPalPB.Bounds = new Rectangle(lNextPbTL, new Size(64, 64));
-                lPalPB.SizeMode = PictureBoxSizeMode.StretchImage;
-                lPalPB.Tag = (byte)i;
-                lPalPB.MouseClick += new MouseEventHandler(PaletteImageMouseClick);
-                lNextPbTL.Offset(64 + PADDING, 0);
-                if (lKeys.MoveNext())
+                im = null;
+              }
+            }
+            else if (ViewMode == eViewMode.EditBumpSquares)
+            {
+              BumpImageChunk bim = mMainForm.Level.GetBumpById(i);
+              if (bim != null) im = bim.ToImage();
+            }
+            else if (ViewMode == eViewMode.EditBumpPixels)
+            {
+              if (Enum.IsDefined(typeof(BumpImageChunk.eBumpType), i))
+              {
+                BumpImageChunk.eBumpType lBumpType = (BumpImageChunk.eBumpType)i;
+                string lBumpTypeName = Enum.GetName(typeof(BumpImageChunk.eBumpType), lBumpType);
+                Bitmap lBmp = new Bitmap(64, 64);
+                Graphics g = Graphics.FromImage(lBmp);
+                SizeF lBumpNameSize = g.MeasureString(lBumpTypeName, lFont);
+
+                //grow the bmp if needed (it'll be scaled back by the PictureBox
+                if (lBumpNameSize.Width > lBmp.Width)
                 {
-                  SetSelImage(lKeys.Current, lPalPB);
+                  lBmp = new Bitmap((int)lBumpNameSize.Width, 64);
+                  g = Graphics.FromImage(lBmp);
                 }
+
+                g.Clear(BumpImageChunk.GetColorForBumpType(lBumpType));
+
+                //write the name on:
+                float xf = lBmp.Width / 2 - lBumpNameSize.Width / 2;
+                float yf = 64 / 2 - lBumpNameSize.Height / 2;
+
+                g.FillRectangle(lNameBGBrush, xf, yf, lBumpNameSize.Width, lBumpNameSize.Height);
+
+                g.DrawString(
+                    lBumpTypeName,
+                    lFont,
+                    lNameFGBrush,
+                    xf,
+                    yf);
+
+                im = lBmp;
+              }
+            }
+
+            // have image, add it to editing palette
+            if (im != null)
+            {
+              lPalPB = new PictureBox();
+              lPalPB.Image = im;
+              mMainForm.GridViewPalettePanel.Size =
+                new Size(lNextPbTL.X + 64 + PADDING,
+                         lNextPbTL.Y + 64);
+              mMainForm.GridViewPalettePanel.Controls.Add(lPalPB);
+              lPalPB.Bounds = new Rectangle(lNextPbTL, new Size(64, 64));
+              lPalPB.SizeMode = PictureBoxSizeMode.StretchImage;
+              lPalPB.Tag = (byte)i;
+              lPalPB.MouseClick += new MouseEventHandler(PaletteImageMouseClick);
+              lNextPbTL.Offset(64 + PADDING, 0);
+              if (lKeys.MoveNext())
+              {
+                SetSelImage(lKeys.Current, lPalPB);
               }
             }
           }
+
+          //if there were fewer palette entries than there are keys,
+          //fill the remaining keys with the last palette entry
           while (lKeys.MoveNext())
           {
             SetSelImage(lKeys.Current, lPalPB);
           }
-          mMainForm.GridViewPalettePanel.ResumeLayout();
+
           mMainForm.GridViewSelImageGroupBox.Visible = true;
         }
         else //not edit tex or edit bump
         {
           mMainForm.GridViewSelImageGroupBox.Visible = false;
         }
+        mMainForm.GridViewPalettePanel.ResumeLayout();
 
-        if (OnViewModeChange != null) OnViewModeChange(this, null);
+        // make a list of how many times each bump tex is used, to be used
+        // in editing the bump map, pixel by pixel
+        if (ViewMode == eViewMode.EditBumpPixels)
+        {
+          mBumpImageUsageCountArray = new int[mMainForm.Level.SHET.BumpImages.mChildren.Length];
+          int lBumpIdx = (int)eTexMetaDataEntries.Bumpmap;
+          foreach (FlatChunk flat in mMainForm.Level.SHET.Flats)
+          {
+            if (flat.TexMetaData != null)
+            {
+              foreach (byte[][] row in flat.TexMetaData)
+              {
+                foreach (byte[] entry in row)
+                {
+                  mBumpImageUsageCountArray[entry[lBumpIdx]]++;
+                }
+              }
+            }
+          }
+        }
+
+        if (OnViewModeChanged != null) OnViewModeChanged(this, null);
         InvalidateGridDisplay();
       }
     }
-    public event EventHandler OnViewModeChange;
+    public event EventHandler OnViewModeChanged;
 
     #endregion
+
+    private int[] mBumpImageUsageCountArray;
 
     #region SelectedMeta property
 
@@ -505,11 +694,11 @@ namespace MMEd.Viewers
       set
       {
         mSelectedMeta = value;
-        if (OnSelectedMetaChange != null) OnSelectedMetaChange(this, null);
+        if (OnSelectedMetaChanged != null) OnSelectedMetaChanged(this, null);
         InvalidateGridDisplay();
       }
     }
-    public event EventHandler OnSelectedMetaChange;
+    public event EventHandler OnSelectedMetaChanged;
 
     #endregion
 
