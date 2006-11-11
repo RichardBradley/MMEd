@@ -4,7 +4,7 @@ using System.Text;
 
 namespace GLTK
 {
-  public struct Cubiod
+  public struct Cuboid
   {
     public double XMin;
     public double XMax;

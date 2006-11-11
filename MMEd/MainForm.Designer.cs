@@ -90,6 +90,8 @@ namespace MMEd
           this.Viewer3DRenderingSurfaceTopRight = new GLTK.RenderingSurface();
           this.Viewer3DRenderingSurfaceBottomRight = new GLTK.RenderingSurface();
           this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+          this.panel2 = new System.Windows.Forms.Panel();
+          this.ThreeDeeEditorStatusLabel = new System.Windows.Forms.Label();
           this.mMenuStrip.SuspendLayout();
           this.MainSplitter.Panel1.SuspendLayout();
           this.MainSplitter.Panel2.SuspendLayout();
@@ -125,6 +127,7 @@ namespace MMEd
           this.RightHandSplit.Panel1.SuspendLayout();
           this.RightHandSplit.Panel2.SuspendLayout();
           this.RightHandSplit.SuspendLayout();
+          this.panel2.SuspendLayout();
           this.SuspendLayout();
           // 
           // mMenuStrip
@@ -683,6 +686,7 @@ namespace MMEd
           // 
           // ViewTab3dEditor
           // 
+          this.ViewTab3dEditor.Controls.Add(this.panel2);
           this.ViewTab3dEditor.Controls.Add(this.LeftRightSplit);
           this.ViewTab3dEditor.Location = new System.Drawing.Point(4, 22);
           this.ViewTab3dEditor.Name = "ViewTab3dEditor";
@@ -694,7 +698,9 @@ namespace MMEd
           // 
           // LeftRightSplit
           // 
-          this.LeftRightSplit.Dock = System.Windows.Forms.DockStyle.Fill;
+          this.LeftRightSplit.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                      | System.Windows.Forms.AnchorStyles.Left)
+                      | System.Windows.Forms.AnchorStyles.Right)));
           this.LeftRightSplit.Location = new System.Drawing.Point(3, 3);
           this.LeftRightSplit.Name = "LeftRightSplit";
           // 
@@ -705,7 +711,7 @@ namespace MMEd
           // LeftRightSplit.Panel2
           // 
           this.LeftRightSplit.Panel2.Controls.Add(this.RightHandSplit);
-          this.LeftRightSplit.Size = new System.Drawing.Size(630, 529);
+          this.LeftRightSplit.Size = new System.Drawing.Size(630, 493);
           this.LeftRightSplit.SplitterDistance = 276;
           this.LeftRightSplit.TabIndex = 0;
           // 
@@ -723,8 +729,8 @@ namespace MMEd
           // LeftHandSplit.Panel2
           // 
           this.LeftHandSplit.Panel2.Controls.Add(this.Viewer3DRenderingSurfaceBottomLeft);
-          this.LeftHandSplit.Size = new System.Drawing.Size(276, 529);
-          this.LeftHandSplit.SplitterDistance = 239;
+          this.LeftHandSplit.Size = new System.Drawing.Size(276, 493);
+          this.LeftHandSplit.SplitterDistance = 222;
           this.LeftHandSplit.TabIndex = 0;
           // 
           // Viewer3DRenderingSurfaceTopLeft
@@ -732,7 +738,7 @@ namespace MMEd
           this.Viewer3DRenderingSurfaceTopLeft.Dock = System.Windows.Forms.DockStyle.Fill;
           this.Viewer3DRenderingSurfaceTopLeft.Location = new System.Drawing.Point(0, 0);
           this.Viewer3DRenderingSurfaceTopLeft.Name = "Viewer3DRenderingSurfaceTopLeft";
-          this.Viewer3DRenderingSurfaceTopLeft.Size = new System.Drawing.Size(276, 239);
+          this.Viewer3DRenderingSurfaceTopLeft.Size = new System.Drawing.Size(276, 222);
           this.Viewer3DRenderingSurfaceTopLeft.TabIndex = 0;
           this.Viewer3DRenderingSurfaceTopLeft.Text = "renderingSurface1";
           // 
@@ -741,7 +747,7 @@ namespace MMEd
           this.Viewer3DRenderingSurfaceBottomLeft.Dock = System.Windows.Forms.DockStyle.Fill;
           this.Viewer3DRenderingSurfaceBottomLeft.Location = new System.Drawing.Point(0, 0);
           this.Viewer3DRenderingSurfaceBottomLeft.Name = "Viewer3DRenderingSurfaceBottomLeft";
-          this.Viewer3DRenderingSurfaceBottomLeft.Size = new System.Drawing.Size(276, 286);
+          this.Viewer3DRenderingSurfaceBottomLeft.Size = new System.Drawing.Size(276, 267);
           this.Viewer3DRenderingSurfaceBottomLeft.TabIndex = 0;
           this.Viewer3DRenderingSurfaceBottomLeft.Text = "renderingSurface3";
           // 
@@ -759,8 +765,8 @@ namespace MMEd
           // RightHandSplit.Panel2
           // 
           this.RightHandSplit.Panel2.Controls.Add(this.Viewer3DRenderingSurfaceBottomRight);
-          this.RightHandSplit.Size = new System.Drawing.Size(350, 529);
-          this.RightHandSplit.SplitterDistance = 240;
+          this.RightHandSplit.Size = new System.Drawing.Size(350, 493);
+          this.RightHandSplit.SplitterDistance = 223;
           this.RightHandSplit.TabIndex = 0;
           // 
           // Viewer3DRenderingSurfaceTopRight
@@ -768,7 +774,7 @@ namespace MMEd
           this.Viewer3DRenderingSurfaceTopRight.Dock = System.Windows.Forms.DockStyle.Fill;
           this.Viewer3DRenderingSurfaceTopRight.Location = new System.Drawing.Point(0, 0);
           this.Viewer3DRenderingSurfaceTopRight.Name = "Viewer3DRenderingSurfaceTopRight";
-          this.Viewer3DRenderingSurfaceTopRight.Size = new System.Drawing.Size(350, 240);
+          this.Viewer3DRenderingSurfaceTopRight.Size = new System.Drawing.Size(350, 223);
           this.Viewer3DRenderingSurfaceTopRight.TabIndex = 0;
           this.Viewer3DRenderingSurfaceTopRight.Text = "renderingSurface2";
           // 
@@ -777,9 +783,27 @@ namespace MMEd
           this.Viewer3DRenderingSurfaceBottomRight.Dock = System.Windows.Forms.DockStyle.Fill;
           this.Viewer3DRenderingSurfaceBottomRight.Location = new System.Drawing.Point(0, 0);
           this.Viewer3DRenderingSurfaceBottomRight.Name = "Viewer3DRenderingSurfaceBottomRight";
-          this.Viewer3DRenderingSurfaceBottomRight.Size = new System.Drawing.Size(350, 285);
+          this.Viewer3DRenderingSurfaceBottomRight.Size = new System.Drawing.Size(350, 266);
           this.Viewer3DRenderingSurfaceBottomRight.TabIndex = 0;
           this.Viewer3DRenderingSurfaceBottomRight.Text = "renderingSurface4";
+          // 
+          // panel2
+          // 
+          this.panel2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
+                      | System.Windows.Forms.AnchorStyles.Right)));
+          this.panel2.Controls.Add(this.ThreeDeeEditorStatusLabel);
+          this.panel2.Location = new System.Drawing.Point(1, 502);
+          this.panel2.Name = "panel2";
+          this.panel2.Size = new System.Drawing.Size(631, 32);
+          this.panel2.TabIndex = 1;
+          // 
+          // ThreeDeeEditorStatusLabel
+          // 
+          this.ThreeDeeEditorStatusLabel.AutoSize = true;
+          this.ThreeDeeEditorStatusLabel.Location = new System.Drawing.Point(6, 6);
+          this.ThreeDeeEditorStatusLabel.Name = "ThreeDeeEditorStatusLabel";
+          this.ThreeDeeEditorStatusLabel.Size = new System.Drawing.Size(0, 13);
+          this.ThreeDeeEditorStatusLabel.TabIndex = 0;
           // 
           // MainForm
           // 
@@ -837,6 +861,8 @@ namespace MMEd
           this.RightHandSplit.Panel1.ResumeLayout(false);
           this.RightHandSplit.Panel2.ResumeLayout(false);
           this.RightHandSplit.ResumeLayout(false);
+          this.panel2.ResumeLayout(false);
+          this.panel2.PerformLayout();
           this.ResumeLayout(false);
           this.PerformLayout();
 
@@ -904,6 +930,8 @@ namespace MMEd
       private System.Windows.Forms.ToolTip toolTip1;
       public System.Windows.Forms.TrackBar GridViewTransparencySlider;
       public System.Windows.Forms.Button BumpEditFillButton;
+      private System.Windows.Forms.Panel panel2;
+      internal System.Windows.Forms.Label ThreeDeeEditorStatusLabel;
     }
 }
 

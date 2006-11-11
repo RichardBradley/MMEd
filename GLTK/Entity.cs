@@ -148,9 +148,9 @@ namespace GLTK
       set { mMeshes = value; }
     }
 
-    public Cubiod GetBoundingBox()
+    public Cuboid GetBoundingBox()
     {
-      Cubiod lRet = new Cubiod();
+      Cuboid lRet = new Cuboid();
       lRet.XMin = double.MaxValue;
       lRet.YMin = double.MaxValue;
       lRet.ZMin = double.MaxValue;

@@ -46,7 +46,7 @@ namespace MMEd.Viewers
       if (mActiveEntity != null)
       {
         Mesh lBoundingMesh = new Mesh(PolygonMode.Quads);
-        Cubiod lBounds = mActiveEntity.GetBoundingBox();
+        Cuboid lBounds = mActiveEntity.GetBoundingBox();
 
         lBoundingMesh.AddFace(
           new Vertex(new GLTK.Point(lBounds.XMin, lBounds.YMin, lBounds.ZMax), Color.Red),

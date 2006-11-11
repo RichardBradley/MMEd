@@ -120,19 +120,22 @@ namespace MMEd.Viewers
       bool lCameraIsUpsideDown = lCamera.YAxis.Dot(Vector.ZAxis) < 0;
       if (mDraggingButton == MouseButtons.Left)
       {
-        if (Control.ModifierKeys == Keys.Alt)
+        if (Control.ModifierKeys == Keys.Alt && lCamera.ProjectionMode == eProjectionMode.Orthographic)
         {
           FlatChunk.ObjectEntry lObject = ActiveObject as FlatChunk.ObjectEntry;
           if (lObject != null)
           {
-            Vector lDelta = ((lNewMousePoint.X - mLastMouseDown.X) * lCamera.XAxis)
-              + ((lNewMousePoint.Y - mLastMouseDown.Y) * lCamera.YAxis);
+            double lDeltaX = (lNewMousePoint.X - mLastMouseDown.X);
+            // Origin is at bottom-left, but mouse position is measured from orign at top-left (or vice versa)
+            double lDeltaY = -(lNewMousePoint.Y - mLastMouseDown.Y);
+            double lScale = (lCamera.Position.GetPositionVector() * lCamera.ZAxis) / lSender.Width;
+            Vector lDelta = ((lDeltaX * lCamera.XAxis) + (lDeltaY * lCamera.YAxis)) * lScale;
             lObject.OriginPosition.X += (short)(lDelta.x);
             lObject.OriginPosition.Y += (short)(lDelta.y);
-            lObject.OriginPosition.Z += (short)(lDelta.z);
+            // MMs has a left handed coordinate system, so the z-axis is pointing the "wrong" way
+            lObject.OriginPosition.Z -= (short)(lDelta.z);
             RebuildObject(lObject);
             InvalidateAllViewers();
-            return;
           }
         }
         else if (Control.ModifierKeys == Keys.Shift)
@@ -174,7 +177,7 @@ namespace MMEd.Viewers
             if (lCamera.ProjectionMode == eProjectionMode.Perspective && MovementMode == eMovementMode.FlyMode)
             {
               lCamera.Move(-0.1 * MoveScale * (lNewMousePoint.X - mLastMouseDown.X) * lCamera.XAxis);
-              lCamera.Move(0.1 * MoveScale * (lNewMousePoint.Y - mLastMouseDown.Y) * lCamera.ZAxis);
+              lCamera.Move(-0.1 * MoveScale * (lNewMousePoint.Y - mLastMouseDown.Y) * lCamera.YAxis);
             }
           }
         }
@@ -254,11 +257,14 @@ namespace MMEd.Viewers
           return;
       }
 
-      lDelta *= 5;
+      if (Control.ModifierKeys != Keys.Control)
+      {
+        lDelta *= 5;
+      }
 
       lObject.OriginPosition.X += (short)(lDelta.x);
       lObject.OriginPosition.Y += (short)(lDelta.y);
-      lObject.OriginPosition.Z += (short)(lDelta.z);
+      lObject.OriginPosition.Z -= (short)(lDelta.z);
 
       RebuildObject(lObject);
       InvalidateAllViewers();
@@ -335,7 +341,7 @@ namespace MMEd.Viewers
         lBL.Camera.LookAt(new GLTK.Point(0, 0, 0), GLTK.Vector.ZAxis);
 
         MMEdView lBR = mViews[mMainForm.Viewer3DRenderingSurfaceBottomRight];
-        lBR.Camera.Position = new GLTK.Point(0, 5000, 0);
+        lBR.Camera.Position = new GLTK.Point(0, -5000, 0);
         lBR.Camera.LookAt(new GLTK.Point(0, 0, 0), GLTK.Vector.ZAxis);
 
         //set defaults
@@ -381,6 +387,7 @@ namespace MMEd.Viewers
       {
         mScene.RemoveMMEdObject(xiObject);
         mScene.AddObject(xiObject.GetEntity(mSubject as Level, TextureMode, SelectedMetadata));
+        UpdateActiveObjectStatus(xiObject);
       }
     }
 
@@ -502,9 +509,29 @@ namespace MMEd.Viewers
           mActiveObject = value;
           InvalidateAllViewers();
         }
+
+        UpdateActiveObjectStatus(mActiveObject);
       }
     }
 
+    private void UpdateActiveObjectStatus(object xiObject)
+    {
+      FlatChunk.ObjectEntry lObject = xiObject as FlatChunk.ObjectEntry;
+
+      string lStatus = null;
+      if (lObject != null)
+      {
+        lStatus = string.Format("Pos: ({0},{1},{2}) Rot: ({3},{4},{5})",
+          lObject.OriginPosition.X,
+          lObject.OriginPosition.Y,
+          lObject.OriginPosition.Z,
+          lObject.RotationVector.X,
+          lObject.RotationVector.Y,
+          lObject.RotationVector.Z);
+      }
+
+      mMainForm.ThreeDeeEditorStatusLabel.Text = lStatus;
+    }
 
     private object mActiveObject = null;
 

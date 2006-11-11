@@ -281,7 +281,7 @@ namespace GLTK
 
     public int SetLight(Light xiLight)
     {
-      SetLight(GetLightId(mNextLight), xiLight);
+      SetLight(mNextLight, xiLight);
 
       int lRet = mNextLight;
 
@@ -318,16 +318,17 @@ namespace GLTK
         case 7:
           return Gl.GL_LIGHT7;
         default:
-          throw new Exception("Only 7 lights are supported");
+          throw new Exception("Only 8 lights are supported");
       }
     }
 
     public int SetLight(int xiLightId, Light xiLight)
     {
+      int lGLLightId = GetLightId(xiLightId);
       using (ScopedLock lLock = LockContext())
       {
         Gl.glLightfv(
-          xiLightId,
+          lGLLightId,
           Gl.GL_POSITION,
           new float[] { 
           (float)xiLight.Position.x, 
@@ -336,7 +337,7 @@ namespace GLTK
            1f});
 
         Gl.glLightfv(
-          xiLightId,
+          lGLLightId,
           Gl.GL_DIFFUSE,
           new float[] { 
           (float)xiLight.DiffuseColor.R  / 255, 
@@ -345,7 +346,7 @@ namespace GLTK
           (float)xiLight.DiffuseIntensity});
 
         Gl.glLightfv(
-          xiLightId,
+          lGLLightId,
           Gl.GL_AMBIENT,
           new float[] { 
           (float)xiLight.AmbientColor.R  / 255, 
@@ -354,7 +355,7 @@ namespace GLTK
           (float)xiLight.AmbientIntensity});
 
         Gl.glLightfv(
-          xiLightId,
+          lGLLightId,
           Gl.GL_SPECULAR,
           new float[] { 
           (float)xiLight.SpecularColor.R  / 255, 
@@ -362,7 +363,7 @@ namespace GLTK
           (float)xiLight.SpecularColor.B  / 255,
           (float)xiLight.SpecularIntensity});
 
-        Gl.glEnable(GetLightId(mNextLight));
+        Gl.glEnable(lGLLightId);
       }
 
       return xiLightId;

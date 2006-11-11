@@ -57,7 +57,7 @@
   <ItemGroup>
     <Compile Include="AbstractRenderer.cs" />
     <Compile Include="Camera.cs" />
-    <Compile Include="Cubiod.cs" />
+    <Compile Include="Cuboid.cs" />
     <Compile Include="DeviceContextEventArgs.cs" />
     <Compile Include="Entity.cs" />
     <Compile Include="ImmediateModeRenderer.cs" />
