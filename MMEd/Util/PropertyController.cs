@@ -43,18 +43,66 @@ namespace MMEd.Util
       Type lPropType = mProperty.PropertyType;
       mAllowedValues = xiAllowedValues;
 
-      if (!lPropType.IsEnum 
+      if (!lPropType.IsEnum
         && lPropType != typeof(bool)
         && xiAllowedValues == null) throw new ArgumentException("If property is not enumerated or boolean, then you must provide an array of allowed values");
 
-      if (xiPropertyUpdateEventName != null)
+      // have a guess at an update event name. Don't throw an exception
+      // if we guess wrong
+      bool lEventNameInferred = false;
+      if (xiPropertyUpdateEventName == null)
       {
-        EventInfo lEv = mTarget.GetType().GetEvent(xiPropertyUpdateEventName);
-        lEv.AddEventHandler(mTarget, new EventHandler(this.ValueChangeHandler));
+        xiPropertyUpdateEventName = string.Format("On{0}Changed", xiPropertyName);
+        lEventNameInferred = true;
+      }
+
+      EventInfo lEv = mTarget.GetType().GetEvent(xiPropertyUpdateEventName);
+      if (lEv == null)
+      {
+        if (!lEventNameInferred)
+          throw new ArgumentException(string.Format("Event \"{0}\" not found on type {1}", xiPropertyUpdateEventName, xiTarget.GetType()));
+      }
+      else
+      {
+        if (!lEv.EventHandlerType.IsAssignableFrom(typeof(EventHandler)))
+        {
+          if (!lEventNameInferred)
+            throw new ArgumentException(string.Format("Event \"{0}\" is incompatible with System.EventHandler on type {1}", xiPropertyUpdateEventName, xiTarget.GetType()));
+        }
+        else
+        {
+          lEv.AddEventHandler(mTarget, new EventHandler(this.ValueChangeHandler));
+        }
       }
     }
 
-    
+    public class NamedValueHolder
+    {
+      public object Value;
+      public string Name;
+      public override string ToString()
+      {
+        return Name;
+      }
+      public NamedValueHolder(string xiName, object xiValue)
+      {
+        this.Value = xiValue;
+        this.Name = xiName;
+      }
+      public override bool Equals(object obj)
+      {
+        return obj is NamedValueHolder 
+          && Value.Equals(((NamedValueHolder)obj).Value);
+      }
+      public override int GetHashCode()
+      {
+        return Value.GetHashCode();
+      }
+
+    }
+
+    #region ToolStripMenuItem
+
     private ToolStripMenuItem[] mToolStripItems;
     public ToolStripMenuItem[] CreateMenuItems()
     {
@@ -82,75 +130,20 @@ namespace MMEd.Util
           lAcc.Add(lItem);
         }
       }
-      else //bool
+      else if (mProperty.PropertyType == typeof(bool))
       {
         ToolStripMenuItem lItem = new ToolStripMenuItem();
         lItem.Text = Utils.CamelCaseToSentence(mProperty.Name);
         lItem.Click += new EventHandler(this.ToolStripClickHandler);
         lAcc.Add(lItem);
       }
+      else
+      {
+        throw new Exception(string.Format("Can't create menu items for properties of type {0}", mProperty.PropertyType));
+      }
       mToolStripItems = lAcc.ToArray();
       ValueChangeHandler(null, null);
       return mToolStripItems;
-    }
-
-    public class NamedValueHolder
-    {
-      public object Value;
-      public string Name;
-      public override string ToString()
-      {
-        return Name;
-      }
-      public NamedValueHolder(string xiName, object xiValue)
-      {
-        this.Value = xiValue;
-        this.Name = xiName;
-      }
-      public override bool Equals(object obj)
-      {
-        return Value.Equals(((NamedValueHolder)obj).Value);
-      }
-      public override int GetHashCode()
-      {
-        return Value.GetHashCode();
-      }
-
-    }
-
-    private ToolStripComboBox mToolStripComboBox;
-    public ToolStripComboBox CreateToolStripComboBox()
-    {
-      if (mToolStripComboBox != null) throw new Exception("Can't create more than one menu combo box");
-      if (!mProperty.PropertyType.IsEnum && mAllowedValues == null) throw new Exception("Only enumerated properties or properties with a list of allowed values can use menu combo box");
-      mToolStripComboBox = new ToolStripComboBox();
-
-      if (mAllowedValues != null)
-      {
-        foreach (NamedValueHolder lNV in mAllowedValues)
-        {
-          mToolStripComboBox.Items.Add(lNV);
-        }
-      }
-      else
-      {
-        foreach (object lValue in Enum.GetValues(mProperty.PropertyType))
-        {
-          mToolStripComboBox.Items.Add(new NamedValueHolder(Utils.CamelCaseToSentence(Enum.GetName(mProperty.PropertyType, lValue)), lValue));
-        }
-      }
-
-      mToolStripComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
-      mToolStripComboBox.SelectedIndexChanged += new EventHandler(this.ComboBoxSelectHandler);
-      ValueChangeHandler(null, null);
-      return mToolStripComboBox;
-    }
-
-    public void ComboBoxSelectHandler(object xiSender, EventArgs xiArgs)
-    {
-      object lNewValue = ((NamedValueHolder)((ToolStripComboBox)xiSender).SelectedItem).Value;
-      mProperty.SetValue(mTarget, lNewValue, null);
-      ValueChangeHandler(null, null);
     }
 
     public void ToolStripClickHandler(object xiSender, EventArgs xiArgs)
@@ -173,6 +166,94 @@ namespace MMEd.Util
       ValueChangeHandler(null, null);
     }
 
+    #endregion
+
+    #region ToolStripComboBox
+
+    private ToolStripComboBox mToolStripComboBox;
+    public ToolStripComboBox CreateToolStripComboBox()
+    {
+      if (mToolStripComboBox != null) throw new Exception("Can't create more than one menu combo box");
+      if (!mProperty.PropertyType.IsEnum && mAllowedValues == null) throw new Exception("Only enumerated properties or properties with a list of allowed values can use menu combo box");
+      mToolStripComboBox = new ToolStripComboBox();
+
+      if (mAllowedValues != null)
+      {
+        foreach (NamedValueHolder lNV in mAllowedValues)
+        {
+          mToolStripComboBox.Items.Add(lNV);
+        }
+      }
+      else if (mProperty.PropertyType.IsEnum)
+      {
+        foreach (object lValue in Enum.GetValues(mProperty.PropertyType))
+        {
+          mToolStripComboBox.Items.Add(new NamedValueHolder(Utils.CamelCaseToSentence(Enum.GetName(mProperty.PropertyType, lValue)), lValue));
+        }
+      }
+      else
+      {
+        throw new Exception(string.Format("Can't create menu combo for properties of type {0}", mProperty.PropertyType));
+      }
+
+      mToolStripComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+      mToolStripComboBox.SelectedIndexChanged += new EventHandler(this.ToolStripComboBoxSelectHandler);
+      ValueChangeHandler(null, null);
+      return mToolStripComboBox;
+    }
+
+    public void ToolStripComboBoxSelectHandler(object xiSender, EventArgs xiArgs)
+    {
+      object lNewValue = ((NamedValueHolder)((ToolStripComboBox)xiSender).SelectedItem).Value;
+      mProperty.SetValue(mTarget, lNewValue, null);
+      ValueChangeHandler(null, null);
+    }
+
+    #endregion
+
+    #region ComboBox
+
+    private ComboBox mComboBox;
+    public void BindTo(ComboBox xiCombo)
+    {
+      if (mComboBox != null) throw new Exception("Can't bind to more than one combo box");
+      if (!mProperty.PropertyType.IsEnum && mAllowedValues == null) throw new Exception("Only enumerated properties or properties with a list of allowed values can use combo box");
+      mComboBox = xiCombo;
+      mComboBox.Items.Clear();
+
+      if (mAllowedValues != null)
+      {
+        foreach (NamedValueHolder lNV in mAllowedValues)
+        {
+          mComboBox.Items.Add(lNV);
+        }
+      }
+      else if (mProperty.PropertyType.IsEnum)
+      {
+        foreach (object lValue in Enum.GetValues(mProperty.PropertyType))
+        {
+          mComboBox.Items.Add(new NamedValueHolder(Utils.CamelCaseToSentence(Enum.GetName(mProperty.PropertyType, lValue)), lValue));
+        }
+      }
+      else
+      {
+        throw new Exception(string.Format("Can't bind to combo for properties of type {0}", mProperty.PropertyType));
+      }
+
+      mComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+      mComboBox.SelectedIndexChanged += new EventHandler(this.ComboBoxSelectHandler);
+      ValueChangeHandler(null, null);
+    }
+
+    public void ComboBoxSelectHandler(object xiSender, EventArgs xiArgs)
+    {
+      object lNewValue = ((NamedValueHolder)((ComboBox)xiSender).SelectedItem).Value;
+      mProperty.SetValue(mTarget, lNewValue, null);
+      ValueChangeHandler(null, null);
+    }
+
+    #endregion
+
     public void ValueChangeHandler(object xiSender, EventArgs xiArgs)
     {
       if (mAllowedValues != null)
@@ -187,6 +268,10 @@ namespace MMEd.Util
         {
           mToolStripComboBox.SelectedItem = new NamedValueHolder(null, lNewValue);
         }
+        if (mComboBox != null)
+        {
+          mComboBox.SelectedItem = new NamedValueHolder(null, lNewValue);
+        }
       } 
       else if (mProperty.PropertyType.IsEnum)
       {
@@ -200,6 +285,10 @@ namespace MMEd.Util
         if (mToolStripComboBox != null)
         {
           mToolStripComboBox.SelectedItem = new NamedValueHolder(null, lNewValue);
+        }
+        if (mComboBox != null)
+        {
+          mComboBox.SelectedItem = new NamedValueHolder(null, lNewValue);
         }
       }
       else

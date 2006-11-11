@@ -197,12 +197,12 @@ namespace MMEd.Chunks
       }
     }
 
-    public IEnumerable<GLTK.Entity> GetEntities(Level xiLevel, eTextureMode xiTextureMode, FlatChunk.TexMetaDataEntries xiSelectedMetadata)
+    public IEnumerable<GLTK.Entity> GetEntities(Level xiLevel, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata)
     {
       return GetEntities(xiLevel, xiTextureMode, xiSelectedMetadata, this);
     }
 
-    public IEnumerable<GLTK.Entity> GetEntities(Level xiLevel, eTextureMode xiTextureMode, FlatChunk.TexMetaDataEntries xiSelectedMetadata, object xiMeshOwner)
+    public IEnumerable<GLTK.Entity> GetEntities(Level xiLevel, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata, object xiMeshOwner)
     {
       MMEdEntity lAcc = new MMEdEntity(xiMeshOwner);
       Mesh lColouredMesh = null;

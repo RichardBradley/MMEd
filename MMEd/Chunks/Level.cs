@@ -301,7 +301,7 @@ namespace MMEd.Chunks
       }
     }
 
-    public IEnumerable<GLTK.Entity> GetEntities(Level xiLevel, eTextureMode xiTextureMode, FlatChunk.TexMetaDataEntries xiSelectedMetadata)
+    public IEnumerable<GLTK.Entity> GetEntities(Level xiLevel, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata)
     {
       List<Entity> lAcc = new List<Entity>();
 

@@ -38,7 +38,7 @@ namespace MMEd.Viewers.ThreeDee
   //to be redered as a ThreeDee scene
   public interface IEntityProvider
   {
-    IEnumerable<Entity> GetEntities(Level xiLevel, eTextureMode xiTextureMode, FlatChunk.TexMetaDataEntries xiSelectedMetadata);
+    IEnumerable<Entity> GetEntities(Level xiLevel, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata);
   }
 
 }

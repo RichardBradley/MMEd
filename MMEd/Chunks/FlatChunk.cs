@@ -15,42 +15,42 @@ using Point = GLTK.Point;
 
 namespace MMEd.Chunks
 {
+  // The values in this enum are valid Idxs for the third 
+  // dimension of the TexMetaData array
+  public enum eTexMetaDataEntries
+  {
+    Zero = 0, // something which also follows the course. Can't be zeroed out without invalidating the level
+    One = 1, // something which seems to always be zero
+    Two = 2, // something to do with the corners? No immediately noticeable difference when zeroed out.
+    CameraPos = 3, // the camera position idx. Indexes entries in qq
+    Four = 4, // some sort of isobars around the path of the course, and ranges 0-4 or so. This seems to be something to do with the restart position for when you die
+    Waypoint = 5, // an ascending counter for the position
+    Bumpmap = 6, // the bump map. Indexes entries in qq
+    Seven = 7 // follows closely the path of the course, except for odd bits 0 elsewhere. It seems to control the restart angle after death, or the offset in the tex square where you restart.        
+  }
+
+  // The weapons available in the game
+  public enum eWeaponType
+  {
+    Grabber = 1,
+    Ommer = 2,
+    Molotovs = 3,
+    TurboBall = 4, //the power to turn into a white ball
+    FlameBall = 5,
+    Invisibility = 6,
+    Mallet = 7,
+    Molotovs2 = 8, //don't know what the difference is here
+    FireTrail = 9,
+    Missiles = 10,
+    Mines = 11,
+    GroupGrabber = 12,
+    OmniOmmer = 13,
+    MultiMallet = 14,
+    GroupSpeedUp = 15
+  }
+
   public class FlatChunk : Chunk, IEntityProvider
   {
-    // The values in this enum are valid Idxs for the third 
-    // dimension of the TexMetaData array
-    public enum TexMetaDataEntries
-    {
-      Zero = 0, // something which also follows the course. Can't be zeroed out without invalidating the level
-      One = 1, // something which seems to always be zero
-      Two = 2, // something to do with the corners? No immediately noticeable difference when zeroed out.
-      CameraPos = 3, // the camera position idx. Indexes entries in qq
-      Four = 4, // some sort of isobars around the path of the course, and ranges 0-4 or so. This seems to be something to do with the restart position for when you die
-      Waypoint = 5, // an ascending counter for the position
-      Bumpmap = 6, // the bump map. Indexes entries in qq
-      Seven = 7 // follows closely the path of the course, except for odd bits 0 elsewhere. It seems to control the restart angle after death, or the offset in the tex square where you restart.        
-    }
-
-    // The weapons available in the game
-    public enum WeaponType
-    {
-      Grabber = 1,
-      Ommer = 2,
-      Molotovs = 3,
-      TurboBall = 4, //the power to turn into a white ball
-      FlameBall = 5,
-      Invisibility = 6,
-      Mallet = 7,
-      Molotovs2 = 8, //don't know what the difference is here
-      FireTrail = 9,
-      Missiles = 10,
-      Mines = 11,
-      GroupGrabber = 12,
-      OmniOmmer = 13,
-      MultiMallet = 14,
-      GroupSpeedUp = 15
-    }
-
     [Description("The number at the start of the Flat. I haven't seen it refrenced anywhere yet")]
     public short DeclaredIdx;
 
@@ -323,7 +323,7 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
         bout.Write(ShortUnknown);
       }
 
-      public Entity GetEntity(Level xiLevel, eTextureMode xiTextureMode, TexMetaDataEntries xiSelectedMetadata)
+      public Entity GetEntity(Level xiLevel, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata)
       {
         TMDChunk lObjt = xiLevel.GetObjtById(this.ObjtType);
         if (lObjt != null)
@@ -358,8 +358,8 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
 
     public class WeaponEntry
     {
-      [Description("The type of the weapon. See enum WeaponType")]
-      public WeaponType WeaponType;
+      [Description("The type of the weapon. See enum eWeaponType")]
+      public eWeaponType eWeaponType;
 
       [Description("dunno")]
       public short ShortUnknown;
@@ -372,7 +372,7 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
       {
         try
         {
-          WeaponType = (WeaponType)bin.ReadInt16();
+          eWeaponType = (eWeaponType)bin.ReadInt16();
         }
         catch (InvalidCastException e)
         {
@@ -384,7 +384,7 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
 
       public void WriteToStream(BinaryWriter bout)
       {
-        bout.Write((short)WeaponType);
+        bout.Write((short)eWeaponType);
         bout.Write(ShortUnknown);
         Position.WriteShort3Coord64(bout);
       }
@@ -410,7 +410,7 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
       }
     }
 
-    public IEnumerable<GLTK.Entity> GetEntities(Level xiLevel, eTextureMode xiTextureMode, FlatChunk.TexMetaDataEntries xiSelectedMetadata)
+    public IEnumerable<GLTK.Entity> GetEntities(Level xiLevel, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata)
     {
       //qq hack:
       if (this.TreeNode.Checked)
@@ -492,7 +492,7 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
                       xf,
                       yf);
 
-                  if (xiSelectedMetadata == TexMetaDataEntries.Waypoint)
+                  if (xiSelectedMetadata == eTexMetaDataEntries.Waypoint)
                   {
                     Pen lPen = xiLevel.WaypointIsKeyWaypoint(lVal)
                         ? lKeyWaypointPen

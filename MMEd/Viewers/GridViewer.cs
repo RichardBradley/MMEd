@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using MMEd;
+using MMEd.Util;
 using MMEd.Chunks;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -15,49 +16,30 @@ namespace MMEd.Viewers
     private GridViewer(MainForm xiMainForm)
       : base(xiMainForm)
     {
-
-      xiMainForm.GridDisplayPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.GridDisplayPanel_Paint);
-      foreach (string name in Enum.GetNames(typeof(FlatChunk.TexMetaDataEntries)))
-      {
-        mMainForm.GridViewMetaTypeCombo.Items.Add(name);
-      }
-      mMainForm.GridViewMetaTypeCombo.SelectedIndex = 0;
-
-
-      mMainForm.GridViewRadioImages.CheckedChanged += new System.EventHandler(this.InvalidateGridDisplayEvent);
-      mMainForm.GridViewMetaTypeCombo.SelectedIndexChanged += new System.EventHandler(this.InvalidateGridDisplayEvent);
+      mMainForm.GridDisplayPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.GridDisplayPanel_Paint);
       mMainForm.GridDisplayPanel.MouseMove += new MouseEventHandler(this.GridDisplayMouseMove);
       mMainForm.GridDisplayPanel.MouseClick += new MouseEventHandler(this.GridDisplayMouseClick);
 
-      mMainForm.GridViewRadioImages.CheckedChanged += new EventHandler(this.ModeChanged);
-      mMainForm.GridViewRadioViewBump.CheckedChanged += new EventHandler(this.ModeChanged);
-      mMainForm.GridViewRadioViewOdds.CheckedChanged += new EventHandler(this.ModeChanged);
-      mMainForm.GridViewRadioEditTex.CheckedChanged += new EventHandler(this.ModeChanged);
-      mMainForm.GridViewRadioEditBump.CheckedChanged += new EventHandler(this.ModeChanged);
-      mMainForm.GridViewRadioEditMeta.CheckedChanged += new EventHandler(this.ModeChanged);
+      new PropertyController(this, "SelectedMeta").BindTo(mMainForm.GridViewMetaTypeCombo);
+      new PropertyController(this, "ViewMode").BindTo(mMainForm.GridViewViewModeCombo);
 
       mMainForm.ViewerTabControl.KeyPress += new KeyPressEventHandler(this.ViewerTabControl_KeyPress);
 
-      InitialiseTransparencyAttributes();
+      //set the transparency
+      mMainForm.GridViewTransparencySlider.ValueChanged += new EventHandler(this.TransparencyLevelChange);
+      TransparencyLevelChange(null, null);
     }
 
     private void GridDisplayPanel_Paint(object sender, PaintEventArgs e)
     {
       if (mSubject == null) return;
 
-      bool lDrawBump = mMainForm.GridViewRadioEditBump.Checked
-          || mMainForm.GridViewRadioViewBump.Checked;
-      bool lDrawOdds = mMainForm.GridViewRadioViewOdds.Checked;
-
-      bool lEditMetaMode = mMainForm.GridViewRadioEditMeta.Checked;
-      int lDrawNumType =
-         (int)(FlatChunk.TexMetaDataEntries)
-          Enum.Parse(typeof(FlatChunk.TexMetaDataEntries), (string)mMainForm.GridViewMetaTypeCombo.SelectedItem);
-
+      // create GDI helper objects outside of the main loop, if we're
+      // drawing numbers on later:
       int lNumberOffX = 0, lNumberOffY = 0;
       Font lNumberFont = null;
       Brush lNumberFGBrush = null, lNumberBGBrush = null;
-      if (lEditMetaMode)
+      if (ViewMode == eViewMode.EditMetadata)
       {
         lNumberFont = new Font(FontFamily.GenericMonospace, 10);
         lNumberFGBrush = new SolidBrush(Color.Black);
@@ -82,14 +64,14 @@ namespace MMEd.Viewers
                 x * mSubjectTileWidth,
                 y * mSubjectTileHeight);
 
-            if (lDrawOdds)
+            if (ViewMode == eViewMode.ViewOdds)
             {
               Rectangle lDest = new Rectangle(
                   x * mSubjectTileWidth,
                   y * mSubjectTileHeight,
                   mSubjectTileWidth,
                   mSubjectTileHeight);
-              OddImageChunk bic = mMainForm.Level.GetOddById(mSubject.TexMetaData[x][y][lDrawNumType]);
+              OddImageChunk bic = mMainForm.Level.GetOddById(mSubject.TexMetaData[x][y][(int)SelectedMeta]);
 
               // If we don't have an odd to draw here, bic is null
               // and nothing is drawn - just leave the base texture as-is.
@@ -98,7 +80,7 @@ namespace MMEd.Viewers
                 DrawTransparentImage(e, bic.ToImage(), lDest);
               }
             }
-            else if (lDrawBump)
+            else if (ViewMode == eViewMode.EditBump || ViewMode == eViewMode.ViewBump)
             {
               // Draw the bump map on top as a transparent image.
               Rectangle lDest = new Rectangle(
@@ -106,25 +88,17 @@ namespace MMEd.Viewers
                     y * mSubjectTileHeight,
                     mSubjectTileWidth,
                     mSubjectTileHeight);
-              BumpImageChunk bic = mMainForm.Level.GetBumpById(mSubject.TexMetaData[x][y][(int)FlatChunk.TexMetaDataEntries.Bumpmap]);
+              BumpImageChunk bic = mMainForm.Level.GetBumpById(mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.Bumpmap]);
 
               if (bic != null)
               {
                 DrawTransparentImage(e, bic.ToImage(), lDest);
               }
             }
-            else
-            {
-              e.Graphics.DrawImageUnscaled(
-                  mMainForm.Level.GetTileById(mSubject.TextureIds[x][y]).ToBitmap(),
-                  x * mSubjectTileWidth,
-                  y * mSubjectTileHeight);
-            }
 
-            if (lEditMetaMode)
+            if (ViewMode == eViewMode.EditMetadata)
             {
-
-              string text = string.Format("{0:x}", mSubject.TexMetaData[x][y][lDrawNumType]);
+              string text = string.Format("{0:x}", mSubject.TexMetaData[x][y][(int)SelectedMeta]);
 
               SizeF size = e.Graphics.MeasureString(text, lNumberFont);
 
@@ -149,7 +123,9 @@ namespace MMEd.Viewers
       }
 
       //highlight editable square
-      if (lEditMetaMode || mMainForm.GridViewRadioEditTex.Checked || mMainForm.GridViewRadioEditBump.Checked)
+      if (ViewMode == eViewMode.EditBump 
+        || ViewMode == eViewMode.EditMetadata
+        || ViewMode == eViewMode.EditTextures)
       {
         Point lMousePos = mMainForm.GridDisplayPanel.PointToClient(Cursor.Position);
         //assume graphics clip will take care of clipping
@@ -162,8 +138,13 @@ namespace MMEd.Viewers
       }
     }
 
-    private void InitialiseTransparencyAttributes()
+    private void TransparencyLevelChange(object xiSender, EventArgs xiArgs)
     {
+      float lAlpha = mMainForm.GridViewTransparencySlider.Value
+        / (float)mMainForm.GridViewTransparencySlider.Maximum;
+
+      // reset the mTransparencyAttributes matrix
+      //
       // Define a colour matrix. This allows transformations
       // of the bitmap data using matrix operations. The
       // rows correspond to RGB + alpha and one other; here
@@ -173,13 +154,15 @@ namespace MMEd.Viewers
                     new float[] {1, 0, 0, 0, 0},
                     new float[] {0, 1, 0, 0, 0},
                     new float[] {0, 0, 1, 0, 0},
-                    new float[] {0, 0, 0, 0.5f, 0}, 
+                    new float[] {0, 0, 0, lAlpha, 0}, 
                     new float[] {0, 0, 0, 0, 1}
                   };
       ColorMatrix lMatrix = new ColorMatrix(lMatrixDefinition);
       mTransparencyAttributes.SetColorMatrix(lMatrix,
         ColorMatrixFlag.Default,
         ColorAdjustType.Bitmap);
+
+      InvalidateGridDisplay();
     }
 
     private void DrawTransparentImage(PaintEventArgs e, Image xiImage, Rectangle xiDest)
@@ -223,7 +206,6 @@ namespace MMEd.Viewers
         mMainForm.GridDisplayPanel.Width = 100;
         mMainForm.GridDisplayPanel.Height = 100;
         mMainForm.GridDisplayPanel.Controls.Clear();
-        mMainForm.GridViewRadioEditMeta.Enabled = false;
       }
       else
       {
@@ -235,8 +217,6 @@ namespace MMEd.Viewers
 
         mMainForm.GridDisplayPanel.Width = mSubjectTileWidth * mSubject.Width;
         mMainForm.GridDisplayPanel.Height = mSubjectTileHeight * mSubject.Height;
-
-        mMainForm.GridViewRadioEditMeta.Enabled = mSubject.TexMetaData != null;
 
         //init the selected image display boxes
         const int PADDING = 5, IMG_X_OFF = 32;
@@ -263,7 +243,7 @@ namespace MMEd.Viewers
           mKeyOrMouseToSelPicBoxDict[key].Location = new Point(IMG_X_OFF, i * (64 + PADDING));
         }
       }
-      mMainForm.GridViewRadioImages.Checked = true;
+      ViewMode = eViewMode.ViewOnly;
       ModeChanged(null, null);
     }
 
@@ -310,58 +290,6 @@ namespace MMEd.Viewers
 
     private void ModeChanged(object sender, EventArgs e)
     {
-      const int PADDING = 5;
-      if (mMainForm.GridViewRadioEditTex.Checked
-          || mMainForm.GridViewRadioEditBump.Checked)
-      {
-        bool lIsTex = mMainForm.GridViewRadioEditTex.Checked;
-        mMainForm.GridViewPalettePanel.Controls.Clear();
-        mMainForm.GridViewPalettePanel.SuspendLayout();
-        Point lNextPbTL = new Point(0, 0);
-        IEnumerator<object> lKeys = mKeyOrMouseToSelPicBoxDict.Keys.GetEnumerator();
-        PictureBox lPalPB = null;
-        for (int i = 0; i < 256; i++)
-        {
-          //fetch im
-          Chunk c = lIsTex
-            ? (Chunk)mMainForm.Level.GetTileById(i)
-            : (Chunk)mMainForm.Level.GetBumpById(i);
-
-          if (c != null && c is ImageViewer.IImageProvider)
-          {
-            Image im = ((ImageViewer.IImageProvider)c).ToImage();
-            if (!lIsTex ||
-               (im.Width == this.mSubjectTileWidth
-                 && im.Height == this.mSubjectTileHeight))
-            {
-              lPalPB = new PictureBox();
-              lPalPB.Image = im;
-              mMainForm.GridViewPalettePanel.Size =
-                new Size(lNextPbTL.X + 64 + PADDING,
-                         lNextPbTL.Y + 64);
-              mMainForm.GridViewPalettePanel.Controls.Add(lPalPB);
-              lPalPB.Bounds = new Rectangle(lNextPbTL, new Size(64, 64));
-              lPalPB.SizeMode = PictureBoxSizeMode.StretchImage;
-              lPalPB.Tag = (byte)i;
-              lPalPB.MouseClick += new MouseEventHandler(PaletteImageMouseClick);
-              lNextPbTL.Offset(64 + PADDING, 0);
-              if (lKeys.MoveNext())
-              {
-                SetSelImage(lKeys.Current, lPalPB);
-              }
-            }
-          }
-        }
-        while (lKeys.MoveNext())
-        {
-          SetSelImage(lKeys.Current, lPalPB);
-        }
-      }
-      mMainForm.GridViewPalettePanel.ResumeLayout();
-      mMainForm.GridViewSelImageGroupBox.Visible =
-        mMainForm.GridViewRadioEditTex.Checked
-        || mMainForm.GridViewRadioEditBump.Checked;
-      InvalidateGridDisplay();
     }
 
     void PaletteImageMouseClick(object sender, MouseEventArgs e)
@@ -375,7 +303,7 @@ namespace MMEd.Viewers
       {
         int x = e.X / mSubjectTileWidth;
         int y = e.Y / mSubjectTileHeight;
-        if (mMainForm.GridViewRadioEditMeta.Checked)
+        if (ViewMode == eViewMode.EditMetadata)
         {
           //edit meta data mode
           if (mSubject.TexMetaData != null
@@ -383,17 +311,8 @@ namespace MMEd.Viewers
              && y < mSubject.TexMetaData[x].Length)
           {
             short val;
-            if (mMainForm.GridViewRadioEditMeta.Checked)
-            {
-              int lDrawNumType =
-                (int)(FlatChunk.TexMetaDataEntries)
-              Enum.Parse(typeof(FlatChunk.TexMetaDataEntries), (string)mMainForm.GridViewMetaTypeCombo.SelectedItem);
-              val = mSubject.TexMetaData[x][y][lDrawNumType];
-            }
-            else
-            {
-              val = mSubject.TextureIds[x][y];
-            }
+
+            val = mSubject.TexMetaData[x][y][(int)SelectedMeta];
 
             string lReply = Microsoft.VisualBasic.Interaction.InputBox(
               string.Format("Value at ({0},{1}) is {2} (0x{2:x}). New value:", x, y, val),
@@ -406,17 +325,13 @@ namespace MMEd.Viewers
             {
               val = short.Parse(lReply);
 
-              int lDrawNumType =
-                (int)(FlatChunk.TexMetaDataEntries)
-                Enum.Parse(typeof(FlatChunk.TexMetaDataEntries), (string)mMainForm.GridViewMetaTypeCombo.SelectedItem);
-
-              mSubject.TexMetaData[x][y][lDrawNumType] = (byte)val;
+              mSubject.TexMetaData[x][y][(int)SelectedMeta] = (byte)val;
 
               InvalidateGridDisplay();
             }
           }
         }
-        else if (mMainForm.GridViewRadioEditTex.Checked)
+        else if (ViewMode == eViewMode.EditTextures)
         {
           //edit textures mode
           if (mKeyOrMouseToSelPicBoxDict.ContainsKey(e.Button))
@@ -426,13 +341,13 @@ namespace MMEd.Viewers
             InvalidateGridDisplay();
           }
         }
-        else if (mMainForm.GridViewRadioEditBump.Checked)
+        else if (ViewMode == eViewMode.EditBump)
         {
           //edit bump mode
           if (mKeyOrMouseToSelPicBoxDict.ContainsKey(e.Button))
           {
             PictureBox lSel = mKeyOrMouseToSelPicBoxDict[e.Button];
-            mSubject.TexMetaData[x][y][(int)FlatChunk.TexMetaDataEntries.Bumpmap] = (byte)lSel.Tag;
+            mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.Bumpmap] = (byte)lSel.Tag;
             InvalidateGridDisplay();
           }
         }
@@ -455,8 +370,7 @@ namespace MMEd.Viewers
     private void ViewerTabControl_KeyPress(object sender, KeyPressEventArgs e)
     {
       if (mMainForm.ViewerTabControl.SelectedTab == this.Tab
-         && (mMainForm.GridViewRadioEditTex.Checked //tex edit mode
-           || mMainForm.GridViewRadioEditBump.Checked)
+         && (ViewMode == eViewMode.EditTextures || ViewMode == eViewMode.EditBump)
          && mKeyOrMouseToSelPicBoxDict.ContainsKey(e.KeyChar))
       {
         //drill down the child heirarchy
@@ -485,7 +399,14 @@ namespace MMEd.Viewers
             int x = p.X / mSubjectTileWidth;
             int y = p.Y / mSubjectTileHeight;
             PictureBox lSel = mKeyOrMouseToSelPicBoxDict[e.KeyChar];
-            mSubject.TextureIds[x][y] = (byte)lSel.Tag;
+            if (ViewMode == eViewMode.EditTextures)
+            {
+              mSubject.TextureIds[x][y] = (byte)lSel.Tag;
+            }
+            else if (ViewMode == eViewMode.EditBump)
+            {
+              mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.Bumpmap] = (byte)lSel.Tag;
+            }
             InvalidateGridDisplay();
             return;
           }
@@ -495,6 +416,102 @@ namespace MMEd.Viewers
         }
       }
     }
+
+    #region ViewMode property
+
+    public enum eViewMode
+    {
+      ViewOnly,
+      ViewBump,
+      ViewOdds,
+      EditTextures,
+      EditBump,
+      EditMetadata
+    }
+
+    private eViewMode mViewMode = eViewMode.ViewOnly;
+    public eViewMode ViewMode
+    {
+      get { return mViewMode; }
+      set
+      {
+        const int PADDING = 5;
+        mViewMode = value;
+        if (ViewMode == eViewMode.EditTextures || ViewMode == eViewMode.EditBump)
+        {
+          mMainForm.GridViewPalettePanel.SuspendLayout();
+          mMainForm.GridViewPalettePanel.Controls.Clear();
+          Point lNextPbTL = new Point(0, 0);
+          IEnumerator<object> lKeys = mKeyOrMouseToSelPicBoxDict.Keys.GetEnumerator();
+          PictureBox lPalPB = null;
+          for (int i = 0; i < 256; i++)
+          {
+            //fetch im
+            Chunk c = (ViewMode == eViewMode.EditTextures)
+              ? (Chunk)mMainForm.Level.GetTileById(i)
+              : (Chunk)mMainForm.Level.GetBumpById(i);
+
+            if (c != null && c is ImageViewer.IImageProvider)
+            {
+              Image im = ((ImageViewer.IImageProvider)c).ToImage();
+              if (ViewMode == eViewMode.EditBump ||
+                 (im.Width == this.mSubjectTileWidth
+                   && im.Height == this.mSubjectTileHeight))
+              {
+                lPalPB = new PictureBox();
+                lPalPB.Image = im;
+                mMainForm.GridViewPalettePanel.Size =
+                  new Size(lNextPbTL.X + 64 + PADDING,
+                           lNextPbTL.Y + 64);
+                mMainForm.GridViewPalettePanel.Controls.Add(lPalPB);
+                lPalPB.Bounds = new Rectangle(lNextPbTL, new Size(64, 64));
+                lPalPB.SizeMode = PictureBoxSizeMode.StretchImage;
+                lPalPB.Tag = (byte)i;
+                lPalPB.MouseClick += new MouseEventHandler(PaletteImageMouseClick);
+                lNextPbTL.Offset(64 + PADDING, 0);
+                if (lKeys.MoveNext())
+                {
+                  SetSelImage(lKeys.Current, lPalPB);
+                }
+              }
+            }
+          }
+          while (lKeys.MoveNext())
+          {
+            SetSelImage(lKeys.Current, lPalPB);
+          }
+          mMainForm.GridViewPalettePanel.ResumeLayout();
+          mMainForm.GridViewSelImageGroupBox.Visible = true;
+        }
+        else //not edit tex or edit bump
+        {
+          mMainForm.GridViewSelImageGroupBox.Visible = false;
+        }
+
+        if (OnViewModeChange != null) OnViewModeChange(this, null);
+        InvalidateGridDisplay();
+      }
+    }
+    public event EventHandler OnViewModeChange;
+
+    #endregion
+
+    #region SelectedMeta property
+
+    private eTexMetaDataEntries mSelectedMeta = eTexMetaDataEntries.Waypoint;
+    public eTexMetaDataEntries SelectedMeta
+    {
+      get { return mSelectedMeta; }
+      set
+      {
+        mSelectedMeta = value;
+        if (OnSelectedMetaChange != null) OnSelectedMetaChange(this, null);
+        InvalidateGridDisplay();
+      }
+    }
+    public event EventHandler OnSelectedMetaChange;
+
+    #endregion
 
     private ImageAttributes mTransparencyAttributes = new ImageAttributes();
   }

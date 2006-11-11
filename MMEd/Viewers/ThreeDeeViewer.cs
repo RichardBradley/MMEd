@@ -234,7 +234,7 @@ namespace MMEd.Viewers
             MovementMode = eMovementMode.InspectMode;
             DrawNormalsMode = eDrawNormalsMode.HideNormals;
             TextureMode = eTextureMode.NormalTextures;
-            SelectedMetadata = FlatChunk.TexMetaDataEntries.Waypoint;
+            SelectedMetadata = eTexMetaDataEntries.Waypoint;
           }
           else
           {
@@ -242,7 +242,7 @@ namespace MMEd.Viewers
             MovementMode = eMovementMode.FlyMode;
             DrawNormalsMode = eDrawNormalsMode.HideNormals;
             TextureMode = eTextureMode.NormalTextures;
-            SelectedMetadata = FlatChunk.TexMetaDataEntries.Waypoint;
+            SelectedMetadata = eTexMetaDataEntries.Waypoint;
           }
         }
 
@@ -374,9 +374,9 @@ namespace MMEd.Viewers
 
     #region SelectedMetadata property
 
-    private FlatChunk.TexMetaDataEntries mSelectedMetadata;
+    private eTexMetaDataEntries mSelectedMetadata;
 
-    public FlatChunk.TexMetaDataEntries SelectedMetadata
+    public eTexMetaDataEntries SelectedMetadata
     {
       get { return mSelectedMetadata; }
       set

@@ -28,6 +28,7 @@ namespace MMEd
         /// </summary>
         private void InitializeComponent()
         {
+          this.components = new System.ComponentModel.Container();
           System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
           this.mMenuStrip = new System.Windows.Forms.MenuStrip();
           this.MnuFile = new System.Windows.Forms.ToolStripMenuItem();
@@ -61,16 +62,13 @@ namespace MMEd
           this.GridDisplayPanelHolder = new MMEd.Util.SmoothScrollingPanel();
           this.GridDisplayPanel = new MMEd.Util.UserPaintDoubleBufferedPanel();
           this.groupBox1 = new System.Windows.Forms.GroupBox();
-          this.GridViewRadioViewOdds = new System.Windows.Forms.RadioButton();
-          this.GridViewRadioViewBump = new System.Windows.Forms.RadioButton();
-          this.GridViewRadioEditBump = new System.Windows.Forms.RadioButton();
-          this.GridViewRadioEditTex = new System.Windows.Forms.RadioButton();
+          this.GridViewTransparencySlider = new System.Windows.Forms.TrackBar();
+          this.GridViewViewModeCombo = new System.Windows.Forms.ComboBox();
           this.GridViewMetaTypeCombo = new System.Windows.Forms.ComboBox();
-          this.GridViewRadioEditMeta = new System.Windows.Forms.RadioButton();
-          this.GridViewRadioImages = new System.Windows.Forms.RadioButton();
           this.ViewTab3D = new System.Windows.Forms.TabPage();
           this.Viewer3DRenderingSurface = new GLTK.RenderingSurface();
           this.ViewTabBump = new System.Windows.Forms.TabPage();
+          this.BumpEditFillButton = new System.Windows.Forms.Button();
           this.label8 = new System.Windows.Forms.Label();
           this.label7 = new System.Windows.Forms.Label();
           this.label6 = new System.Windows.Forms.Label();
@@ -91,7 +89,7 @@ namespace MMEd
           this.RightHandSplit = new System.Windows.Forms.SplitContainer();
           this.Viewer3DRenderingSurfaceTopRight = new GLTK.RenderingSurface();
           this.Viewer3DRenderingSurfaceBottomRight = new GLTK.RenderingSurface();
-          this.BumpEditFillButton = new System.Windows.Forms.Button();
+          this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
           this.mMenuStrip.SuspendLayout();
           this.MainSplitter.Panel1.SuspendLayout();
           this.MainSplitter.Panel2.SuspendLayout();
@@ -109,6 +107,7 @@ namespace MMEd
           this.smoothScrollingPanel1.SuspendLayout();
           this.GridDisplayPanelHolder.SuspendLayout();
           this.groupBox1.SuspendLayout();
+          ((System.ComponentModel.ISupportInitialize)(this.GridViewTransparencySlider)).BeginInit();
           this.ViewTab3D.SuspendLayout();
           this.ViewTabBump.SuspendLayout();
           ((System.ComponentModel.ISupportInitialize)(this.BumpViewPictureBox)).BeginInit();
@@ -153,7 +152,7 @@ namespace MMEd
           this.MnuiFileOpen.ImageTransparentColor = System.Drawing.Color.Magenta;
           this.MnuiFileOpen.Name = "MnuiFileOpen";
           this.MnuiFileOpen.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-          this.MnuiFileOpen.Size = new System.Drawing.Size(161, 22);
+          this.MnuiFileOpen.Size = new System.Drawing.Size(174, 22);
           this.MnuiFileOpen.Text = "&Open";
           this.MnuiFileOpen.Click += new System.EventHandler(this.MnuiFileOpen_Click);
           // 
@@ -163,7 +162,7 @@ namespace MMEd
           this.saveToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
           this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
           this.saveToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-          this.saveToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+          this.saveToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
           this.saveToolStripMenuItem.Text = "&Save As...";
           this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
           // 
@@ -317,9 +316,9 @@ namespace MMEd
           this.GridViewSelImageGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                       | System.Windows.Forms.AnchorStyles.Right)));
           this.GridViewSelImageGroupBox.Controls.Add(this.GridViewSelPanelHolder);
-          this.GridViewSelImageGroupBox.Location = new System.Drawing.Point(504, 190);
+          this.GridViewSelImageGroupBox.Location = new System.Drawing.Point(504, 121);
           this.GridViewSelImageGroupBox.Name = "GridViewSelImageGroupBox";
-          this.GridViewSelImageGroupBox.Size = new System.Drawing.Size(133, 180);
+          this.GridViewSelImageGroupBox.Size = new System.Drawing.Size(133, 249);
           this.GridViewSelImageGroupBox.TabIndex = 4;
           this.GridViewSelImageGroupBox.TabStop = false;
           this.GridViewSelImageGroupBox.Text = "Selected Images";
@@ -333,7 +332,7 @@ namespace MMEd
           this.GridViewSelPanelHolder.Controls.Add(this.GridViewSelPanel);
           this.GridViewSelPanelHolder.Location = new System.Drawing.Point(6, 19);
           this.GridViewSelPanelHolder.Name = "GridViewSelPanelHolder";
-          this.GridViewSelPanelHolder.Size = new System.Drawing.Size(121, 155);
+          this.GridViewSelPanelHolder.Size = new System.Drawing.Size(121, 224);
           this.GridViewSelPanelHolder.TabIndex = 0;
           // 
           // GridViewSelPanel
@@ -356,7 +355,7 @@ namespace MMEd
           // GridViewerStatusLabel
           // 
           this.GridViewerStatusLabel.Name = "GridViewerStatusLabel";
-          this.GridViewerStatusLabel.Size = new System.Drawing.Size(41, 17);
+          this.GridViewerStatusLabel.Size = new System.Drawing.Size(45, 17);
           this.GridViewerStatusLabel.Text = "(status)";
           // 
           // groupBox2
@@ -466,96 +465,50 @@ namespace MMEd
           // 
           this.GridDisplayPanel.Location = new System.Drawing.Point(0, 0);
           this.GridDisplayPanel.Name = "GridDisplayPanel";
-          this.GridDisplayPanel.Size = new System.Drawing.Size(200, 114);
+          this.GridDisplayPanel.Size = new System.Drawing.Size(200, 192);
           this.GridDisplayPanel.TabIndex = 1;
           // 
           // groupBox1
           // 
           this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-          this.groupBox1.Controls.Add(this.GridViewRadioViewOdds);
-          this.groupBox1.Controls.Add(this.GridViewRadioViewBump);
-          this.groupBox1.Controls.Add(this.GridViewRadioEditBump);
-          this.groupBox1.Controls.Add(this.GridViewRadioEditTex);
+          this.groupBox1.Controls.Add(this.GridViewTransparencySlider);
+          this.groupBox1.Controls.Add(this.GridViewViewModeCombo);
           this.groupBox1.Controls.Add(this.GridViewMetaTypeCombo);
-          this.groupBox1.Controls.Add(this.GridViewRadioEditMeta);
-          this.groupBox1.Controls.Add(this.GridViewRadioImages);
           this.groupBox1.Location = new System.Drawing.Point(504, 0);
           this.groupBox1.Name = "groupBox1";
-          this.groupBox1.Size = new System.Drawing.Size(133, 184);
+          this.groupBox1.Size = new System.Drawing.Size(133, 118);
           this.groupBox1.TabIndex = 0;
           this.groupBox1.TabStop = false;
-          this.groupBox1.Text = "View Mode";
+          this.groupBox1.Text = "View Options";
           // 
-          // GridViewRadioViewOdds
+          // GridViewTransparencySlider
           // 
-          this.GridViewRadioViewOdds.AutoSize = true;
-          this.GridViewRadioViewOdds.Location = new System.Drawing.Point(6, 65);
-          this.GridViewRadioViewOdds.Name = "GridViewRadioViewOdds";
-          this.GridViewRadioViewOdds.Size = new System.Drawing.Size(74, 17);
-          this.GridViewRadioViewOdds.TabIndex = 6;
-          this.GridViewRadioViewOdds.Text = "View odds";
-          this.GridViewRadioViewOdds.UseVisualStyleBackColor = true;
+          this.GridViewTransparencySlider.Location = new System.Drawing.Point(5, 73);
+          this.GridViewTransparencySlider.Name = "GridViewTransparencySlider";
+          this.GridViewTransparencySlider.Size = new System.Drawing.Size(122, 42);
+          this.GridViewTransparencySlider.TabIndex = 4;
+          this.toolTip1.SetToolTip(this.GridViewTransparencySlider, "Set the transparency level for overlaid textures (bump, odd)");
+          this.GridViewTransparencySlider.Value = 5;
           // 
-          // GridViewRadioViewBump
+          // GridViewViewModeCombo
           // 
-          this.GridViewRadioViewBump.AutoSize = true;
-          this.GridViewRadioViewBump.Location = new System.Drawing.Point(6, 42);
-          this.GridViewRadioViewBump.Name = "GridViewRadioViewBump";
-          this.GridViewRadioViewBump.Size = new System.Drawing.Size(77, 17);
-          this.GridViewRadioViewBump.TabIndex = 5;
-          this.GridViewRadioViewBump.Text = "View bump";
-          this.GridViewRadioViewBump.UseVisualStyleBackColor = true;
-          // 
-          // GridViewRadioEditBump
-          // 
-          this.GridViewRadioEditBump.AutoSize = true;
-          this.GridViewRadioEditBump.Location = new System.Drawing.Point(6, 111);
-          this.GridViewRadioEditBump.Name = "GridViewRadioEditBump";
-          this.GridViewRadioEditBump.Size = new System.Drawing.Size(72, 17);
-          this.GridViewRadioEditBump.TabIndex = 4;
-          this.GridViewRadioEditBump.Text = "Edit bump";
-          this.GridViewRadioEditBump.UseVisualStyleBackColor = true;
-          // 
-          // GridViewRadioEditTex
-          // 
-          this.GridViewRadioEditTex.AutoSize = true;
-          this.GridViewRadioEditTex.Location = new System.Drawing.Point(6, 88);
-          this.GridViewRadioEditTex.Name = "GridViewRadioEditTex";
-          this.GridViewRadioEditTex.Size = new System.Drawing.Size(83, 17);
-          this.GridViewRadioEditTex.TabIndex = 3;
-          this.GridViewRadioEditTex.Text = "Edit textures";
-          this.GridViewRadioEditTex.UseVisualStyleBackColor = true;
+          this.GridViewViewModeCombo.FormattingEnabled = true;
+          this.GridViewViewModeCombo.Location = new System.Drawing.Point(5, 19);
+          this.GridViewViewModeCombo.Name = "GridViewViewModeCombo";
+          this.GridViewViewModeCombo.Size = new System.Drawing.Size(121, 21);
+          this.GridViewViewModeCombo.TabIndex = 3;
+          this.toolTip1.SetToolTip(this.GridViewViewModeCombo, "Change the primary view / edit mode of the grid");
           // 
           // GridViewMetaTypeCombo
           // 
           this.GridViewMetaTypeCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
           this.GridViewMetaTypeCombo.FormattingEnabled = true;
-          this.GridViewMetaTypeCombo.Location = new System.Drawing.Point(6, 157);
+          this.GridViewMetaTypeCombo.Location = new System.Drawing.Point(5, 46);
           this.GridViewMetaTypeCombo.Name = "GridViewMetaTypeCombo";
           this.GridViewMetaTypeCombo.Size = new System.Drawing.Size(121, 21);
           this.GridViewMetaTypeCombo.TabIndex = 2;
-          // 
-          // GridViewRadioEditMeta
-          // 
-          this.GridViewRadioEditMeta.AutoSize = true;
-          this.GridViewRadioEditMeta.Location = new System.Drawing.Point(6, 134);
-          this.GridViewRadioEditMeta.Name = "GridViewRadioEditMeta";
-          this.GridViewRadioEditMeta.Size = new System.Drawing.Size(90, 17);
-          this.GridViewRadioEditMeta.TabIndex = 1;
-          this.GridViewRadioEditMeta.Text = "Edit metadata";
-          this.GridViewRadioEditMeta.UseVisualStyleBackColor = true;
-          // 
-          // GridViewRadioImages
-          // 
-          this.GridViewRadioImages.AutoSize = true;
-          this.GridViewRadioImages.Checked = true;
-          this.GridViewRadioImages.Location = new System.Drawing.Point(6, 19);
-          this.GridViewRadioImages.Name = "GridViewRadioImages";
-          this.GridViewRadioImages.Size = new System.Drawing.Size(70, 17);
-          this.GridViewRadioImages.TabIndex = 0;
-          this.GridViewRadioImages.TabStop = true;
-          this.GridViewRadioImages.Text = "View only";
-          this.GridViewRadioImages.UseVisualStyleBackColor = true;
+          this.toolTip1.SetToolTip(this.GridViewMetaTypeCombo, "Change the selected meta type, for use when viewing \"odd\" images or changing nume" +
+                  "ric meta data");
           // 
           // ViewTab3D
           // 
@@ -598,6 +551,15 @@ namespace MMEd
           this.ViewTabBump.Text = "Bump";
           this.ViewTabBump.UseVisualStyleBackColor = true;
           // 
+          // BumpEditFillButton
+          // 
+          this.BumpEditFillButton.Location = new System.Drawing.Point(261, 44);
+          this.BumpEditFillButton.Name = "BumpEditFillButton";
+          this.BumpEditFillButton.Size = new System.Drawing.Size(75, 23);
+          this.BumpEditFillButton.TabIndex = 8;
+          this.BumpEditFillButton.Text = "Fill";
+          this.BumpEditFillButton.UseVisualStyleBackColor = true;
+          // 
           // label8
           // 
           this.label8.AutoSize = true;
@@ -622,9 +584,9 @@ namespace MMEd
           this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
           this.label6.Location = new System.Drawing.Point(3, 237);
           this.label6.Name = "label6";
-          this.label6.Size = new System.Drawing.Size(148, 20);
+          this.label6.Size = new System.Drawing.Size(47, 20);
           this.label6.TabIndex = 5;
-          this.label6.Text = "View (Does work)";
+          this.label6.Text = "View";
           // 
           // label5
           // 
@@ -819,15 +781,6 @@ namespace MMEd
           this.Viewer3DRenderingSurfaceBottomRight.TabIndex = 0;
           this.Viewer3DRenderingSurfaceBottomRight.Text = "renderingSurface4";
           // 
-          // BumpEditFillButton
-          // 
-          this.BumpEditFillButton.Location = new System.Drawing.Point(261, 44);
-          this.BumpEditFillButton.Name = "BumpEditFillButton";
-          this.BumpEditFillButton.Size = new System.Drawing.Size(75, 23);
-          this.BumpEditFillButton.TabIndex = 8;
-          this.BumpEditFillButton.Text = "Fill";
-          this.BumpEditFillButton.UseVisualStyleBackColor = true;
-          // 
           // MainForm
           // 
           this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -863,6 +816,7 @@ namespace MMEd
           this.GridDisplayPanelHolder.ResumeLayout(false);
           this.groupBox1.ResumeLayout(false);
           this.groupBox1.PerformLayout();
+          ((System.ComponentModel.ISupportInitialize)(this.GridViewTransparencySlider)).EndInit();
           this.ViewTab3D.ResumeLayout(false);
           this.ViewTabBump.ResumeLayout(false);
           this.ViewTabBump.PerformLayout();
@@ -913,9 +867,7 @@ namespace MMEd
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.GroupBox groupBox1;
-        public System.Windows.Forms.ComboBox GridViewMetaTypeCombo;
-        public System.Windows.Forms.RadioButton GridViewRadioEditMeta;
-        public System.Windows.Forms.RadioButton GridViewRadioImages;
+      public System.Windows.Forms.ComboBox GridViewMetaTypeCombo;
         public System.Windows.Forms.TabPage ViewTab3D;
         public GLTK.RenderingSurface Viewer3DRenderingSurface;
         public System.Windows.Forms.TabPage ViewTabBump;
@@ -941,17 +893,16 @@ namespace MMEd
         internal GLTK.RenderingSurface Viewer3DRenderingSurfaceTopRight;
         internal GLTK.RenderingSurface Viewer3DRenderingSurfaceBottomRight;
         internal System.Windows.Forms.TabPage ViewTab3dEditor;
-        private System.Windows.Forms.StatusStrip statusStrip1;
-        public System.Windows.Forms.RadioButton GridViewRadioEditTex;
+      private System.Windows.Forms.StatusStrip statusStrip1;
         public System.Windows.Forms.ToolStripStatusLabel GridViewerStatusLabel;
         private MMEd.Util.SmoothScrollingPanel smoothScrollingPanel1;
         public System.Windows.Forms.Panel GridViewPalettePanel;
         public System.Windows.Forms.Panel GridViewSelPanel;
         public MMEd.Util.SmoothScrollingPanel GridViewSelPanelHolder;
-        public System.Windows.Forms.GroupBox GridViewSelImageGroupBox;
-        public System.Windows.Forms.RadioButton GridViewRadioEditBump;
-        public System.Windows.Forms.RadioButton GridViewRadioViewBump;
-      public System.Windows.Forms.RadioButton GridViewRadioViewOdds;
+      public System.Windows.Forms.GroupBox GridViewSelImageGroupBox;
+      public System.Windows.Forms.ComboBox GridViewViewModeCombo;
+      private System.Windows.Forms.ToolTip toolTip1;
+      public System.Windows.Forms.TrackBar GridViewTransparencySlider;
       public System.Windows.Forms.Button BumpEditFillButton;
     }
 }

@@ -308,13 +308,13 @@ namespace MMEd.Viewers
     public override void SetSubject(Chunk xiChunk)
     {
       if (!(xiChunk is IEntityProvider)) xiChunk = null;
+      mOptionsMenu.Visible = (xiChunk != null);
       if (mSubject == xiChunk) return;
       bool lResetViewMode = true;
       if (xiChunk != null && mSubject != null && xiChunk.GetType() == mSubject.GetType())
         lResetViewMode = false;
       mSubject = (IEntityProvider)xiChunk;
 
-      mOptionsMenu.Visible = (mSubject != null);
       MoveScale = xiChunk is Level ? 100 : 100;
 
       Cursor prevCursor = mMainForm.Viewer3DRenderingSurfaceTopRight.Cursor;
@@ -346,14 +346,14 @@ namespace MMEd.Viewers
             MovementMode = eMovementMode.InspectMode;
             DrawNormalsMode = eDrawNormalsMode.HideNormals;
             TextureMode = eTextureMode.NormalTextures;
-            SelectedMetadata = FlatChunk.TexMetaDataEntries.Waypoint;
+            SelectedMetadata = eTexMetaDataEntries.Waypoint;
           }
           else
           {
             MovementMode = eMovementMode.FlyMode;
             DrawNormalsMode = eDrawNormalsMode.HideNormals;
             TextureMode = eTextureMode.NormalTextures;
-            SelectedMetadata = FlatChunk.TexMetaDataEntries.Waypoint;
+            SelectedMetadata = eTexMetaDataEntries.Waypoint;
           }
         }
 
@@ -463,9 +463,9 @@ namespace MMEd.Viewers
 
     #region SelectedMetadata property
 
-    private FlatChunk.TexMetaDataEntries mSelectedMetadata;
+    private eTexMetaDataEntries mSelectedMetadata;
 
-    public FlatChunk.TexMetaDataEntries SelectedMetadata
+    public eTexMetaDataEntries SelectedMetadata
     {
       get { return mSelectedMetadata; }
       set
