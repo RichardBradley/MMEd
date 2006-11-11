@@ -61,6 +61,7 @@ namespace MMEd
           this.GridDisplayPanelHolder = new MMEd.Util.SmoothScrollingPanel();
           this.GridDisplayPanel = new MMEd.Util.UserPaintDoubleBufferedPanel();
           this.groupBox1 = new System.Windows.Forms.GroupBox();
+          this.GridViewRadioViewOdds = new System.Windows.Forms.RadioButton();
           this.GridViewRadioViewBump = new System.Windows.Forms.RadioButton();
           this.GridViewRadioEditBump = new System.Windows.Forms.RadioButton();
           this.GridViewRadioEditTex = new System.Windows.Forms.RadioButton();
@@ -90,7 +91,7 @@ namespace MMEd
           this.RightHandSplit = new System.Windows.Forms.SplitContainer();
           this.Viewer3DRenderingSurfaceTopRight = new GLTK.RenderingSurface();
           this.Viewer3DRenderingSurfaceBottomRight = new GLTK.RenderingSurface();
-          this.GridViewRadioViewOdds = new System.Windows.Forms.RadioButton();
+          this.BumpEditFillButton = new System.Windows.Forms.Button();
           this.mMenuStrip.SuspendLayout();
           this.MainSplitter.Panel1.SuspendLayout();
           this.MainSplitter.Panel2.SuspendLayout();
@@ -152,7 +153,7 @@ namespace MMEd
           this.MnuiFileOpen.ImageTransparentColor = System.Drawing.Color.Magenta;
           this.MnuiFileOpen.Name = "MnuiFileOpen";
           this.MnuiFileOpen.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-          this.MnuiFileOpen.Size = new System.Drawing.Size(174, 22);
+          this.MnuiFileOpen.Size = new System.Drawing.Size(161, 22);
           this.MnuiFileOpen.Text = "&Open";
           this.MnuiFileOpen.Click += new System.EventHandler(this.MnuiFileOpen_Click);
           // 
@@ -162,7 +163,7 @@ namespace MMEd
           this.saveToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
           this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
           this.saveToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-          this.saveToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
+          this.saveToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
           this.saveToolStripMenuItem.Text = "&Save As...";
           this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
           // 
@@ -355,7 +356,7 @@ namespace MMEd
           // GridViewerStatusLabel
           // 
           this.GridViewerStatusLabel.Name = "GridViewerStatusLabel";
-          this.GridViewerStatusLabel.Size = new System.Drawing.Size(45, 17);
+          this.GridViewerStatusLabel.Size = new System.Drawing.Size(41, 17);
           this.GridViewerStatusLabel.Text = "(status)";
           // 
           // groupBox2
@@ -485,6 +486,16 @@ namespace MMEd
           this.groupBox1.TabStop = false;
           this.groupBox1.Text = "View Mode";
           // 
+          // GridViewRadioViewOdds
+          // 
+          this.GridViewRadioViewOdds.AutoSize = true;
+          this.GridViewRadioViewOdds.Location = new System.Drawing.Point(6, 65);
+          this.GridViewRadioViewOdds.Name = "GridViewRadioViewOdds";
+          this.GridViewRadioViewOdds.Size = new System.Drawing.Size(74, 17);
+          this.GridViewRadioViewOdds.TabIndex = 6;
+          this.GridViewRadioViewOdds.Text = "View odds";
+          this.GridViewRadioViewOdds.UseVisualStyleBackColor = true;
+          // 
           // GridViewRadioViewBump
           // 
           this.GridViewRadioViewBump.AutoSize = true;
@@ -570,6 +581,7 @@ namespace MMEd
           // 
           // ViewTabBump
           // 
+          this.ViewTabBump.Controls.Add(this.BumpEditFillButton);
           this.ViewTabBump.Controls.Add(this.label8);
           this.ViewTabBump.Controls.Add(this.label7);
           this.ViewTabBump.Controls.Add(this.label6);
@@ -807,15 +819,14 @@ namespace MMEd
           this.Viewer3DRenderingSurfaceBottomRight.TabIndex = 0;
           this.Viewer3DRenderingSurfaceBottomRight.Text = "renderingSurface4";
           // 
-          // GridViewRadioViewOdds
+          // BumpEditFillButton
           // 
-          this.GridViewRadioViewOdds.AutoSize = true;
-          this.GridViewRadioViewOdds.Location = new System.Drawing.Point(6, 65);
-          this.GridViewRadioViewOdds.Name = "GridViewRadioViewOdds";
-          this.GridViewRadioViewOdds.Size = new System.Drawing.Size(74, 17);
-          this.GridViewRadioViewOdds.TabIndex = 6;
-          this.GridViewRadioViewOdds.Text = "View odds";
-          this.GridViewRadioViewOdds.UseVisualStyleBackColor = true;
+          this.BumpEditFillButton.Location = new System.Drawing.Point(261, 44);
+          this.BumpEditFillButton.Name = "BumpEditFillButton";
+          this.BumpEditFillButton.Size = new System.Drawing.Size(75, 23);
+          this.BumpEditFillButton.TabIndex = 8;
+          this.BumpEditFillButton.Text = "Fill";
+          this.BumpEditFillButton.UseVisualStyleBackColor = true;
           // 
           // MainForm
           // 
@@ -941,6 +952,7 @@ namespace MMEd
         public System.Windows.Forms.RadioButton GridViewRadioEditBump;
         public System.Windows.Forms.RadioButton GridViewRadioViewBump;
       public System.Windows.Forms.RadioButton GridViewRadioViewOdds;
+      public System.Windows.Forms.Button BumpEditFillButton;
     }
 }
 

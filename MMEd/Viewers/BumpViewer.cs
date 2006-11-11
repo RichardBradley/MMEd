@@ -14,6 +14,7 @@ namespace MMEd.Viewers
     {
       mMainForm.BumpViewPictureBox.Click += new System.EventHandler(this.BumpViewPictureBox_Click);
       mMainForm.BumpEditPictureBox.Click += new System.EventHandler(this.BumpEditPictureBox_Click);
+      mMainForm.BumpEditFillButton.Click += new EventHandler(BumpEditFillButton_Click);
     }
 
     public override bool CanViewChunk(Chunk xiChunk)
@@ -134,6 +135,22 @@ namespace MMEd.Viewers
       mChunk.SetPixelType(mX, mY, lType);
       mMainForm.BumpTypeLabel.Text = lType.ToString();
 
+      RefreshView();
+    }
+
+    public void BumpEditFillButton_Click(object sender, EventArgs e)
+    {
+      BumpImageChunk.eBumpType lType = (BumpImageChunk.eBumpType)mMainForm.BumpCombo.SelectedItem;
+
+      for (int x = 0; x < 8; x++)
+      {
+        for (int y = 0; y < 8; y++)
+        {
+          mChunk.SetPixelType(x, y, lType);
+        }
+      }
+
+      mMainForm.BumpTypeLabel.Text = lType.ToString();
       RefreshView();
     }
 
