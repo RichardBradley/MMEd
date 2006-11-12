@@ -123,16 +123,17 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
     /// <summary>
     /// 	Resize the FlatChunk
     /// </summary>
+    /// <param name="xiNewFlgA"></param>
     /// <param name="xiNewWidth"></param>
     /// <param name="xiNewHeight"></param>
     /// <returns>
-    ///   The increase in file size, in bytes (12 bytes per square - 2 texture,
-    ///   2 height and 8 meta data.
+    ///   The increase in file size, in bytes
     /// </returns>
     ///========================================================================
-    public int Resize(short xiNewWidth, short xiNewHeight)
+    public int Resize(bool xiNewFlgA, short xiNewWidth, short xiNewHeight)
     {
       int lExtraSquares = (xiNewWidth * xiNewHeight) - (Width * Height);
+      int lExtraMeta = (xiNewFlgA ? (xiNewWidth * xiNewHeight) : 0) - (FlgA ? (Width * Height) : 0);
 
       short[][] lOldTextureIds = TextureIds;
       short[][] lOldTerrainHeight = TerrainHeight;
@@ -143,23 +144,65 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
 
       TextureIds = new short[Width][];
       TerrainHeight = new short[Width][];
-      TexMetaData = new Byte[Width][][];
+      TexMetaData = xiNewFlgA ? new Byte[Width][][] : null;
 
       for (int x = 0; x < Width; x++)
       {
         TextureIds[x] = new short[Height];
         TerrainHeight[x] = new short[Height];
-        TexMetaData[x] = new Byte[Height][];
+        if (xiNewFlgA) TexMetaData[x] = new Byte[Height][];
 
         for (int y = 0; y < Height; y++)
         {
           TextureIds[x][y] = (x < lOldTextureIds.Length && y < lOldTextureIds[x].Length) ? lOldTextureIds[x][y] : lOldTextureIds[0][0];
           TerrainHeight[x][y] = (x < lOldTerrainHeight.Length && y < lOldTerrainHeight[x].Length) ? lOldTerrainHeight[x][y] : lOldTerrainHeight[0][0];
-          TexMetaData[x][y] = (x < lOldTexMetaData.Length && y < lOldTexMetaData[x].Length) ? lOldTexMetaData[x][y] : lOldTexMetaData[0][0];
+          if (xiNewFlgA && FlgA)
+          {
+            TexMetaData[x][y] = (x < lOldTexMetaData.Length && y < lOldTexMetaData[x].Length) ? lOldTexMetaData[x][y] : lOldTexMetaData[0][0];
+          }
+          else if (xiNewFlgA)
+          {
+            TexMetaData[x][y] = new Byte[8]; // Initialise to all zero since we've got nothing better to do
+          }
         }
       }
 
-      return lExtraSquares * 12;
+      FlgA = xiNewFlgA;
+      return lExtraSquares * 4 + lExtraMeta * 8;
+    }
+
+    ///========================================================================
+    ///  Method : ReplaceWeapons
+    /// 
+    /// <summary>
+    /// 	Replace the current list of weapons in this Flat with a new one.
+    /// </summary>
+    /// <param name="xiNewWeapons"></param>
+    /// <returns></returns>
+    ///========================================================================
+    public int ReplaceWeapons(IList<WeaponEntry> xiNewWeapons)
+    {
+      int lSizeIncrease = (xiNewWeapons.Count - Weapons.Length) * 12;
+      Weapons = new WeaponEntry[xiNewWeapons.Count];
+      xiNewWeapons.CopyTo(Weapons, 0);
+      return lSizeIncrease;
+    }
+
+    ///========================================================================
+    ///  Method : ReplaceObjects
+    /// 
+    /// <summary>
+    /// 	Replace the current list of objects in this Flat with a new one.
+    /// </summary>
+    /// <param name="xiNewWeapons"></param>
+    /// <returns></returns>
+    ///========================================================================
+    public int ReplaceObjects(IList<ObjectEntry> xiNewObjects)
+    {
+      int lSizeIncrease = (xiNewObjects.Count - Objects.Length) * 22;
+      Objects = new ObjectEntry[xiNewObjects.Count];
+      xiNewObjects.CopyTo(Objects, 0);
+      return lSizeIncrease;
     }
 
     public void Deserialise(BinaryReader bin)

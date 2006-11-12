@@ -289,7 +289,7 @@ namespace MMEd.Viewers
         double x = e.X / (double)mSubjectTileWidth;
         double y = e.Y / (double)mSubjectTileHeight;
 
-        string lWorldCoord = "Only available for non-rotated sheets";
+        string lWorldCoord = "World Coord: Only available for non-rotated sheets";
         if (mSubject.RotationVector.Norm() == 0)
         {
           lWorldCoord = string.Format("World Coord: ({0:0}, {1:0}, {2:0})",
