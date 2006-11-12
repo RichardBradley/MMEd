@@ -379,7 +379,7 @@ namespace MMEd.Viewers
               int lBumpPxX = (e.X % mSubjectTileWidth) / (mSubjectTileWidth / 8);
               int lBumpPxY = (e.Y % mSubjectTileHeight) / (mSubjectTileHeight / 8);
 
-              UpdateBumpPixel(x, y, lBumpPxX, lBumpPxY, (BumpImageChunk.eBumpType)lNewVal);
+              UpdateBumpPixel(x, y, lBumpPxX, lBumpPxY, lNewVal);
 
               InvalidateGridDisplay();
             }
@@ -393,7 +393,7 @@ namespace MMEd.Viewers
       int xiTexY,
       int xiBumpPxX, //the x-offset of the bump pixel in the square
       int xiBumpPxY,
-      BumpImageChunk.eBumpType xiNewVal)
+      byte xiNewVal)
     {
       byte lBumpImageIdx = mSubject.TexMetaData[xiTexX][xiTexY][(int)eTexMetaDataEntries.Bumpmap];
 
@@ -429,7 +429,7 @@ namespace MMEd.Viewers
           }
           MessageBox.Show(@"The requested change cannot be performed:
 There are no free bump images which are not already in use!
-Try running ""Reindex bump"" on the level (select the top node in the chunk tree) [qq TODO!]");
+Try running ""Reindex bump"" on the level (in the Actions tab)");
           break;
       }
     }
@@ -495,7 +495,7 @@ Try running ""Reindex bump"" on the level (select the top node in the chunk tree
               int lBumpPxX = (p.X % mSubjectTileWidth) / (mSubjectTileWidth / 8);
               int lBumpPxY = (p.Y % mSubjectTileHeight) / (mSubjectTileHeight / 8);
 
-              UpdateBumpPixel(x, y, lBumpPxX, lBumpPxY, (BumpImageChunk.eBumpType)lNewVal);
+              UpdateBumpPixel(x, y, lBumpPxX, lBumpPxY, lNewVal);
             }
             InvalidateGridDisplay();
             return;
@@ -584,10 +584,13 @@ Try running ""Reindex bump"" on the level (select the top node in the chunk tree
             }
             else if (ViewMode == eViewMode.EditBumpPixels)
             {
-              if (Enum.IsDefined(typeof(BumpImageChunk.eBumpType), i))
+              if (i < BumpImageChunk.HIGHEST_KNOWN_BUMP_TYPE)
               {
-                BumpImageChunk.eBumpType lBumpType = (BumpImageChunk.eBumpType)i;
-                string lBumpTypeName = Enum.GetName(typeof(BumpImageChunk.eBumpType), lBumpType);
+                BumpImageChunk.BumpTypeInfo bti = BumpImageChunk.GetBumpTypeInfo((byte)i);
+
+                string lBumpTypeName = bti == null
+                  ? string.Format("0x{0:x}", i)
+                  : bti.Name;
                 Bitmap lBmp = new Bitmap(64, 64);
                 Graphics g = Graphics.FromImage(lBmp);
                 SizeF lBumpNameSize = g.MeasureString(lBumpTypeName, lFont);
@@ -599,7 +602,7 @@ Try running ""Reindex bump"" on the level (select the top node in the chunk tree
                   g = Graphics.FromImage(lBmp);
                 }
 
-                g.Clear(BumpImageChunk.GetColorForBumpType(lBumpType));
+                g.Clear(BumpImageChunk.GetColorForBumpType((byte)i));
 
                 //write the name on:
                 float xf = lBmp.Width / 2 - lBumpNameSize.Width / 2;

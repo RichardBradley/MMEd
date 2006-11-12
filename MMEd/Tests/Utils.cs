@@ -63,5 +63,24 @@ namespace MMEd.Tests
         Assert.AreEqual(rndcol, back);
       }
     }
+
+    [Test]
+    public void TestByteArrayComparer()
+    {
+      string[] ss = new string[] { "", "asd", "ass", "qwer", "qwe" };
+      StringComparer sComp = StringComparer.InvariantCulture;
+      ByteArrayComparer bComp = new ByteArrayComparer();
+      for (int i=0; i<ss.Length; i++)
+        for (int j = 0; j < ss.Length; j++)
+        {
+          string sa = ss[i];
+          string sb = ss[j];
+          byte[] ba = Encoding.ASCII.GetBytes(sa);
+          byte[] bb = Encoding.ASCII.GetBytes(sb);
+          Assert.AreEqual(
+            sComp.Compare(sa, sb),
+            bComp.Compare(ba, bb));
+        }
+    }
   }
 }

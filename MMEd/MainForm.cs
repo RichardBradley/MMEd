@@ -38,6 +38,7 @@ namespace MMEd
             //register the viewer manager classes
             //qq there must be a better way of doing this, it seems a bit
             //   odd
+            ViewTabActions.Tag = ActionsViewer.InitialiseViewer(this);
             ViewTabXML.Tag = XMLViewer.InitialiseViewer(this);
             ViewTabFlat.Tag = FlatViewer.InitialiseViewer(this);
             ViewTabImg.Tag = ImageViewer.InitialiseViewer(this);
@@ -180,7 +181,7 @@ namespace MMEd
                 Viewer lViewer = (Viewer)lActiveViewerPage.Tag;
                 if (!lViewer.CanViewChunk(lActiveChunk))
                 {
-                    ViewerTabControl.SelectedTab = ViewTabSummary;
+                    ViewerTabControl.SelectedTab = ViewTabActions;
                 }
             }
 
@@ -245,15 +246,5 @@ namespace MMEd
 
       public event KeyEventHandler DialogKey;
 
-      /*qqAIT
-      private void splitContainer3_SplitterMoved(object sender, SplitterEventArgs e)
-      {
-        LeftHandSplit.SplitterDistance = e.SplitY;
-      }
-
-      private void splitContainer2_SplitterMoved(object sender, SplitterEventArgs e)
-      {
-        RightHandSplit.SplitterDistance = e.SplitY;
-      }*/
     }
 }

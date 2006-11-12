@@ -16,62 +16,6 @@ namespace MMEd.Chunks
 {
   public class BumpImageChunk : Chunk, Viewers.ImageViewer.IImageProvider
   {
-    //qq It would be really good if this list could be merged
-    //   with the list in makeBumpTypeToBumpTypeInfoMap, to reduce
-    //   duplication of info. Is it possible to annotate Enum entries with
-    //   attributes?
-    public enum eBumpType
-    {
-      plain = 0x00,
-      wall = 0x01,
-      milk = 0x02,
-      syrup = 0x03,
-      ketchup = 0x04,
-      roadBorder = 0x05,
-      roadBorder2 = 0x06,
-      water = 0x07,
-      hole = 0x08, // A void or hole in the surface
-      lilyPad = 0x09, // NB This doesn't do much on a random pool course
-      grassStalk = 0x0A,
-      jumpWoosh3 = 0x0B, // A super speedup if you're going fast enough (found on the jump between tables in Rack)
-      unknown0C = 0x0C, // This is present in Rack & Roll, but driving over it has no discernable effect
-      roadBorderPool = 0x0D, // Edge of the track in a pool table course
-      poolPocket = 0x0E, // A pool pocket - death trap
-      lowSurvivalHeight = 0x0F, // Driving off the edge of this means you die even if you don't fall very far. (Also without it, the edge of the Rack & Roll table sometimes appears over the car rather than under it)
-      unknown10 = 0x10,
-      clearGoo = 0x11,
-      powderSpill = 0x12,
-      greenGoo = 0x13,
-      redGoo = 0x14,
-      roadBorderLab = 0x15,
-      jumpWoosh = 0x16,
-      unknown17 = 0x17,
-      unknown18 = 0x18,
-      enterTestTube = 0x19,
-      unknown1A = 0x1A,
-      unknown1B = 0x1B,
-      microGooEdge = 0x1C,
-      microGooMiddle = 0x1D,
-      exitMicroscope = 0x1E,
-      unknown1F = 0x1F,
-      jumpWhoosh2 = 0x20, // Allegedly like jumpWhoosh. But appears to have a "one-way" property in some cases, and energetic attempts to violate this result in a "splash"
-      enterTeleport = 0x21,
-      unknown22 = 0x22,
-      sand = 0x23,
-      unknown24 = 0x24,
-      unknown25 = 0x25,
-      unknown26 = 0x26,
-      unknown27 = 0x27, // Driving over this has no discernable effect in Rack & Roll.
-      teleport1 = 0x28, // Teleport. Destination unknown.
-      teleport2 = 0x29, // Teleport. Destination unknown.
-      teleport3 = 0x2A, // Teleport. Destination unknown.
-      teleport4 = 0x2B, // Teleport. Destination unknown.
-      teleport5 = 0x2C, // Teleport. Destination unknown.
-      splash = 0x2D, // A "splash" - death trap.
-      unknown2E = 0x2E,
-      unknown2F = 0x2F,
-    }
-
     public BumpImageChunk() { }
     public BumpImageChunk(int idx, Stream inStr)
     {
@@ -115,119 +59,122 @@ namespace MMEd.Chunks
       for (int x = 0; x < 8; x++)
         for (int y = 0; y < 8; y++) 
         {
-            Brush b = new SolidBrush(mPalette[Data[8 * x + y]]); //(note x-y swap)
-            g.FillRectangle(b, x*SCALE, y*SCALE, SCALE, SCALE);
+           //(note x-y swap)
+           Brush b = new SolidBrush(GetColorForBumpType(Data[8 * x + y]));
+           g.FillRectangle(b, x*SCALE, y*SCALE, SCALE, SCALE);
         }
       return lBmp;
     }
 
-    public static Color GetColorForBumpType(eBumpType xiVal)
+    public static Color GetColorForBumpType(byte xiVal)
     {
-      return mPalette[(int)xiVal];
+      if (xiVal > mBumpTypes.Length || mBumpTypes[xiVal] == null)
+      {
+        return Color.Magenta;
+      }
+      else
+      {
+        return mBumpTypes[(int)xiVal].Color;
+      }
+    }
+
+    public static BumpTypeInfo GetBumpTypeInfo(byte xiVal)
+    {
+      if (xiVal > mBumpTypes.Length)
+      {
+        return null;
+      }
+      else
+      {
+        return mBumpTypes[(int)xiVal];
+      }
     }
 
     // Get the eBumpType for the supplied coordinates
-    public eBumpType GetPixelType(int xiX, int xiY)
+    public byte GetPixelType(int xiX, int xiY)
     {
-      // Brackets are needed so that int division happens first
-      return (eBumpType)Data[8 * xiX + xiY];
+      return Data[8 * xiX + xiY];
     }
 
     // Set the eBumpType for the supplied coordinates
-    public void SetPixelType(int xiX, int xiY, eBumpType xiType)
+    public void SetPixelType(int xiX, int xiY, byte xiType)
     {
-      // Brackets are needed so that int division happens first
-      Data[8 * xiX + xiY] = (byte)xiType;
+      Data[8 * xiX + xiY] = xiType;
       mBitmapCache = null;
     }
 
-    public static Hashtable BumpTypeToBumpTypeInfoMap = makeBumpTypeToBumpTypeInfoMap();
+    private static BumpTypeInfo[] mBumpTypes = MakeBumpTypes();
 
-    private static Hashtable makeBumpTypeToBumpTypeInfoMap()
+    private static BumpTypeInfo[] MakeBumpTypes()
     {
-      // Should this be in some kind of data file, for easy editing?
-      // This will probably be fine, while everyone has VS
-      Hashtable ht = new Hashtable();
-      BTF(ht, eBumpType.plain, 0x000000);
-      BTF(ht, eBumpType.wall, 0xcccccc);
-      BTF(ht, eBumpType.milk, 0xf8e8d8);
-      BTF(ht, eBumpType.syrup, 0xa87020);
-      BTF(ht, eBumpType.ketchup, 0xff0000);
-      BTF(ht, eBumpType.roadBorder, 0x89cba0);
-      BTF(ht, eBumpType.roadBorder2, 0x89cbbf);
-      BTF(ht, eBumpType.water, 0x4551ec);
-      BTF(ht, eBumpType.hole, 0xffffff);
-      BTF(ht, eBumpType.lilyPad, 0x33ff33);
-      BTF(ht, eBumpType.grassStalk, 0x00ff00);
-      BTF(ht, eBumpType.jumpWoosh3, 0xffd400);
-      BTF(ht, eBumpType.unknown0C, 0xff00ff);
-      BTF(ht, eBumpType.roadBorderPool, 0x89cbde);
-      BTF(ht, eBumpType.poolPocket, 0xeeeeee);
-      BTF(ht, eBumpType.lowSurvivalHeight, 0x00dddd);
-      BTF(ht, eBumpType.unknown10, 0xff00ff);
-      BTF(ht, eBumpType.clearGoo, 0xffeedd);
-      BTF(ht, eBumpType.powderSpill, 0x3333ff);
-      BTF(ht, eBumpType.greenGoo, 0x33ff33);
-      BTF(ht, eBumpType.redGoo, 0xff3333);
-      BTF(ht, eBumpType.roadBorderLab, 0x89cbfd);
-      BTF(ht, eBumpType.jumpWoosh, 0xffe400);
-      BTF(ht, eBumpType.unknown17, 0xff00ff);
-      BTF(ht, eBumpType.unknown18, 0xff00ff);
-      BTF(ht, eBumpType.enterTestTube, 0xff9900);
-      BTF(ht, eBumpType.unknown1A, 0xff00ff);
-      BTF(ht, eBumpType.unknown1B, 0xff00ff);
-      BTF(ht, eBumpType.microGooEdge, 0xaaaa00);
-      BTF(ht, eBumpType.microGooMiddle, 0x888800);
-      BTF(ht, eBumpType.exitMicroscope, 0xff7700);
-      BTF(ht, eBumpType.unknown1F, 0xff00ff);
-      BTF(ht, eBumpType.jumpWhoosh2, 0xfff400);
-      BTF(ht, eBumpType.enterTeleport, 0xff8800);
-      BTF(ht, eBumpType.unknown22, 0xff00ff);
-      BTF(ht, eBumpType.sand, 0xc9b549);
-      BTF(ht, eBumpType.unknown24, 0xff00ff);
-      BTF(ht, eBumpType.unknown25, 0xff00ff);
-      BTF(ht, eBumpType.unknown26, 0xff00ff);
-      BTF(ht, eBumpType.unknown27, 0xff00ff);
-      BTF(ht, eBumpType.teleport1, 0xffaa00);
-      BTF(ht, eBumpType.teleport2, 0xffdd00);
-      BTF(ht, eBumpType.teleport3, 0xffbb00);
-      BTF(ht, eBumpType.teleport4, 0xffee00);
-      BTF(ht, eBumpType.teleport5, 0xffcc00);
-      BTF(ht, eBumpType.splash, 0x4444ff);
-      BTF(ht, eBumpType.unknown2E, 0xff00ff);
-      BTF(ht, eBumpType.unknown2F, 0xff00ff);
-      return ht;
+      mBumpTypes = new BumpTypeInfo[64];
+      mBumpTypes[0x00] = new BumpTypeInfo("plain", 0x000000);
+      mBumpTypes[0x01] = new BumpTypeInfo("wall", 0xcccccc);
+      mBumpTypes[0x02] = new BumpTypeInfo("milk", 0xf8e8d8);
+      mBumpTypes[0x03] = new BumpTypeInfo("syrup", 0xa87020);
+      mBumpTypes[0x04] = new BumpTypeInfo("ketchup", 0xff0000);
+      mBumpTypes[0x05] = new BumpTypeInfo("roadBorder", 0x89cba0);
+      mBumpTypes[0x06] = new BumpTypeInfo("roadBorder2", 0x89cbbf);
+      mBumpTypes[0x07] = new BumpTypeInfo("water", 0x4551ec);
+      mBumpTypes[0x08] = new BumpTypeInfo("hole", 0xffffff, "A void or hole in the surface");
+      mBumpTypes[0x09] = new BumpTypeInfo("lilyPad", 0x33ff33, "NB This doesn't do much on a random pool course");
+      mBumpTypes[0x0A] = new BumpTypeInfo("grassStalk", 0x00ff00);
+      mBumpTypes[0x0B] = new BumpTypeInfo("jumpWoosh3", 0xffd400, "A super speedup if you're going fast enough (found on the jump between tables in Rack)");
+      mBumpTypes[0x0C] = new BumpTypeInfo("unknown0C", 0xff00ff, "This is present in Rack & Roll, but driving over it has no discernable effect");
+      mBumpTypes[0x0D] = new BumpTypeInfo("roadBorderPool", 0x89cbde, "Edge of the track in a pool table course");
+      mBumpTypes[0x0E] = new BumpTypeInfo("poolPocket", 0xeeeeee, "A pool pocket - death trap");
+      mBumpTypes[0x0F] = new BumpTypeInfo("lowSurvivalHeight", 0x00dddd, "Driving off the edge of this means you die even if you don't fall very far. (Also without it,the edge of the Rack & Roll table sometimes appears over the car rather than under it)");
+      //10?
+      mBumpTypes[0x11] = new BumpTypeInfo("clearGoo", 0xffeedd);
+      mBumpTypes[0x12] = new BumpTypeInfo("powderSpill", 0x3333ff);
+      mBumpTypes[0x13] = new BumpTypeInfo("greenGoo", 0x33ff33);
+      mBumpTypes[0x14] = new BumpTypeInfo("redGoo", 0xff3333);
+      mBumpTypes[0x15] = new BumpTypeInfo("roadBorderLab", 0x89cbfd);
+      mBumpTypes[0x16] = new BumpTypeInfo("jumpWoosh", 0xffe400);
+      //17-18?
+      mBumpTypes[0x19] = new BumpTypeInfo("enterTestTube", 0xff9900);
+      //1a-1b?
+      mBumpTypes[0x1C] = new BumpTypeInfo("microGooEdge", 0xaaaa00);
+      mBumpTypes[0x1D] = new BumpTypeInfo("microGooMiddle", 0x888800);
+      mBumpTypes[0x1E] = new BumpTypeInfo("exitMicroscope", 0xff7700);
+      //1f?
+      mBumpTypes[0x20] = new BumpTypeInfo("jumpWhoosh2", 0xfff400, "Allegedly like jumpWhoosh. But appears to have a one-way property in some cases, and energetic attempts to violate this result in a \"splash\"");
+      mBumpTypes[0x21] = new BumpTypeInfo("enterTeleport", 0xff8800);
+      //22?
+      mBumpTypes[0x23] = new BumpTypeInfo("sand", 0xc9b549);
+      //24-26?
+      mBumpTypes[0x27] = new BumpTypeInfo("unknown27", 0xff00ff, "Driving over this has no discernable effect in Rack & Roll.");
+      mBumpTypes[0x28] = new BumpTypeInfo("teleport1", 0xffaa00, "Teleport. Destination unknown.");
+      mBumpTypes[0x29] = new BumpTypeInfo("teleport2", 0xffdd00, "Teleport. Destination unknown.");
+      mBumpTypes[0x2A] = new BumpTypeInfo("teleport3", 0xffbb00, "Teleport. Destination unknown.");
+      mBumpTypes[0x2B] = new BumpTypeInfo("teleport4", 0xffee00, "Teleport. Destination unknown.");
+      mBumpTypes[0x2C] = new BumpTypeInfo("teleport5", 0xffcc00, "Teleport. Destination unknown.");
+      mBumpTypes[0x2D] = new BumpTypeInfo("splash", 0x4444ff, "A \"splash\" - death trap.");
+      return mBumpTypes;
     }
 
-    private static void BTF(Hashtable xiHt, eBumpType xiVal, int xiColor)
-    {
-      xiHt[xiVal] = new BumpTypeInfo(xiVal, Color.FromArgb(xiColor | ~0x00ffffff));
-    }
-
-    private static Color[] mPalette = makePalette();
-
-    private static Color[] makePalette()
-    {
-      Color[] acc = new Color[64];
-      for (int i = 0; i < acc.Length; i++)
-      {
-        BumpTypeInfo bti = (BumpTypeInfo)BumpTypeToBumpTypeInfoMap[(eBumpType)i];
-        acc[i] = bti == null ? Color.Magenta : bti.Color;
-      }
-      return acc;
-    }
+    // this wasn't necessary under the enum scheme, but I think it's
+    // preferable to having the list of types twice...
+    public const int HIGHEST_KNOWN_BUMP_TYPE = 45;
 
     public class BumpTypeInfo
     {
-      public eBumpType Val;
       public Color Color;
+      public string Name;
+      public string Description;
       
-      public BumpTypeInfo(eBumpType xiVal, Color xiColor)
+      public BumpTypeInfo(string xiName, Color xiColor, string xiDescription)
       {
-        Val = xiVal;
+        Name = xiName;
         Color = xiColor;
+        Description = xiDescription;
       }
-      public BumpTypeInfo() { }
+
+      public BumpTypeInfo(string xiName, int xiColor)
+        : this(xiName, xiColor, null) { }
+
+      public BumpTypeInfo(string xiName, int xiColor, string xiDescription)
+        : this(xiName, Color.FromArgb(xiColor | ~0x00ffffff), xiDescription) { }
     }
 
     public override void ReplaceChild(Chunk xiFrom, Chunk xiTo)
@@ -240,9 +187,26 @@ namespace MMEd.Chunks
       Array.Copy(xiFrom.Data, this.Data, Data.Length);
     }
 
-    int mIdx;
+    //set the bump to be all zero
+    public void Clear()
+    {
+      Array.Clear(mData, 0, mData.Length);
+      mBitmapCache = null;
+    }
+
     [Description("The data.")]
-    public byte[] Data;
+    public byte[] Data
+    {
+      get { return mData; }
+      set
+      {
+        mData = value;
+        mBitmapCache = null;
+      }
+    }
+
+    int mIdx;
+    private byte[] mData;
     public const int SCALE = 16;
   }
 }

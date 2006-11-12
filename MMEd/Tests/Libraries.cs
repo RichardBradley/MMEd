@@ -18,7 +18,7 @@ namespace MMEd.Tests
     public void TestBinaryReader()
     {
       //check that the underlying stream can be modified, and
-      //binary ready won't complain
+      //binary reader won't complain or cache any state
       //
       //two int32s, 10 then 5
       byte[] data = new byte[] { 10, 0, 0, 0, 5, 0, 0, 0 };
@@ -63,12 +63,12 @@ namespace MMEd.Tests
     public void TestXmlArraySerialisation()
     {
       ClassWithArrays o = new ClassWithArrays();
-      o.twoDCStyle = new int[2][];
-      for (int i = 0; i < o.twoDCStyle.Length; i++)
+      o.twoDeeCStyle = new int[2][];
+      for (int i = 0; i < o.twoDeeCStyle.Length; i++)
       {
-        o.twoDCStyle[i] = new int[2];
+        o.twoDeeCStyle[i] = new int[2];
       }
-      //o.twoDVBStyle = new int[2,2];
+      //o.twoDeeVBStyle = new int[2,2];
       StringWriter sw = new StringWriter();
       XmlSerializer xs = new XmlSerializer(typeof(ClassWithArrays));
       xs.Serialize(sw, o);
@@ -77,9 +77,10 @@ namespace MMEd.Tests
 
     public class ClassWithArrays
     {
-      public int[][] twoDCStyle;
+      public int[][] twoDeeCStyle;
 
-      //public int[,] twoDVBStyle;
+      // not XML Serialisable:
+      //public int[,] twoDeeVBStyle;
     }
 
     enum SparseEnum
@@ -94,14 +95,30 @@ namespace MMEd.Tests
       //I would have expected this to throw an exception.
       SparseEnum lVal = (SparseEnum)2;
       string s = Enum.GetName(typeof(SparseEnum), lVal);
-      Console.Out.WriteLine("s={0}", s); //null?
+      Assert.AreEqual(s, null);
     }
 
     [Test]
     [ExpectedException(typeof(AssertionException))]
     public void ArrayCompare()
     {
+      //this assertion fails :-(
       Assert.IsTrue(new byte[] { 1, 2, 3 } == new byte[] { 1, 2, 3 });
+    }
+
+    [Test]
+    public void TestSortingStuff()
+    {
+      byte[] a = new byte[] {1}, b = new byte[] {1}, c = new byte[] {2};
+      SortedDictionary<byte[], byte[]> sDict = new SortedDictionary<byte[],byte[]>(new ByteArrayComparer());
+      sDict[a] = a;
+      sDict[b] = b; //overwrites [a], since compare(a,b) == 0
+      sDict[c] = c;
+      // == is a reference operator here (see ArrayCompare() above)
+      Assert.IsTrue(sDict[a] == b);
+      Assert.IsTrue(sDict[b] == b);
+      Assert.IsTrue(sDict[c] == c);
+      Assert.IsTrue(sDict[new byte[] { 1 }] == b);
     }
   }
 }

@@ -50,14 +50,26 @@ namespace MMEd.Viewers
       }
       else
       {
-        BumpImageChunk.eBumpType lType = mChunk.GetPixelType(mX, mY);
-        mMainForm.BumpTypeLabel.Text = lType.ToString();
+        byte lType = mChunk.GetPixelType(mX, mY);
+        mMainForm.BumpTypeLabel.Text = GetBumpTypeName(lType);
         SetUpDropDown(lType);
 
         RefreshView();
       }
 
       mLastSubject = xiChunk;
+    }
+
+    private static string GetBumpTypeName(byte val)
+    {
+      if (BumpImageChunk.GetBumpTypeInfo(val) == null)
+      {
+        return string.Format("{0:x} (Unknown)", val);
+      }
+      else
+      {
+        return BumpImageChunk.GetBumpTypeInfo(val).Name;
+      }
     }
 
     protected void RefreshView()
@@ -103,14 +115,14 @@ namespace MMEd.Viewers
       get { return mMainForm.ViewTabBump; }
     }
 
-    protected void SetUpDropDown(BumpImageChunk.eBumpType xiSelected)
+    protected void SetUpDropDown(byte xiSelected)
     {
-      foreach (object val in Enum.GetValues(typeof(BumpImageChunk.eBumpType)))
+      for (byte b = 0; b < 50; b++)
       {
-        mMainForm.BumpCombo.Items.Add(val);
+        mMainForm.BumpCombo.Items.Add(GetBumpTypeName(b));
       }
 
-      mMainForm.BumpCombo.SelectedItem = xiSelected;
+      mMainForm.BumpCombo.SelectedIndex = xiSelected;
     }
 
     public void BumpViewPictureBox_Click(object sender, EventArgs e)
@@ -119,8 +131,8 @@ namespace MMEd.Viewers
       mX = lArgs.X / mScale;
       mY = lArgs.Y / mScale;
 
-      BumpImageChunk.eBumpType lType = mChunk.GetPixelType(mX, mY);
-      mMainForm.BumpTypeLabel.Text = lType.ToString();
+      byte lType = mChunk.GetPixelType(mX, mY);
+      mMainForm.BumpTypeLabel.Text = GetBumpTypeName(lType);
       
       RefreshView();
     }
@@ -131,16 +143,16 @@ namespace MMEd.Viewers
       mX = lArgs.X / mScale;
       mY = lArgs.Y / mScale;
 
-      BumpImageChunk.eBumpType lType = (BumpImageChunk.eBumpType)mMainForm.BumpCombo.SelectedItem;
+      byte lType = (byte)mMainForm.BumpCombo.SelectedIndex;
       mChunk.SetPixelType(mX, mY, lType);
-      mMainForm.BumpTypeLabel.Text = lType.ToString();
+      mMainForm.BumpTypeLabel.Text = GetBumpTypeName(lType);
 
       RefreshView();
     }
 
     public void BumpEditFillButton_Click(object sender, EventArgs e)
     {
-      BumpImageChunk.eBumpType lType = (BumpImageChunk.eBumpType)mMainForm.BumpCombo.SelectedItem;
+      byte lType = (byte)mMainForm.BumpCombo.SelectedIndex;
 
       for (int x = 0; x < 8; x++)
       {
@@ -150,7 +162,7 @@ namespace MMEd.Viewers
         }
       }
 
-      mMainForm.BumpTypeLabel.Text = lType.ToString();
+      mMainForm.BumpTypeLabel.Text = GetBumpTypeName(lType);
       RefreshView();
     }
 

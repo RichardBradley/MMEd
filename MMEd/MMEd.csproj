@@ -107,6 +107,7 @@
     <Compile Include="Tests\Libraries.cs" />
     <Compile Include="Tests\Serialisation.cs" />
     <Compile Include="Tests\Utils.cs" />
+    <Compile Include="Util\ByteArrayComparer.cs" />
     <Compile Include="Util\FlatEditorPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -123,6 +124,7 @@
     <Compile Include="Util\StreamUtils.cs" />
     <Compile Include="Util\Utils.cs" />
     <Compile Include="Viewer.cs" />
+    <Compile Include="Viewers\ActionsViewer.cs" />
     <Compile Include="Viewers\FlatViewer.cs" />
     <Compile Include="Viewers\MMEdEntity.cs" />
     <Compile Include="Viewers\MMEdScene.cs" />

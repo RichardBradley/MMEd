@@ -37,8 +37,7 @@ namespace MMEd
           this.MainSplitter = new System.Windows.Forms.SplitContainer();
           this.ChunkTreeView = new System.Windows.Forms.TreeView();
           this.ViewerTabControl = new System.Windows.Forms.TabControl();
-          this.ViewTabSummary = new System.Windows.Forms.TabPage();
-          this.label1 = new System.Windows.Forms.Label();
+          this.ViewTabActions = new System.Windows.Forms.TabPage();
           this.ViewTabXML = new System.Windows.Forms.TabPage();
           this.XMLViewerCommitBtn = new System.Windows.Forms.Button();
           this.XMLTextBox = new System.Windows.Forms.TextBox();
@@ -85,6 +84,8 @@ namespace MMEd
           this.VRAMPictureBox = new System.Windows.Forms.PictureBox();
           this.VRAMStatusStrip = new System.Windows.Forms.StatusStrip();
           this.ViewTab3dEditor = new System.Windows.Forms.TabPage();
+          this.panel2 = new System.Windows.Forms.Panel();
+          this.ThreeDeeEditorStatusLabel = new System.Windows.Forms.Label();
           this.LeftRightSplit = new System.Windows.Forms.SplitContainer();
           this.LeftHandSplit = new System.Windows.Forms.SplitContainer();
           this.Viewer3DRenderingSurfaceTopLeft = new GLTK.RenderingSurface();
@@ -92,15 +93,15 @@ namespace MMEd
           this.RightHandSplit = new System.Windows.Forms.SplitContainer();
           this.Viewer3DRenderingSurfaceTopRight = new GLTK.RenderingSurface();
           this.Viewer3DRenderingSurfaceBottomRight = new GLTK.RenderingSurface();
-          this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-          this.panel2 = new System.Windows.Forms.Panel();
-          this.ThreeDeeEditorStatusLabel = new System.Windows.Forms.Label();
+          this.ToolTip = new System.Windows.Forms.ToolTip(this.components);
+          this.ActionsTabReindexBumpButton = new System.Windows.Forms.Button();
+          this.label1 = new System.Windows.Forms.Label();
           this.mMenuStrip.SuspendLayout();
           this.MainSplitter.Panel1.SuspendLayout();
           this.MainSplitter.Panel2.SuspendLayout();
           this.MainSplitter.SuspendLayout();
           this.ViewerTabControl.SuspendLayout();
-          this.ViewTabSummary.SuspendLayout();
+          this.ViewTabActions.SuspendLayout();
           this.ViewTabXML.SuspendLayout();
           this.ViewTabFlat.SuspendLayout();
           this.ViewTabImg.SuspendLayout();
@@ -122,6 +123,7 @@ namespace MMEd
           this.panel1.SuspendLayout();
           ((System.ComponentModel.ISupportInitialize)(this.VRAMPictureBox)).BeginInit();
           this.ViewTab3dEditor.SuspendLayout();
+          this.panel2.SuspendLayout();
           this.LeftRightSplit.Panel1.SuspendLayout();
           this.LeftRightSplit.Panel2.SuspendLayout();
           this.LeftRightSplit.SuspendLayout();
@@ -131,7 +133,6 @@ namespace MMEd
           this.RightHandSplit.Panel1.SuspendLayout();
           this.RightHandSplit.Panel2.SuspendLayout();
           this.RightHandSplit.SuspendLayout();
-          this.panel2.SuspendLayout();
           this.SuspendLayout();
           // 
           // mMenuStrip
@@ -206,7 +207,7 @@ namespace MMEd
           this.ViewerTabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                       | System.Windows.Forms.AnchorStyles.Left)
                       | System.Windows.Forms.AnchorStyles.Right)));
-          this.ViewerTabControl.Controls.Add(this.ViewTabSummary);
+          this.ViewerTabControl.Controls.Add(this.ViewTabActions);
           this.ViewerTabControl.Controls.Add(this.ViewTabXML);
           this.ViewerTabControl.Controls.Add(this.ViewTabFlat);
           this.ViewerTabControl.Controls.Add(this.ViewTabImg);
@@ -223,25 +224,17 @@ namespace MMEd
           this.ViewerTabControl.Selected += new System.Windows.Forms.TabControlEventHandler(this.ViewerTabControl_Selected);
           this.ViewerTabControl.SelectedIndexChanged += new System.EventHandler(this.ViewerTabControl_SelectedIndexChanged);
           // 
-          // ViewTabSummary
+          // ViewTabActions
           // 
-          this.ViewTabSummary.Controls.Add(this.label1);
-          this.ViewTabSummary.Location = new System.Drawing.Point(4, 22);
-          this.ViewTabSummary.Name = "ViewTabSummary";
-          this.ViewTabSummary.Padding = new System.Windows.Forms.Padding(3);
-          this.ViewTabSummary.Size = new System.Drawing.Size(636, 535);
-          this.ViewTabSummary.TabIndex = 0;
-          this.ViewTabSummary.Text = "Summary";
-          this.ViewTabSummary.UseVisualStyleBackColor = true;
-          // 
-          // label1
-          // 
-          this.label1.AutoSize = true;
-          this.label1.Location = new System.Drawing.Point(6, 3);
-          this.label1.Name = "label1";
-          this.label1.Size = new System.Drawing.Size(175, 13);
-          this.label1.TabIndex = 0;
-          this.label1.Text = "Nothing here yet... (hint: open a file)";
+          this.ViewTabActions.Controls.Add(this.label1);
+          this.ViewTabActions.Controls.Add(this.ActionsTabReindexBumpButton);
+          this.ViewTabActions.Location = new System.Drawing.Point(4, 22);
+          this.ViewTabActions.Name = "ViewTabActions";
+          this.ViewTabActions.Padding = new System.Windows.Forms.Padding(3);
+          this.ViewTabActions.Size = new System.Drawing.Size(636, 535);
+          this.ViewTabActions.TabIndex = 0;
+          this.ViewTabActions.Text = "Actions";
+          this.ViewTabActions.UseVisualStyleBackColor = true;
           // 
           // ViewTabXML
           // 
@@ -528,7 +521,7 @@ namespace MMEd
           this.GridViewTransparencySlider.Name = "GridViewTransparencySlider";
           this.GridViewTransparencySlider.Size = new System.Drawing.Size(122, 42);
           this.GridViewTransparencySlider.TabIndex = 4;
-          this.toolTip1.SetToolTip(this.GridViewTransparencySlider, "Set the transparency level for overlaid textures (bump, odd)");
+          this.ToolTip.SetToolTip(this.GridViewTransparencySlider, "Set the transparency level for overlaid textures (bump, odd)");
           this.GridViewTransparencySlider.Value = 5;
           // 
           // GridViewViewModeCombo
@@ -538,7 +531,7 @@ namespace MMEd
           this.GridViewViewModeCombo.Name = "GridViewViewModeCombo";
           this.GridViewViewModeCombo.Size = new System.Drawing.Size(121, 21);
           this.GridViewViewModeCombo.TabIndex = 3;
-          this.toolTip1.SetToolTip(this.GridViewViewModeCombo, "Change the primary view / edit mode of the grid");
+          this.ToolTip.SetToolTip(this.GridViewViewModeCombo, "Change the primary view / edit mode of the grid");
           // 
           // GridViewMetaTypeCombo
           // 
@@ -548,7 +541,7 @@ namespace MMEd
           this.GridViewMetaTypeCombo.Name = "GridViewMetaTypeCombo";
           this.GridViewMetaTypeCombo.Size = new System.Drawing.Size(121, 21);
           this.GridViewMetaTypeCombo.TabIndex = 2;
-          this.toolTip1.SetToolTip(this.GridViewMetaTypeCombo, "Change the selected meta type, for use when viewing \"odd\" images or changing nume" +
+          this.ToolTip.SetToolTip(this.GridViewMetaTypeCombo, "Change the selected meta type, for use when viewing \"odd\" images or changing nume" +
                   "ric meta data");
           // 
           // ViewTab3D
@@ -734,6 +727,24 @@ namespace MMEd
           this.ViewTab3dEditor.Text = "3D Editor";
           this.ViewTab3dEditor.UseVisualStyleBackColor = true;
           // 
+          // panel2
+          // 
+          this.panel2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
+                      | System.Windows.Forms.AnchorStyles.Right)));
+          this.panel2.Controls.Add(this.ThreeDeeEditorStatusLabel);
+          this.panel2.Location = new System.Drawing.Point(1, 502);
+          this.panel2.Name = "panel2";
+          this.panel2.Size = new System.Drawing.Size(631, 32);
+          this.panel2.TabIndex = 1;
+          // 
+          // ThreeDeeEditorStatusLabel
+          // 
+          this.ThreeDeeEditorStatusLabel.AutoSize = true;
+          this.ThreeDeeEditorStatusLabel.Location = new System.Drawing.Point(6, 6);
+          this.ThreeDeeEditorStatusLabel.Name = "ThreeDeeEditorStatusLabel";
+          this.ThreeDeeEditorStatusLabel.Size = new System.Drawing.Size(0, 13);
+          this.ThreeDeeEditorStatusLabel.TabIndex = 0;
+          // 
           // LeftRightSplit
           // 
           this.LeftRightSplit.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
@@ -768,7 +779,7 @@ namespace MMEd
           // 
           this.LeftHandSplit.Panel2.Controls.Add(this.Viewer3DRenderingSurfaceBottomLeft);
           this.LeftHandSplit.Size = new System.Drawing.Size(276, 493);
-          this.LeftHandSplit.SplitterDistance = 222;
+          this.LeftHandSplit.SplitterDistance = 221;
           this.LeftHandSplit.TabIndex = 0;
           // 
           // Viewer3DRenderingSurfaceTopLeft
@@ -776,7 +787,7 @@ namespace MMEd
           this.Viewer3DRenderingSurfaceTopLeft.Dock = System.Windows.Forms.DockStyle.Fill;
           this.Viewer3DRenderingSurfaceTopLeft.Location = new System.Drawing.Point(0, 0);
           this.Viewer3DRenderingSurfaceTopLeft.Name = "Viewer3DRenderingSurfaceTopLeft";
-          this.Viewer3DRenderingSurfaceTopLeft.Size = new System.Drawing.Size(276, 222);
+          this.Viewer3DRenderingSurfaceTopLeft.Size = new System.Drawing.Size(276, 221);
           this.Viewer3DRenderingSurfaceTopLeft.TabIndex = 0;
           this.Viewer3DRenderingSurfaceTopLeft.Text = "renderingSurface1";
           // 
@@ -785,7 +796,7 @@ namespace MMEd
           this.Viewer3DRenderingSurfaceBottomLeft.Dock = System.Windows.Forms.DockStyle.Fill;
           this.Viewer3DRenderingSurfaceBottomLeft.Location = new System.Drawing.Point(0, 0);
           this.Viewer3DRenderingSurfaceBottomLeft.Name = "Viewer3DRenderingSurfaceBottomLeft";
-          this.Viewer3DRenderingSurfaceBottomLeft.Size = new System.Drawing.Size(276, 267);
+          this.Viewer3DRenderingSurfaceBottomLeft.Size = new System.Drawing.Size(276, 268);
           this.Viewer3DRenderingSurfaceBottomLeft.TabIndex = 0;
           this.Viewer3DRenderingSurfaceBottomLeft.Text = "renderingSurface3";
           // 
@@ -825,23 +836,25 @@ namespace MMEd
           this.Viewer3DRenderingSurfaceBottomRight.TabIndex = 0;
           this.Viewer3DRenderingSurfaceBottomRight.Text = "renderingSurface4";
           // 
-          // panel2
+          // ActionsTabReindexBumpButton
           // 
-          this.panel2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
-                      | System.Windows.Forms.AnchorStyles.Right)));
-          this.panel2.Controls.Add(this.ThreeDeeEditorStatusLabel);
-          this.panel2.Location = new System.Drawing.Point(1, 502);
-          this.panel2.Name = "panel2";
-          this.panel2.Size = new System.Drawing.Size(631, 32);
-          this.panel2.TabIndex = 1;
+          this.ActionsTabReindexBumpButton.Location = new System.Drawing.Point(15, 16);
+          this.ActionsTabReindexBumpButton.Name = "ActionsTabReindexBumpButton";
+          this.ActionsTabReindexBumpButton.Size = new System.Drawing.Size(142, 23);
+          this.ActionsTabReindexBumpButton.TabIndex = 0;
+          this.ActionsTabReindexBumpButton.Text = "Re-index bump map";
+          this.ActionsTabReindexBumpButton.UseVisualStyleBackColor = true;
           // 
-          // ThreeDeeEditorStatusLabel
+          // label1
           // 
-          this.ThreeDeeEditorStatusLabel.AutoSize = true;
-          this.ThreeDeeEditorStatusLabel.Location = new System.Drawing.Point(6, 6);
-          this.ThreeDeeEditorStatusLabel.Name = "ThreeDeeEditorStatusLabel";
-          this.ThreeDeeEditorStatusLabel.Size = new System.Drawing.Size(0, 13);
-          this.ThreeDeeEditorStatusLabel.TabIndex = 0;
+          this.label1.AutoSize = true;
+          this.label1.Location = new System.Drawing.Point(163, 16);
+          this.label1.Name = "label1";
+          this.label1.Size = new System.Drawing.Size(300, 39);
+          this.label1.TabIndex = 1;
+          this.label1.Text = "Coalesce repeated bump map images, and update references \r\nto the removed bump im" +
+              "ages from any Flats which use them.\r\nPlease select the top node in the file tree" +
+              " before doing this.";
           // 
           // MainForm
           // 
@@ -859,8 +872,8 @@ namespace MMEd
           this.MainSplitter.Panel2.ResumeLayout(false);
           this.MainSplitter.ResumeLayout(false);
           this.ViewerTabControl.ResumeLayout(false);
-          this.ViewTabSummary.ResumeLayout(false);
-          this.ViewTabSummary.PerformLayout();
+          this.ViewTabActions.ResumeLayout(false);
+          this.ViewTabActions.PerformLayout();
           this.ViewTabXML.ResumeLayout(false);
           this.ViewTabXML.PerformLayout();
           this.ViewTabFlat.ResumeLayout(false);
@@ -892,6 +905,8 @@ namespace MMEd
           this.panel1.PerformLayout();
           ((System.ComponentModel.ISupportInitialize)(this.VRAMPictureBox)).EndInit();
           this.ViewTab3dEditor.ResumeLayout(false);
+          this.panel2.ResumeLayout(false);
+          this.panel2.PerformLayout();
           this.LeftRightSplit.Panel1.ResumeLayout(false);
           this.LeftRightSplit.Panel2.ResumeLayout(false);
           this.LeftRightSplit.ResumeLayout(false);
@@ -901,8 +916,6 @@ namespace MMEd
           this.RightHandSplit.Panel1.ResumeLayout(false);
           this.RightHandSplit.Panel2.ResumeLayout(false);
           this.RightHandSplit.ResumeLayout(false);
-          this.panel2.ResumeLayout(false);
-          this.panel2.PerformLayout();
           this.ResumeLayout(false);
           this.PerformLayout();
 
@@ -916,9 +929,7 @@ namespace MMEd
         private System.Windows.Forms.ToolStripMenuItem MnuiFileOpen;
         private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
         public System.Windows.Forms.MenuStrip mMenuStrip;
-        public System.Windows.Forms.TabControl ViewerTabControl;
-        private System.Windows.Forms.TabPage ViewTabSummary;
-        private System.Windows.Forms.Label label1;
+      public System.Windows.Forms.TabControl ViewerTabControl;
         public System.Windows.Forms.TabPage ViewTabXML;
         public System.Windows.Forms.Button XMLViewerCommitBtn;
         public System.Windows.Forms.TextBox XMLTextBox;
@@ -970,11 +981,14 @@ namespace MMEd
         public MMEd.Util.SmoothScrollingPanel GridViewSelPanelHolder;
       public System.Windows.Forms.GroupBox GridViewSelImageGroupBox;
       public System.Windows.Forms.ComboBox GridViewViewModeCombo;
-      private System.Windows.Forms.ToolTip toolTip1;
       public System.Windows.Forms.TrackBar GridViewTransparencySlider;
       public System.Windows.Forms.Button BumpEditFillButton;
       private System.Windows.Forms.Panel panel2;
       internal System.Windows.Forms.Label ThreeDeeEditorStatusLabel;
+      public System.Windows.Forms.ToolTip ToolTip;
+      private System.Windows.Forms.Label label1;
+      public System.Windows.Forms.Button ActionsTabReindexBumpButton;
+      public System.Windows.Forms.TabPage ViewTabActions;
     }
 }
 
