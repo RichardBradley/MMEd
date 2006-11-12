@@ -500,6 +500,18 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
         bout.Write(ShortUnknown);
         OriginPosition.WriteShort3Coord64(bout);
       }
+
+      public Entity GetEntity(Level xiLevel, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata)
+      {
+        Entity lWeaponEntity = xiLevel.GetObjtById(TMDChunk.OBJT_ID_FOR_WEAPONS_BOX)
+          .GetEntity(xiLevel, xiTextureMode, xiSelectedMetadata, this);
+
+        // Set the position.
+        Point lWeaponPosition = ThreeDeeViewer.Short3CoordToPoint(this.OriginPosition);
+        lWeaponEntity.Position = new Point(lWeaponPosition.x, lWeaponPosition.y, -lWeaponPosition.z);
+
+        return lWeaponEntity;
+      }
     }
 
     public FlatChunk() { }
@@ -651,14 +663,7 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
       {
         foreach (WeaponEntry lWeapon in Weapons)
         {
-          Entity lWeaponEntity = xiLevel.GetObjtById(TMDChunk.OBJT_ID_FOR_WEAPONS_BOX)
-            .GetEntity(xiLevel, xiTextureMode, xiSelectedMetadata, lWeapon);
-
-          // Set the position.
-          Point lWeaponPosition = ThreeDeeViewer.Short3CoordToPoint(lWeapon.OriginPosition);
-          lWeaponEntity.Position = new Point(lWeaponPosition.x, lWeaponPosition.y, -lWeaponPosition.z);
-          
-          lAcc.Add(lWeaponEntity);
+          lAcc.Add(lWeapon.GetEntity(xiLevel, xiTextureMode, xiSelectedMetadata));
         }
       }
 

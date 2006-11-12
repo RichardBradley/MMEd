@@ -448,6 +448,12 @@ namespace MMEd.Viewers
           mScene.AddObject(((FlatChunk.ObjectEntry)xiObject).GetEntity(mSubject as Level, TextureMode, SelectedMetadata));
           UpdateActiveObjectStatus(xiObject);
         }
+        else if (xiObject is FlatChunk.WeaponEntry)
+        {
+          mScene.RemoveMMEdObject(xiObject);
+          mScene.AddObject(((FlatChunk.WeaponEntry)xiObject).GetEntity(mSubject as Level, TextureMode, SelectedMetadata));
+          UpdateActiveObjectStatus(xiObject);
+        }
         else if (xiObject is FlatChunk)
         {
           //qq improve the efficiency of this
@@ -582,18 +588,30 @@ namespace MMEd.Viewers
 
     private void UpdateActiveObjectStatus(object xiObject)
     {
-      FlatChunk.ObjectEntry lObject = xiObject as FlatChunk.ObjectEntry;
+      string lStatus = "";
 
-      string lStatus = null;
-      if (lObject != null)
+      Chunk lChunk = xiObject as Chunk;
+      if (lChunk != null)
       {
-        lStatus = string.Format("Pos: ({0},{1},{2}) Rot: ({3},{4},{5})",
-          lObject.OriginPosition.X,
-          lObject.OriginPosition.Y,
-          lObject.OriginPosition.Z,
-          lObject.RotationVector.X,
-          lObject.RotationVector.Y,
-          lObject.RotationVector.Z);
+        lStatus += lChunk.Name + " - ";
+      }
+
+      IPositionable lPos = xiObject as IPositionable;
+      if (lPos != null)
+      {
+        lStatus += string.Format(" Pos: ({0},{1},{2})",
+          lPos.OriginPosition.X,
+          lPos.OriginPosition.Y,
+          lPos.OriginPosition.Z);
+      }
+
+      IRotatable lRot = xiObject as IRotatable;
+      if (lRot != null)
+      {
+        lStatus += string.Format(" Rot: ({0},{1},{2})",
+          lRot.RotationVector.X,
+          lRot.RotationVector.Y,
+          lRot.RotationVector.Z);
       }
 
       mMainForm.ThreeDeeEditorStatusLabel.Text = lStatus;
