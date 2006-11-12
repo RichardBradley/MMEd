@@ -2,11 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Xml.Serialization;
+using GLTK;
 
 // A 3-vector with short components
 
 namespace MMEd.Chunks
 {
+  // Must include Matrix here to give the XmlSerializer a handle on the GLTK
+  // assembly, even though no GLTK.Matrix'es should be emitted.
+  // Note that you can't reference GLTK.Point here, as it will clash with 
+  // Drawing.Point
+  [XmlInclude(typeof(Matrix))]
   public class Short3Coord
   {
     public short X, Y, Z;
