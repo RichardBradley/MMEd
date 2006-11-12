@@ -579,6 +579,68 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
       lAcc.Add(lSurface);
 
       /////////////////////////////////////////////////////
+      // The child weapons
+      if (Weapons != null)
+      {
+        foreach (WeaponEntry lWeapon in Weapons)
+        {
+          // Data to generate a cube built out of triangles.
+          int[][][] lCubeCoords = new int[][][]
+            { 
+              new int[][] { new int[] { 0, 0, 0 }, new int[] { 1, 0, 0 }, new int[] { 1, 1, 0 } }, // xy
+              new int[][] { new int[] { 0, 0, 0 }, new int[] { 0, 1, 0 }, new int[] { 1, 1, 0 } }, // xy
+              new int[][] { new int[] { 0, 0, 1 }, new int[] { 1, 0, 1 }, new int[] { 1, 1, 1 } }, // xy + 1
+              new int[][] { new int[] { 0, 0, 1 }, new int[] { 1, 1, 1 }, new int[] { 0, 1, 1 } }, // xy + 1
+              new int[][] { new int[] { 0, 0, 0 }, new int[] { 1, 0, 0 }, new int[] { 1, 0, 1 } }, // xz
+              new int[][] { new int[] { 0, 0, 0 }, new int[] { 0, 0, 1 }, new int[] { 1, 0, 1 } }, // xz
+              new int[][] { new int[] { 0, 1, 0 }, new int[] { 1, 1, 0 }, new int[] { 1, 1, 1 } }, // xz + 1
+              new int[][] { new int[] { 0, 1, 0 }, new int[] { 0, 1, 1 }, new int[] { 1, 1, 1 } }, // xz + 1
+              new int[][] { new int[] { 0, 0, 0 }, new int[] { 0, 1, 0 }, new int[] { 0, 1, 1 } }, // yz
+              new int[][] { new int[] { 0, 0, 0 }, new int[] { 0, 0, 1 }, new int[] { 0, 1, 1 } }, // yz
+              new int[][] { new int[] { 1, 0, 0 }, new int[] { 1, 1, 0 }, new int[] { 1, 1, 1 } }, // yz + 1
+              new int[][] { new int[] { 1, 0, 0 }, new int[] { 1, 0, 1 }, new int[] { 1, 1, 1 } }  // yz + 1
+            };
+
+          Mesh lWeaponBox = new OwnedMesh(this);
+          Color lColor = Color.Green;
+          short lIconSize = 50;
+          lWeaponBox.RenderMode = RenderMode.Wireframe;
+
+          // Build the mesh.
+          foreach (int[][] lCubeFace in lCubeCoords)
+          {
+            Vertex[] lVertices = new Vertex[lCubeFace.Length];
+
+            for (int i = 0; i < lCubeFace.Length; i++)
+            {
+              Short3Coord lCoords = new Short3Coord();
+              lCoords.X = (short)((lCubeFace[i][0] * lIconSize));
+              lCoords.Y = (short)((lCubeFace[i][1] * lIconSize));
+              lCoords.Z = (short)((lCubeFace[i][2] * lIconSize));
+              Point lVertexPoint = ThreeDeeViewer.Short3CoordToPoint(lCoords);
+              lVertices[i] = new Vertex(lVertexPoint, lColor);
+            }
+
+            lWeaponBox.AddFace(lVertices[0], lVertices[1], lVertices[2]);
+          }
+
+          // Create an entity object for the weapon.
+          MMEdEntity lWeaponEntity = new MMEdEntity(this);
+          lWeaponEntity.Meshes.Add(lWeaponBox);
+
+          // Rotate the entity so the (0, 0, 0) vertex points down, with the (1, 1, 1) vertex above it.
+          lWeaponEntity.RotateAboutWorldOrigin(-Math.PI / 4.0, Vector.ZAxis);
+          lWeaponEntity.RotateAboutWorldOrigin(-Math.PI / 4.0, Vector.XAxis);
+
+          // Set the position.
+          Point lWeaponPosition = ThreeDeeViewer.Short3CoordToPoint(lWeapon.Position);
+          lWeaponEntity.Position = new Point(lWeaponPosition.x, lWeaponPosition.y, -lWeaponPosition.z);
+          
+          lAcc.Add(lWeaponEntity);
+        }
+      }
+
+      /////////////////////////////////////////////////////
       // The child objects
       if (Objects != null)
       {
