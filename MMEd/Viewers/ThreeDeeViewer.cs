@@ -148,6 +148,11 @@ namespace MMEd.Viewers
             FlatChunk.ObjectEntry oe = (FlatChunk.ObjectEntry)((OwnedMesh)lMesh).Owner;
             MessageBox.Show(string.Format("Clicked on object type {0} at {1}, rotation {2}", oe.ObjtType, oe.OriginPosition, oe.RotationVector));
           }
+          else if (lMesh is OwnedMesh && ((OwnedMesh)lMesh).Owner is FlatChunk.WeaponEntry)
+          {
+            FlatChunk.WeaponEntry we = (FlatChunk.WeaponEntry)((OwnedMesh)lMesh).Owner;
+            MessageBox.Show(string.Format("Clicked on weapon type {0} at {1}", we.WeaponType, we.Position));
+          }
           else
           {
             lMesh.RenderMode = lMesh.RenderMode == RenderMode.Filled ?

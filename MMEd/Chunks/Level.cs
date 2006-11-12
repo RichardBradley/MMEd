@@ -16,8 +16,8 @@ using Bitmap = System.Drawing.Bitmap;
 
 namespace MMEd.Chunks
 {
-  //qq are these really necessary? some unit tests fail without them, but they're
-  //   a bit strange
+  // include types which the XMLserialiser can't infer via strongly typed 
+  // member variables:
   [XmlInclude(typeof(NamedImageGroup)), XmlInclude(typeof(TIMChunk)),
   XmlInclude(typeof(OddImageChunk)), XmlInclude(typeof(BumpImageChunk)),
   XmlInclude(typeof(TMDChunk)), XmlInclude(typeof(TypedRawDataChunk))]

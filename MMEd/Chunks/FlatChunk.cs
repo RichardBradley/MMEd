@@ -373,12 +373,10 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
         TMDChunk lObjt = xiLevel.GetObjtById(this.ObjtType);
         if (lObjt != null)
         {
-          //qq hack!
-          Entity[] lEarr = (Entity[])lObjt.GetEntities(xiLevel, xiTextureMode, xiSelectedMetadata, this);
-          if (lEarr.Length != 1) throw new Exception("hack failed!");
-          Entity lE = lEarr[0];
+          Entity lE = lObjt.GetEntity(xiLevel, xiTextureMode, xiSelectedMetadata, this);
 
-          //hacky!
+          //nasty, but required because the PS 3D world coords are left-handed,
+          //and the OpenGl 3D coords are right handed
           lE.Scale(1, 1, -1);
 
           if (this.RotationVector.Norm() != 0)
@@ -391,7 +389,7 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
 
           lE.Position = ThreeDeeViewer.Short3CoordToPoint(this.OriginPosition);
 
-          //hacky!
+          //return to right handed coords
           lE.Scale(1, 1, -1);
 
           return lE;
@@ -404,7 +402,7 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
     public class WeaponEntry
     {
       [Description("The type of the weapon. See enum eWeaponType")]
-      public eWeaponType eWeaponType;
+      public eWeaponType WeaponType;
 
       [Description("dunno")]
       public short ShortUnknown;
@@ -417,7 +415,7 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
       {
         try
         {
-          eWeaponType = (eWeaponType)bin.ReadInt16();
+          WeaponType = (eWeaponType)bin.ReadInt16();
         }
         catch (InvalidCastException e)
         {
@@ -429,7 +427,7 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
 
       public void WriteToStream(BinaryWriter bout)
       {
-        bout.Write((short)eWeaponType);
+        bout.Write((short)WeaponType);
         bout.Write(ShortUnknown);
         Position.WriteShort3Coord64(bout);
       }
@@ -584,53 +582,8 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
       {
         foreach (WeaponEntry lWeapon in Weapons)
         {
-          // Data to generate a cube built out of triangles.
-          int[][][] lCubeCoords = new int[][][]
-            { 
-              new int[][] { new int[] { 0, 0, 0 }, new int[] { 1, 0, 0 }, new int[] { 1, 1, 0 } }, // xy
-              new int[][] { new int[] { 0, 0, 0 }, new int[] { 0, 1, 0 }, new int[] { 1, 1, 0 } }, // xy
-              new int[][] { new int[] { 0, 0, 1 }, new int[] { 1, 0, 1 }, new int[] { 1, 1, 1 } }, // xy + 1
-              new int[][] { new int[] { 0, 0, 1 }, new int[] { 1, 1, 1 }, new int[] { 0, 1, 1 } }, // xy + 1
-              new int[][] { new int[] { 0, 0, 0 }, new int[] { 1, 0, 0 }, new int[] { 1, 0, 1 } }, // xz
-              new int[][] { new int[] { 0, 0, 0 }, new int[] { 0, 0, 1 }, new int[] { 1, 0, 1 } }, // xz
-              new int[][] { new int[] { 0, 1, 0 }, new int[] { 1, 1, 0 }, new int[] { 1, 1, 1 } }, // xz + 1
-              new int[][] { new int[] { 0, 1, 0 }, new int[] { 0, 1, 1 }, new int[] { 1, 1, 1 } }, // xz + 1
-              new int[][] { new int[] { 0, 0, 0 }, new int[] { 0, 1, 0 }, new int[] { 0, 1, 1 } }, // yz
-              new int[][] { new int[] { 0, 0, 0 }, new int[] { 0, 0, 1 }, new int[] { 0, 1, 1 } }, // yz
-              new int[][] { new int[] { 1, 0, 0 }, new int[] { 1, 1, 0 }, new int[] { 1, 1, 1 } }, // yz + 1
-              new int[][] { new int[] { 1, 0, 0 }, new int[] { 1, 0, 1 }, new int[] { 1, 1, 1 } }  // yz + 1
-            };
-
-          Mesh lWeaponBox = new OwnedMesh(this);
-          Color lColor = Color.Green;
-          short lIconSize = 50;
-          lWeaponBox.RenderMode = RenderMode.Wireframe;
-
-          // Build the mesh.
-          foreach (int[][] lCubeFace in lCubeCoords)
-          {
-            Vertex[] lVertices = new Vertex[lCubeFace.Length];
-
-            for (int i = 0; i < lCubeFace.Length; i++)
-            {
-              Short3Coord lCoords = new Short3Coord();
-              lCoords.X = (short)((lCubeFace[i][0] * lIconSize));
-              lCoords.Y = (short)((lCubeFace[i][1] * lIconSize));
-              lCoords.Z = (short)((lCubeFace[i][2] * lIconSize));
-              Point lVertexPoint = ThreeDeeViewer.Short3CoordToPoint(lCoords);
-              lVertices[i] = new Vertex(lVertexPoint, lColor);
-            }
-
-            lWeaponBox.AddFace(lVertices[0], lVertices[1], lVertices[2]);
-          }
-
-          // Create an entity object for the weapon.
-          MMEdEntity lWeaponEntity = new MMEdEntity(this);
-          lWeaponEntity.Meshes.Add(lWeaponBox);
-
-          // Rotate the entity so the (0, 0, 0) vertex points down, with the (1, 1, 1) vertex above it.
-          lWeaponEntity.RotateAboutWorldOrigin(-Math.PI / 4.0, Vector.ZAxis);
-          lWeaponEntity.RotateAboutWorldOrigin(-Math.PI / 4.0, Vector.XAxis);
+          Entity lWeaponEntity = xiLevel.GetObjtById(TMDChunk.OBJT_ID_FOR_WEAPONS_BOX)
+            .GetEntity(xiLevel, xiTextureMode, xiSelectedMetadata, lWeapon);
 
           // Set the position.
           Point lWeaponPosition = ThreeDeeViewer.Short3CoordToPoint(lWeapon.Position);

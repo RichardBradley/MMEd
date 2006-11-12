@@ -21,6 +21,9 @@ namespace MMEd.Chunks
       None = 0 //erm, that's all I know :-)  Descibed as "rel. offsets" mode in some places
     }
 
+    public const int OBJT_ID_FOR_MALLET = 0;
+    public const int OBJT_ID_FOR_WEAPONS_BOX = 1;
+
     public const int TMD_MAGIC_NUMBER = 0x41;
 
     #region public fields
@@ -199,10 +202,10 @@ namespace MMEd.Chunks
 
     public IEnumerable<GLTK.Entity> GetEntities(Level xiLevel, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata)
     {
-      return GetEntities(xiLevel, xiTextureMode, xiSelectedMetadata, this);
+      return new Entity[] { GetEntity(xiLevel, xiTextureMode, xiSelectedMetadata, this) };
     }
 
-    public IEnumerable<GLTK.Entity> GetEntities(Level xiLevel, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata, object xiMeshOwner)
+    public Entity GetEntity(Level xiLevel, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata, object xiMeshOwner)
     {
       MMEdEntity lAcc = new MMEdEntity(xiMeshOwner);
       Mesh lColouredMesh = null;
@@ -283,17 +286,16 @@ namespace MMEd.Chunks
 
       lAcc.Scale(1, 1, -1);
 
-      return new Entity[] { lAcc };
+      return lAcc;
     }
 
     public override string Name
     {
       get
       {
-        return
-      mIdx >= 0 ?
-
-      string.Format("[{0}] TMD", mIdx) : "TMD";
+        return mIdx >= 0 
+          ? string.Format("[{0}] TMD", mIdx) 
+          : "TMD";
       }
     }
 
@@ -303,6 +305,32 @@ namespace MMEd.Chunks
     {
       mIdx = xiIdx;
       Deserialise(xiInStr);
+
+      //double-check the assumption that object 1 is a weapons box:
+      //this is slightly hacky, but might be justifiable because the PS has the 
+      //same assumption
+      // TODO: maybe later do a similar check for MALLET
+      if (xiIdx == OBJT_ID_FOR_WEAPONS_BOX)
+      {
+        string lNotWeaponsBoxBecause = null;
+        if (Faces.Length != 12) lNotWeaponsBoxBecause = string.Format("it has {0} faces, but should have 12", Faces.Length);
+        for (int i=0; i<Faces.Length && lNotWeaponsBoxBecause == null; i++)
+        {
+          if (Faces[i].mMode != Face.Mode.Tri_Flat_Textured)
+          {
+            lNotWeaponsBoxBecause = string.Format("face {0} is mode {1} but expected mode {2}",
+              i, Faces[i].mMode.ToString(), Face.Mode.Tri_Flat_Textured.ToString());
+          }
+        }
+        if (lNotWeaponsBoxBecause != null)
+        {
+          System.Windows.Forms.MessageBox.Show(string.Format("The object with index {0} doesn't look like a weapons box because {1}\n"+
+            "Please tell rtb about this, because he currently thinks that object 1 is always a weapons box\n"+
+            "The 3D view may look a little odd because of this problem",
+            OBJT_ID_FOR_WEAPONS_BOX,
+            lNotWeaponsBoxBecause));
+        }
+      }
     }
 
     public class Face : Chunk
