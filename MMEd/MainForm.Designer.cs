@@ -96,6 +96,8 @@ namespace MMEd
           this.ToolTip = new System.Windows.Forms.ToolTip(this.components);
           this.ActionsTabReindexBumpButton = new System.Windows.Forms.Button();
           this.label1 = new System.Windows.Forms.Label();
+          this.ActionsTabCloneFlatButton = new System.Windows.Forms.Button();
+          this.label9 = new System.Windows.Forms.Label();
           this.mMenuStrip.SuspendLayout();
           this.MainSplitter.Panel1.SuspendLayout();
           this.MainSplitter.Panel2.SuspendLayout();
@@ -228,6 +230,8 @@ namespace MMEd
           // 
           this.ViewTabActions.Controls.Add(this.label1);
           this.ViewTabActions.Controls.Add(this.ActionsTabReindexBumpButton);
+          this.ViewTabActions.Controls.Add(this.label9);
+          this.ViewTabActions.Controls.Add(this.ActionsTabCloneFlatButton);
           this.ViewTabActions.Location = new System.Drawing.Point(4, 22);
           this.ViewTabActions.Name = "ViewTabActions";
           this.ViewTabActions.Padding = new System.Windows.Forms.Padding(3);
@@ -856,6 +860,24 @@ namespace MMEd
               "ages from any Flats which use them.\r\nPlease select the top node in the file tree" +
               " before doing this.";
           // 
+          // ActionsTabCloneFlatButton
+          // 
+          this.ActionsTabCloneFlatButton.Location = new System.Drawing.Point(15, 80);
+          this.ActionsTabCloneFlatButton.Name = "ActionsTabCloneFlatButton";
+          this.ActionsTabCloneFlatButton.Size = new System.Drawing.Size(142, 23);
+          this.ActionsTabCloneFlatButton.TabIndex = 2;
+          this.ActionsTabCloneFlatButton.Text = "Clone flat";
+          this.ActionsTabCloneFlatButton.UseVisualStyleBackColor = true;
+          // 
+          // label9
+          // 
+          this.label9.AutoSize = true;
+          this.label9.Location = new System.Drawing.Point(163, 80);
+          this.label9.Name = "label9";
+          this.label9.Size = new System.Drawing.Size(300, 39);
+          this.label9.TabIndex = 3;
+          this.label9.Text = "Clone the selected Flat and all its contents.";
+          // 
           // MainForm
           // 
           this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -988,6 +1010,8 @@ namespace MMEd
       public System.Windows.Forms.ToolTip ToolTip;
       private System.Windows.Forms.Label label1;
       public System.Windows.Forms.Button ActionsTabReindexBumpButton;
+      private System.Windows.Forms.Label label9;
+      public System.Windows.Forms.Button ActionsTabCloneFlatButton;
       public System.Windows.Forms.TabPage ViewTabActions;
     }
 }

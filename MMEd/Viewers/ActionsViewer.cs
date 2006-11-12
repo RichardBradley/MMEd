@@ -5,6 +5,8 @@ using MMEd;
 using MMEd.Chunks;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Xml.Serialization;
+using System.IO;
 
 // a viewer/editor which performs file wide actions
 
@@ -134,13 +136,61 @@ namespace MMEd.Viewers
       } 
     }
 
+    public void CloneFlat()
+    {
+      FlatChunk lSource = mSubject as FlatChunk;
+      if (lSource == null) return;
+
+      //=======================================================================
+      // Serialise the current Flat to XML, then deserialise - simple method
+      // of creating a deep clone of the Flat.
+      //=======================================================================
+      XmlSerializer lSerializer = new XmlSerializer(lSource.GetType());
+      StringWriter lStringWriter = new StringWriter();
+      lSerializer.Serialize(lStringWriter, lSource);
+      StringReader lStringReader = new StringReader(lStringWriter.ToString());
+      FlatChunk lDest = (FlatChunk)lSerializer.Deserialize(lStringReader);
+
+      //=======================================================================
+      // Add the new Flat to the SHET
+      //=======================================================================
+      lDest.DeclaredName = "NewFlat1";
+      short lMaxIdx = 0;
+      foreach (FlatChunk lExistingFlat in mMainForm.Level.SHET.Flats)
+      {
+        if (lExistingFlat.DeclaredIdx > lMaxIdx)
+        {
+          lMaxIdx = lExistingFlat.DeclaredIdx;
+        }
+      }
+      lDest.DeclaredIdx = (short)(1 + lMaxIdx);
+      int lSizeIncrease = mMainForm.Level.SHET.AddFlat(lDest);
+      mMainForm.Level.SHET.TrailingZeroByteCount -= lSizeIncrease;
+
+      //=======================================================================
+      // Refresh the tree view
+      //=======================================================================
+      mMainForm.Level = mMainForm.Level;
+
+      MessageBox.Show("Flat cloned successfully. " +
+        (mMainForm.Level.SHET.TrailingZeroByteCount < 0 ? 
+        string.Format("Note that you have run out of space in your level file - you will need to free up {0} bytes before you can save your changes.", -mMainForm.Level.SHET.TrailingZeroByteCount) : 
+        ""));
+    }
+
     #endregion
 
     private ActionsViewer(MainForm xiMainForm)
       : base(xiMainForm) 
     {
       mMainForm.ActionsTabReindexBumpButton.Click += new EventHandler(ActionsTabReindexBumpButton_Click);
+      mMainForm.ActionsTabCloneFlatButton.Click += new EventHandler(ActionsTabCloneFlatButton_Click);
       SetSubject(null);
+    }
+
+    void ActionsTabCloneFlatButton_Click(object sender, EventArgs e)
+    {
+      CloneFlat();
     }
 
     void ActionsTabReindexBumpButton_Click(object sender, EventArgs e)
@@ -167,6 +217,7 @@ namespace MMEd.Viewers
       if (mSubject == xiChunk) return;
       mSubject = xiChunk;
       mMainForm.ActionsTabReindexBumpButton.Enabled = (mSubject is Level);
+      mMainForm.ActionsTabCloneFlatButton.Enabled = (mSubject is FlatChunk);
     }
 
     public override System.Windows.Forms.TabPage Tab

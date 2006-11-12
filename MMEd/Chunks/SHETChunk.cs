@@ -199,5 +199,24 @@ Each entry has three components, which are height, pitch and yaw, in some order"
         throw new ArgumentException("xifrom not found!");
       }
     }
+
+    ///========================================================================
+    ///  Method : AddFlat
+    /// 
+    /// <summary>
+    /// 	Add a new Flat, returning the size of the added Flat in bytes
+    /// </summary>
+    /// <param name="xiFlat"></param>
+    /// <returns></returns>
+    ///========================================================================
+    public int AddFlat(FlatChunk xiFlat)
+    {
+      FlatChunk[] lNewFlats = new FlatChunk[Flats.Length + 1];
+      Array.Copy(Flats, lNewFlats, Flats.Length);
+      lNewFlats[Flats.Length] = xiFlat;
+      Flats = lNewFlats;
+
+      return xiFlat.ByteSize;
+    }
   }
 }

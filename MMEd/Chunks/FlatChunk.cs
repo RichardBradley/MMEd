@@ -9,6 +9,7 @@ using MMEd.Viewers;
 using GLTK;
 using MMEd.Viewers.ThreeDee;
 using Point = GLTK.Point;
+using System.Xml.Serialization;
 
 // A Flat from within the SHET
 // Represents a drivable surface.
@@ -377,6 +378,42 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
       get
       {
         return string.Format("[{0}] {1}", DeclaredIdx, DeclaredName);
+      }
+    }
+
+    ///========================================================================
+    /// Property : ByteSize
+    /// 
+    /// <summary>
+    /// 	The size of this Flat in bytes
+    /// </summary>
+    ///========================================================================
+    [XmlIgnore]
+    public int ByteSize
+    {
+      get
+      {
+        int lSize =
+          2 + // DeclaredIdx
+          9 + // DeclaredName
+          8 + // OriginPosition
+          8 + // RotationVector
+          8 + // Width, Height, ScaleX, ScaleY
+          4 * Width * Height + // Texture IDs, Terrain Height
+          9 + // FlgA, ..., FlgE
+          NextN.Length;
+        
+        if (FlgA)
+        {
+          lSize += 
+            8 * Width * Height + // TexMetaData
+            2 + // Object count
+            Objects.Length * 22 +
+            2 + // Weapon count
+            Weapons.Length * 12;
+        }
+
+        return lSize + (TrailingData != null ? TrailingData.Length : 0);
       }
     }
 

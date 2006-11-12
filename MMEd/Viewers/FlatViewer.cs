@@ -36,6 +36,9 @@ namespace MMEd.Viewers
         return;
       }
 
+      //=======================================================================
+      // Warn about changing flags
+      //=======================================================================
       if (mSubject.FlgA != Panel.FlagACheckBox.Checked ||
         mSubject.FlgB != Panel.FlagBCheckBox.Checked ||
         mSubject.FlgC != Panel.FlagCCheckBox.Checked ||
@@ -52,17 +55,46 @@ namespace MMEd.Viewers
       }
 
       //=======================================================================
+      // Offer to be helpful if changing the origin (should really do this
+      // for rotation too...)
+      //=======================================================================
+      short lNewX = short.Parse(Panel.OriginXTextBox.Text);
+      short lNewY = short.Parse(Panel.OriginYTextBox.Text);
+      short lNewZ = short.Parse(Panel.OriginZTextBox.Text);
+      short lDeltaX = 0;
+      short lDeltaY = 0;
+      short lDeltaZ = 0;
+
+      if (mSubject.OriginPosition.X != lNewX ||
+        mSubject.OriginPosition.Y != lNewY ||
+        mSubject.OriginPosition.Z != lNewZ)
+      {
+        if (MessageBox.Show("You are moving the flat. Do you want to move all the objects and weapons by the same amount?",
+          "MMEd", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+        {
+          lDeltaX = (short)(lNewX - mSubject.OriginPosition.X);
+          lDeltaY = (short)(lNewY - mSubject.OriginPosition.Y);
+          lDeltaZ = (short)(lNewZ - mSubject.OriginPosition.Z);
+        }
+      }
+
+      //=======================================================================
       // Save simple values
       //=======================================================================
       mSubject.DeclaredName = Panel.NameTextBox.Text;
-      mSubject.OriginPosition.X = short.Parse(Panel.OriginXTextBox.Text);
-      mSubject.OriginPosition.Y = short.Parse(Panel.OriginYTextBox.Text);
-      mSubject.OriginPosition.Z = short.Parse(Panel.OriginZTextBox.Text);
+      mSubject.OriginPosition.X = lNewX;
+      mSubject.OriginPosition.Y = lNewY;
+      mSubject.OriginPosition.Z = lNewZ;
       mSubject.RotationVector.X = short.Parse(Panel.RotationXTextBox.Text);
       mSubject.RotationVector.Y = short.Parse(Panel.RotationYTextBox.Text);
       mSubject.RotationVector.Z = short.Parse(Panel.RotationZTextBox.Text);
       mSubject.ScaleX = short.Parse(Panel.ScaleXTextBox.Text);
       mSubject.ScaleY = short.Parse(Panel.ScaleYTextBox.Text);
+      mSubject.FlgA = Panel.FlagACheckBox.Checked;
+      mSubject.FlgB = Panel.FlagBCheckBox.Checked;
+      mSubject.FlgC = Panel.FlagCCheckBox.Checked;
+      mSubject.FlgD = Panel.FlagDCheckBox.Checked;
+      mSubject.FlgE = Panel.FlagECheckBox.Checked;
 
       //=======================================================================
       // Change width, height and Flag A, if appropriate
@@ -87,9 +119,9 @@ namespace MMEd.Viewers
         lWeapon.WeaponType = (eWeaponType)Enum.Parse(typeof(eWeaponType), ((ComboBox)Panel.WeaponsTable.Controls[ii]).Text);
         lWeapon.ShortUnknown = short.Parse(((TextBox)Panel.WeaponsTable.Controls[ii + 1]).Text);
         lWeapon.OriginPosition = new Short3Coord();
-        lWeapon.OriginPosition.X = short.Parse(((TextBox)Panel.WeaponsTable.Controls[ii + 2]).Text);
-        lWeapon.OriginPosition.Y = short.Parse(((TextBox)Panel.WeaponsTable.Controls[ii + 3]).Text);
-        lWeapon.OriginPosition.Z = short.Parse(((TextBox)Panel.WeaponsTable.Controls[ii + 4]).Text);
+        lWeapon.OriginPosition.X = (short)(short.Parse(((TextBox)Panel.WeaponsTable.Controls[ii + 2]).Text) + lDeltaX);
+        lWeapon.OriginPosition.Y = (short)(short.Parse(((TextBox)Panel.WeaponsTable.Controls[ii + 3]).Text) + lDeltaY);
+        lWeapon.OriginPosition.Z = (short)(short.Parse(((TextBox)Panel.WeaponsTable.Controls[ii + 4]).Text) + lDeltaZ);
         lWeapons.Add(lWeapon);
       }
 
@@ -105,9 +137,9 @@ namespace MMEd.Viewers
         FlatChunk.ObjectEntry lObject = new FlatChunk.ObjectEntry();
         lObject.ObjtType = short.Parse(((TextBox)Panel.ObjectsTable.Controls[ii]).Text);
         lObject.OriginPosition = new Short3Coord();
-        lObject.OriginPosition.X = short.Parse(((TextBox)Panel.ObjectsTable.Controls[ii + 1]).Text);
-        lObject.OriginPosition.Y = short.Parse(((TextBox)Panel.ObjectsTable.Controls[ii + 2]).Text);
-        lObject.OriginPosition.Z = short.Parse(((TextBox)Panel.ObjectsTable.Controls[ii + 3]).Text);
+        lObject.OriginPosition.X = (short)(short.Parse(((TextBox)Panel.ObjectsTable.Controls[ii + 1]).Text) + lDeltaX);
+        lObject.OriginPosition.Y = (short)(short.Parse(((TextBox)Panel.ObjectsTable.Controls[ii + 2]).Text) + lDeltaY);
+        lObject.OriginPosition.Z = (short)(short.Parse(((TextBox)Panel.ObjectsTable.Controls[ii + 3]).Text) + lDeltaZ);
         lObject.RotationVector = new Short3Coord();
         lObject.RotationVector.X = short.Parse(((TextBox)Panel.ObjectsTable.Controls[ii + 4]).Text);
         lObject.RotationVector.Y = short.Parse(((TextBox)Panel.ObjectsTable.Controls[ii + 5]).Text);
@@ -127,7 +159,7 @@ namespace MMEd.Viewers
       if (mMainForm.Level.SHET.TrailingZeroByteCount < 0)
       {
         MessageBox.Show("WARNING: You do not currently have enough spare space at the end of your level file. " +
-          "You will need to remove some data from the file before you can save to disk.",
+          string.Format("You will need to free up {0} bytes from the file before you can save to disk.", -mMainForm.Level.SHET.TrailingZeroByteCount),
           "MMEd", MessageBoxButtons.OK, MessageBoxIcon.Warning);
       }
     }
