@@ -49,7 +49,7 @@ namespace MMEd.Chunks
     GroupSpeedUp = 15
   }
 
-  public class FlatChunk : Chunk, IEntityProvider
+  public class FlatChunk : Chunk, IEntityProvider, IPositionable, IRotatable
   {
     [Description("The number at the start of the Flat. I haven't seen it refrenced anywhere yet")]
     public short DeclaredIdx;
@@ -58,12 +58,22 @@ namespace MMEd.Chunks
     public string DeclaredName;
 
     [Description("The position of the top left corner of this sheet, in world co-ordinates")]
-    public Short3Coord OriginPosition;
+    public Short3Coord OriginPosition
+    {
+      get { return mOriginPosition; }
+      set { mOriginPosition = value; }
+    }
+    private Short3Coord mOriginPosition;
 
     [Description(@"A 3-rotation vector for this Flat. X measures the positive rotation about
             the X-axis, with 1024 being 90 degrees, and so on for Y and Z. The order of rotation
             is cruicial. qq: write it in here, then!")]
-    public Short3Coord RotationVector;
+    public Short3Coord RotationVector
+    {
+      get { return mRotationVector; }
+      set { mRotationVector = value; }
+    }
+    private Short3Coord mRotationVector;
 
     [Description("The width, in texture squares of this Flat")]
     public short Width;
@@ -370,13 +380,24 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
       }
     }
 
-    public class ObjectEntry
+    public class ObjectEntry : IPositionable, IRotatable
     {
       [Description("The position of the origin of the object, in the co-ordinate space of the parent Flat")]
-      public Short3Coord OriginPosition;
+      public Short3Coord OriginPosition
+      {
+        get { return mOriginPosition; }
+        set { mOriginPosition = value; }
+      }
+      private Short3Coord mOriginPosition;
 
       [Description("A 3-rotation vector for this object. See Flat.RotationVector")]
-      public Short3Coord RotationVector;
+      public Short3Coord RotationVector
+      {
+        get { return mRotationVector; }
+        set { mRotationVector = value; }
+      }
+      private Short3Coord mRotationVector;
+
 
       [Description("The type of the object. Indexes the OBJT array (TODO)")]
       public short ObjtType;
@@ -442,7 +463,7 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
       }
     }
 
-    public class WeaponEntry
+    public class WeaponEntry : IPositionable
     {
       [Description("The type of the weapon. See enum eWeaponType")]
       public eWeaponType WeaponType;
@@ -451,7 +472,12 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
       public short ShortUnknown;
 
       [Description("The position of the weapon, in the co-ordinate space of the parent Flat")]
-      public Short3Coord Position;
+      public Short3Coord OriginPosition
+      {
+        get { return mPosition; }
+        set { mPosition = value; }
+      }
+      public Short3Coord mPosition;
 
       public WeaponEntry() { }
       public WeaponEntry(BinaryReader bin)
@@ -465,14 +491,14 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
           throw new DeserialisationException("Unrecognised weapon type: " + e, bin.BaseStream.Position);
         }
         ShortUnknown = bin.ReadInt16();
-        Position = Short3Coord.ReadShort3Coord64(bin);
+        OriginPosition = Short3Coord.ReadShort3Coord64(bin);
       }
 
       public void WriteToStream(BinaryWriter bout)
       {
         bout.Write((short)WeaponType);
         bout.Write(ShortUnknown);
-        Position.WriteShort3Coord64(bout);
+        OriginPosition.WriteShort3Coord64(bout);
       }
     }
 
@@ -629,7 +655,7 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
             .GetEntity(xiLevel, xiTextureMode, xiSelectedMetadata, lWeapon);
 
           // Set the position.
-          Point lWeaponPosition = ThreeDeeViewer.Short3CoordToPoint(lWeapon.Position);
+          Point lWeaponPosition = ThreeDeeViewer.Short3CoordToPoint(lWeapon.OriginPosition);
           lWeaponEntity.Position = new Point(lWeaponPosition.x, lWeaponPosition.y, -lWeaponPosition.z);
           
           lAcc.Add(lWeaponEntity);

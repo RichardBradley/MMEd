@@ -86,10 +86,10 @@ namespace MMEd.Viewers
         FlatChunk.WeaponEntry lWeapon = new FlatChunk.WeaponEntry();
         lWeapon.WeaponType = (eWeaponType)Enum.Parse(typeof(eWeaponType), ((ComboBox)Panel.WeaponsTable.Controls[ii]).Text);
         lWeapon.ShortUnknown = short.Parse(((TextBox)Panel.WeaponsTable.Controls[ii + 1]).Text);
-        lWeapon.Position = new Short3Coord();
-        lWeapon.Position.X = short.Parse(((TextBox)Panel.WeaponsTable.Controls[ii + 2]).Text);
-        lWeapon.Position.Y = short.Parse(((TextBox)Panel.WeaponsTable.Controls[ii + 3]).Text);
-        lWeapon.Position.Z = short.Parse(((TextBox)Panel.WeaponsTable.Controls[ii + 4]).Text);
+        lWeapon.OriginPosition = new Short3Coord();
+        lWeapon.OriginPosition.X = short.Parse(((TextBox)Panel.WeaponsTable.Controls[ii + 2]).Text);
+        lWeapon.OriginPosition.Y = short.Parse(((TextBox)Panel.WeaponsTable.Controls[ii + 3]).Text);
+        lWeapon.OriginPosition.Z = short.Parse(((TextBox)Panel.WeaponsTable.Controls[ii + 4]).Text);
         lWeapons.Add(lWeapon);
       }
 
@@ -137,10 +137,10 @@ namespace MMEd.Viewers
       FlatChunk.WeaponEntry lWeapon = new FlatChunk.WeaponEntry();
       lWeapon.WeaponType = eWeaponType.Mines;
       lWeapon.ShortUnknown = 1;
-      lWeapon.Position = new Short3Coord();
-      lWeapon.Position.X = mSubject.OriginPosition.X;
-      lWeapon.Position.Y = mSubject.OriginPosition.Y;
-      lWeapon.Position.Z = mSubject.OriginPosition.Z;
+      lWeapon.OriginPosition = new Short3Coord();
+      lWeapon.OriginPosition.X = mSubject.OriginPosition.X;
+      lWeapon.OriginPosition.Y = mSubject.OriginPosition.Y;
+      lWeapon.OriginPosition.Z = mSubject.OriginPosition.Z;
       AddWeaponToTable(lWeapon);
     }
 
@@ -266,17 +266,17 @@ namespace MMEd.Viewers
       Panel.WeaponsTable.Controls.Add(lUnknownBox);
 
       TextBox lXBox = new TextBox();
-      lXBox.Text = xiWeapon.Position.X.ToString();
+      lXBox.Text = xiWeapon.OriginPosition.X.ToString();
       lXBox.Width = 60;
       Panel.WeaponsTable.Controls.Add(lXBox);
 
       TextBox lYBox = new TextBox();
-      lYBox.Text = xiWeapon.Position.Y.ToString();
+      lYBox.Text = xiWeapon.OriginPosition.Y.ToString();
       lYBox.Width = 60;
       Panel.WeaponsTable.Controls.Add(lYBox);
 
       TextBox lZBox = new TextBox();
-      lZBox.Text = xiWeapon.Position.Z.ToString();
+      lZBox.Text = xiWeapon.OriginPosition.Z.ToString();
       lZBox.Width = 60;
       Panel.WeaponsTable.Controls.Add(lZBox);
 

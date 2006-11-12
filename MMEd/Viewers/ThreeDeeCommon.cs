@@ -41,4 +41,21 @@ namespace MMEd.Viewers.ThreeDee
     IEnumerable<Entity> GetEntities(Level xiLevel, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata);
   }
 
+  public interface IPositionable
+  {
+    Short3Coord OriginPosition
+    {
+      get;
+      set;
+    }
+  }
+
+  public interface IRotatable
+  {
+    Short3Coord RotationVector
+    {
+      get;
+      set;
+    }
+  }
 }

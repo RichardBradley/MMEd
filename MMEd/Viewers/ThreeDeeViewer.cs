@@ -151,7 +151,7 @@ namespace MMEd.Viewers
           else if (lMesh is OwnedMesh && ((OwnedMesh)lMesh).Owner is FlatChunk.WeaponEntry)
           {
             FlatChunk.WeaponEntry we = (FlatChunk.WeaponEntry)((OwnedMesh)lMesh).Owner;
-            MessageBox.Show(string.Format("Clicked on weapon type {0} at {1}", we.WeaponType, we.Position));
+            MessageBox.Show(string.Format("Clicked on weapon type {0} at {1}", we.WeaponType, we.OriginPosition));
           }
           else
           {

@@ -14,6 +14,27 @@ namespace GLTK
       0, 0, 1, 0,
       0, 0, 0, 1);
 
+    public static Matrix Rotation(double xiAngle, Vector xiAxis)
+    {
+      if (xiAxis.Length == 0)
+      {
+        throw new Exception("Cannot have axis of zero length");
+      }
+
+      double t = 1 - Math.Cos(xiAngle);
+      double s = Math.Sin(xiAngle);
+      double c = Math.Cos(xiAngle);
+      double x = xiAxis.x / xiAxis.Length;
+      double y = xiAxis.y / xiAxis.Length;
+      double z = xiAxis.z / xiAxis.Length;
+
+      return new Matrix(
+        t * x * x + c, t * x * y - s * z, t * x * z + s * y, 0,
+        t * x * y + s * z, t * y * y + c, t * y * z - s * x, 0,
+        t * x * z - s * y, t * y * z + s * x, t * z * z + c, 0,
+        0, 0, 0, 1);
+    }
+
     public Matrix(double aa, double ab, double ac, double ad,
         double ba, double bb, double bc, double bd,
         double ca, double cb, double cc, double cd,

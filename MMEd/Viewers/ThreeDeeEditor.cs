@@ -117,12 +117,11 @@ namespace MMEd.Viewers
       RenderingSurface lSender = sender as RenderingSurface;
       Camera lCamera = mViews[lSender].Camera;
 
-      bool lCameraIsUpsideDown = lCamera.YAxis.Dot(Vector.ZAxis) < 0;
       if (mDraggingButton == MouseButtons.Left)
       {
         if (Control.ModifierKeys == Keys.Alt && lCamera.ProjectionMode == eProjectionMode.Orthographic)
         {
-          FlatChunk.ObjectEntry lObject = ActiveObject as FlatChunk.ObjectEntry;
+          IPositionable lObject = ActiveObject as IPositionable;
           if (lObject != null)
           {
             double lDeltaX = (lNewMousePoint.X - mLastMouseDown.X);
@@ -140,12 +139,21 @@ namespace MMEd.Viewers
         }
         else if (Control.ModifierKeys == Keys.Shift)
         {
+          IRotatable lObject = ActiveObject as IRotatable;
+          if (lObject != null)
+          {
+            double lDelta = (double)(lNewMousePoint.Y - mLastMouseDown.Y);
+            lObject.RotationVector = Matrix.Rotation(lDelta / 100, lCamera.ZAxis) * lObject.RotationVector.ToRotationMatrix();
+            RebuildObject(lObject);
+            InvalidateAllViewers();
+          }
         }
         else if (lCamera.ProjectionMode == eProjectionMode.Perspective)
         {
           switch (MovementMode)
           {
             case eMovementMode.FlyMode:
+              bool lCameraIsUpsideDown = lCamera.YAxis.Dot(Vector.ZAxis) < 0;
               lCamera.Rotate(0.01 * (lNewMousePoint.X - mLastMouseDown.X), lCameraIsUpsideDown ? Vector.ZAxis : -Vector.ZAxis);
               lCamera.Rotate(0.01 * (lNewMousePoint.Y - mLastMouseDown.Y), lCamera.XAxis);
               break;
@@ -169,15 +177,16 @@ namespace MMEd.Viewers
         {
           if (lCamera.ProjectionMode == eProjectionMode.Orthographic)
           {
-            lCamera.Move(-0.1 * MoveScale * (lNewMousePoint.X - mLastMouseDown.X) * lCamera.XAxis);
-            lCamera.Move(0.1 * MoveScale * (lNewMousePoint.Y - mLastMouseDown.Y) * lCamera.YAxis);
+            double lScale = (lCamera.Position.GetPositionVector() * lCamera.ZAxis) / lSender.Width;
+            lCamera.Move(-lScale * (lNewMousePoint.X - mLastMouseDown.X) * lCamera.XAxis);
+            lCamera.Move(lScale * (lNewMousePoint.Y - mLastMouseDown.Y) * lCamera.YAxis);
           }
           else
           {
             if (lCamera.ProjectionMode == eProjectionMode.Perspective && MovementMode == eMovementMode.FlyMode)
             {
-              lCamera.Move(-0.1 * MoveScale * (lNewMousePoint.X - mLastMouseDown.X) * lCamera.XAxis);
-              lCamera.Move(-0.1 * MoveScale * (lNewMousePoint.Y - mLastMouseDown.Y) * lCamera.YAxis);
+              lCamera.Move(0.1 * MoveScale * (lNewMousePoint.X - mLastMouseDown.X) * lCamera.XAxis);
+              lCamera.Move(0.1 * MoveScale * (lNewMousePoint.Y - mLastMouseDown.Y) * lCamera.YAxis);
             }
           }
         }
@@ -221,12 +230,6 @@ namespace MMEd.Viewers
 
     void MainForm_KeyDown(object sender, KeyEventArgs e)
     {
-      FlatChunk.ObjectEntry lObject = ActiveObject as FlatChunk.ObjectEntry;
-      if (lObject == null)
-      {
-        return;
-      }
-
       if (mActiveSurface == null)
       {
         return;
@@ -234,39 +237,93 @@ namespace MMEd.Viewers
 
       Camera lCamera = mViews[mActiveSurface].Camera;
 
-      Vector lDelta;
-      switch (e.KeyCode)
+      if (lCamera.ProjectionMode != eProjectionMode.Orthographic)
       {
-        case Keys.Up:
-          lDelta = lCamera.YAxis;
-          break;
+        return;
+      }
 
-        case Keys.Down:
-          lDelta = -lCamera.YAxis;
-          break;
-
-        case Keys.Right:
-          lDelta = lCamera.XAxis;
-          break;
-
-        case Keys.Left:
-          lDelta = -lCamera.XAxis;
-          break;
-
-        default:
+      if (Control.ModifierKeys == Keys.Shift)
+      {
+        IRotatable lObject = ActiveObject as IRotatable;
+        if (lObject == null)
+        {
           return;
-      }
+        }
 
-      if (Control.ModifierKeys != Keys.Control)
+        double lDelta;
+        switch (e.KeyCode)
+        {
+          case Keys.Up:
+            lDelta = 0.1;
+            break;
+
+          case Keys.Down:
+            lDelta = -0.1;
+            break;
+
+          case Keys.Right:
+            lDelta = 0.1;
+            break;
+
+          case Keys.Left:
+            lDelta = -0.1;
+            break;
+
+          default:
+            return;
+        }
+
+        if (Control.ModifierKeys != Keys.Control)
+        {
+          lDelta /= 5;
+        }
+
+        lObject.RotationVector = lObject.RotationVector.ToRotationMatrix() * Matrix.Rotation(lDelta, lCamera.ZAxis);
+        RebuildObject(lObject);
+        InvalidateAllViewers();
+      }
+      else
       {
-        lDelta *= 5;
+        IPositionable lObject = ActiveObject as IPositionable;
+        if (lObject == null)
+        {
+          return;
+        }
+
+        Vector lDelta;
+        switch (e.KeyCode)
+        {
+          case Keys.Up:
+            lDelta = lCamera.YAxis;
+            break;
+
+          case Keys.Down:
+            lDelta = -lCamera.YAxis;
+            break;
+
+          case Keys.Right:
+            lDelta = lCamera.XAxis;
+            break;
+
+          case Keys.Left:
+            lDelta = -lCamera.XAxis;
+            break;
+
+          default:
+            return;
+        }
+
+        if (Control.ModifierKeys != Keys.Control)
+        {
+          lDelta *= 5;
+        }
+
+        lObject.OriginPosition.X += (short)(lDelta.x);
+        lObject.OriginPosition.Y += (short)(lDelta.y);
+        lObject.OriginPosition.Z -= (short)(lDelta.z);
       }
 
-      lObject.OriginPosition.X += (short)(lDelta.x);
-      lObject.OriginPosition.Y += (short)(lDelta.y);
-      lObject.OriginPosition.Z -= (short)(lDelta.z);
-
-      RebuildObject(lObject);
+      RebuildObject(ActiveObject);
       InvalidateAllViewers();
     }
 
@@ -381,13 +438,22 @@ namespace MMEd.Viewers
         mScene.AddRange(mSubject.GetEntities(mMainForm.Level, TextureMode, SelectedMetadata));
     }
 
-    private void RebuildObject(FlatChunk.ObjectEntry xiObject)
+    private void RebuildObject(object xiObject)
     {
       if (mSubject is Level)
       {
-        mScene.RemoveMMEdObject(xiObject);
-        mScene.AddObject(xiObject.GetEntity(mSubject as Level, TextureMode, SelectedMetadata));
-        UpdateActiveObjectStatus(xiObject);
+        if (xiObject is FlatChunk.ObjectEntry)
+        {
+          mScene.RemoveMMEdObject(xiObject);
+          mScene.AddObject(((FlatChunk.ObjectEntry)xiObject).GetEntity(mSubject as Level, TextureMode, SelectedMetadata));
+          UpdateActiveObjectStatus(xiObject);
+        }
+        else if (xiObject is FlatChunk)
+        {
+          //qq improve the efficiency of this
+          RebuildScene();
+          UpdateActiveObjectStatus(xiObject);
+        }
       }
     }
 

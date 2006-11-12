@@ -243,7 +243,7 @@ namespace GLTK
          
           case eProjectionMode.Orthographic:
             double lSize = xiCamera.Position.GetPositionVector() * xiCamera.ZAxis;
-            double lRatio = (double)lViewPort[2] / (double)lViewPort[3];
+            double lRatio = (double)lViewPort[3] / (double)lViewPort[2];
             Gl.glOrtho(
               -lSize / 2,
               lSize / 2,
