@@ -11,6 +11,11 @@ namespace MMEd.Viewers
   {
     public OwnedMesh() { }
     public OwnedMesh(object xiOwner) { this.mOwner = xiOwner; }
+    public OwnedMesh(object xiOwner, PolygonMode xiMode) 
+      : base(xiMode) 
+    { 
+      this.mOwner = xiOwner; 
+    }
     private object mOwner;
     public object Owner
     {

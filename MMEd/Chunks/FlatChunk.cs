@@ -671,16 +671,12 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
       {
         for (int y = 0; y < Height; y++)
         {
-          Mesh lSquare = new OwnedMesh(this);
-          lSquare.AddFace(
-          new Vertex(new Point(x, y, -GetTerrainHeightSafe(x, y)), 0, 0),
-          new Vertex(new Point(x + 1, y, -GetTerrainHeightSafe(x+1, y)), 1, 0),
-          new Vertex(new Point(x + 1, y + 1, -GetTerrainHeightSafe(x+1, y+1)), 1, 1));
-
+          Mesh lSquare = new OwnedMesh(this, PolygonMode.Quads);
           lSquare.AddFace(
             new Vertex(new Point(x, y, -GetTerrainHeightSafe(x, y)), 0, 0),
+            new Vertex(new Point(x + 1, y, -GetTerrainHeightSafe(x + 1, y)), 1, 0),
             new Vertex(new Point(x + 1, y + 1, -GetTerrainHeightSafe(x + 1, y + 1)), 1, 1),
-            new Vertex(new Point(x, y + 1, -GetTerrainHeightSafe(x, y+1)), 0, 1));
+            new Vertex(new Point(x, y + 1, -GetTerrainHeightSafe(x, y + 1)), 0, 1));
 
           if (this.TreeNode.Checked) //(inactive)
           {
