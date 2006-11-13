@@ -380,8 +380,12 @@ namespace MMEd.Viewers
 
       if (xiChunk == null)
       {
-        // the view has switched to another tab - reset the tree
-        mMainForm.ChunkTreeView.CheckBoxes = false;
+        if (mMainForm.ViewerTabControl.SelectedTab == null
+          || !(mMainForm.ViewerTabControl.SelectedTab.Tag is ThreeDeeViewer))
+        {
+          // the view has switched to another tab - reset the tree
+          mMainForm.ChunkTreeView.CheckBoxes = false;
+        }
         return;
       }
 

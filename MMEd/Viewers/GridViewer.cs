@@ -7,6 +7,8 @@ using MMEd.Chunks;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
+using GLTK;
+using Point = System.Drawing.Point;
 
 // Views and edits the 2D data in the Flats
 
@@ -132,8 +134,101 @@ namespace MMEd.Viewers
       //draw objects?
       if (ShowObjects)
       {
-        mSubject.GetEntities(mMainForm.Level, MMEd.Viewers.ThreeDee.eTextureMode.WireFrame, eTexMetaDataEntries.Zero);
-        //qq:rtb TODO
+        if (mWireFrameCache == null)
+        {
+          mWireFrameCache = new List<ColoredPolygon>();
+
+          IEnumerable<Entity> lScene
+            = mSubject.GetEntities(mMainForm.Level, MMEd.Viewers.ThreeDee.eTextureMode.WireFrame, eTexMetaDataEntries.Zero);
+
+          //find the entity correspoding to mSubject
+          Entity lSubjectsEntity = null;
+          foreach (Entity ent in lScene)
+          {
+            if (ent is MMEdEntity && ((MMEdEntity)ent).Owner == mSubject)
+            {
+              lSubjectsEntity = ent;
+              break;
+            }
+          }
+
+          //the subject should always have an entity:
+          if (lSubjectsEntity == null) throw new Exception("The selected subject is non-null, but it has no corresponding entity in the scene");
+
+          //there are four co-ord systems at play:
+          // 1) World coords (i.e. level coords). This is the coo-ords the entities will be in
+          // 2) Simple Flat coords. This is the coord space the Flat was created in, in which
+          //    the tex squares are at integer coords from (0,0) to (mSubject.Width, mSubject.Height)
+          // 3) Flat coords. This is the simple flat coords scaled up by (mSubject.ScaleX, mSubject.ScaleY)
+          //    These are the coords which appear on the status bar as "Flat Coord"
+          // 4) Paint coords. This is the coord space the flat is painted onto the gird in, in which
+          //    the tex squares are at integer coords from (0,0) 
+          //    to (mSubject.Width+*mSubjectTileWidth, mSubject.Height*mSubjectTileHeight)
+          //
+          // The objects are defined in World coords (1), and the GLTK display matrix for the flat is (2) -> (1)
+          // So we can go from (1) -> (2) -> (4) without needing to bother with (3)
+
+          Matrix lMapWorldCoordsToSimpleFlatCoords = lSubjectsEntity.Transform.Inverse();
+
+          Matrix lMapWorldCoordsToPaintCoords = lMapWorldCoordsToSimpleFlatCoords
+            * Matrix.ScalingMatrix(mSubjectTileWidth, mSubjectTileHeight, 1);
+
+          //iterate over the objects in the scene, and transform them into Flat co-ords
+          //then draw the faces in wireframe
+          foreach (Entity ent in lScene)
+          {
+            if (ent is MMEdEntity && ((MMEdEntity)ent).Owner is FlatChunk.ObjectEntry)
+            {
+              foreach (Mesh m in ent.Meshes)
+              {
+                for (int lFaceStart = 0; lFaceStart < m.Vertices.Count; lFaceStart += (int)m.PolygonMode)
+                {
+                  Point[] lPointBuff = new Point[(int)m.PolygonMode];
+
+                  for (int v = 0; v < (int)m.PolygonMode; v++)
+                  {
+                    GLTK.Point lVertexInWorldCoords = m.Vertices[lFaceStart + v].Position
+                      * ent.Transform;
+
+                    GLTK.Point lVertexInPaintCoords = lVertexInWorldCoords
+                      * lMapWorldCoordsToPaintCoords;
+
+                    lPointBuff[v] = new Point((int)lVertexInPaintCoords.x, (int)lVertexInPaintCoords.y);
+                  }
+
+                  //don't bother blending the colours, just pick the colour from 
+                  // the first vertex
+                  mWireFrameCache.Add(new ColoredPolygon(
+                    m.Vertices[lFaceStart].Color,
+                    lPointBuff));
+                }
+              }
+            }
+          }
+        } //end filling mWireframeCache
+
+        //can't the Graphics object do its own bloody clipping?
+        //it seems to be much faster to do it myself!
+        RectangleF clipF = e.Graphics.ClipBounds;
+        Rectangle clip = new Rectangle(
+          (int)Math.Floor(clipF.Left),
+          (int)Math.Floor(clipF.Top),
+          (int)Math.Ceiling(clipF.Right - clipF.Left),
+          (int)Math.Ceiling(clipF.Bottom - clipF.Top));
+
+        foreach (ColoredPolygon p in mWireFrameCache)
+        {
+          foreach (Point pt in p.Vertices)
+          {
+            if (clip.Contains(pt))
+            {
+              e.Graphics.DrawPolygon(
+                new Pen(p.Color),
+                p.Vertices);
+              break; //i.e. continue outer
+            }
+          }
+        }
       }
 
       //highlight editable square
@@ -169,6 +264,22 @@ namespace MMEd.Viewers
             lHighlightRect);
       }
     }
+
+    private class ColoredPolygon
+    {
+      public Color Color;
+      public Point[] Vertices;
+
+      public ColoredPolygon(Color xiColor, Point[] xiVertices)
+      {
+        Color = xiColor;
+        Vertices = xiVertices;
+      }
+    }
+
+    // a precomputed cache of the objects in the whole level, as coloured polys
+    // in the paint co-ords of the grid view
+    private List<ColoredPolygon> mWireFrameCache = null;
 
     private void TransparencyLevelChange(object xiSender, EventArgs xiArgs)
     {
@@ -230,6 +341,8 @@ namespace MMEd.Viewers
       if (!(xiChunk is FlatChunk)) xiChunk = null;
       if (mSubject == xiChunk) return;
       mSubject = (FlatChunk)xiChunk;
+
+      mWireFrameCache = null;
 
       if (xiChunk == null)
       {

@@ -35,6 +35,16 @@ namespace GLTK
         0, 0, 0, 1);
     }
 
+    //qq:AIT please check name is OK?
+    public static Matrix ScalingMatrix(double x, double y, double z)
+    {
+      return new Matrix(
+        x, 0, 0, 0,
+        0, y, 0, 0,
+        0, 0, z, 0,
+        0, 0, 0, 1);
+    }
+
     public Matrix(double aa, double ab, double ac, double ad,
         double ba, double bb, double bc, double bd,
         double ca, double cb, double cc, double cd,
@@ -228,6 +238,15 @@ namespace GLTK
         xiMatrix[0, 0] * xiPoint[0] + xiMatrix[0, 1] * xiPoint[1] + xiMatrix[0, 2] * xiPoint[2] + xiMatrix[0, 3],
         xiMatrix[1, 0] * xiPoint[0] + xiMatrix[1, 1] * xiPoint[1] + xiMatrix[1, 2] * xiPoint[2] + xiMatrix[1, 3],
         xiMatrix[2, 0] * xiPoint[0] + xiMatrix[2, 1] * xiPoint[1] + xiMatrix[2, 2] * xiPoint[2] + xiMatrix[2, 3]);
+    }
+
+    // (equivalent to (xiMatrix.Transpose() * xiPoint))
+    public static Point operator *(Point xiPoint, Matrix xiMatrix)
+    {
+      return new Point(
+        xiMatrix[0, 0] * xiPoint[0] + xiMatrix[1, 0] * xiPoint[1] + xiMatrix[2, 0] * xiPoint[2] + xiMatrix[3, 0],
+        xiMatrix[0, 1] * xiPoint[0] + xiMatrix[1, 1] * xiPoint[1] + xiMatrix[2, 1] * xiPoint[2] + xiMatrix[3, 1],
+        xiMatrix[0, 2] * xiPoint[0] + xiMatrix[1, 2] * xiPoint[1] + xiMatrix[2, 2] * xiPoint[2] + xiMatrix[3, 2]);
     }
 
     private double subDet(int k, int l)

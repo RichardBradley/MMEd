@@ -260,7 +260,11 @@ namespace MMEd.Viewers
       }
       else
       {
-        mMainForm.ChunkTreeView.CheckBoxes = false;
+        if (mMainForm.ViewerTabControl.SelectedTab == null
+          || !(mMainForm.ViewerTabControl.SelectedTab.Tag is ThreeDeeEditor))
+        {
+          mMainForm.ChunkTreeView.CheckBoxes = false;
+        }
       }
       mMainForm.Viewer3DRenderingSurface.Cursor = prevCursor;
 

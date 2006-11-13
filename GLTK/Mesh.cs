@@ -13,11 +13,13 @@ namespace GLTK
     Textured = 4
   }
 
+  // the values of the entries in this enumeration should
+  // be the vertex count of the faces
   public enum PolygonMode
   {
-    Triangles,
-    Lines,
-    Quads
+    Triangles = 3,
+    Lines = 2,
+    Quads = 4
   }
 
   public class Mesh
