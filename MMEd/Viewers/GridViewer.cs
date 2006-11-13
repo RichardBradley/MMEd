@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
 
+// Views and edits the 2D data in the Flats
 
 namespace MMEd.Viewers
 {
@@ -22,6 +23,7 @@ namespace MMEd.Viewers
 
       new PropertyController(this, "SelectedMeta").BindTo(mMainForm.GridViewMetaTypeCombo);
       new PropertyController(this, "ViewMode").BindTo(mMainForm.GridViewViewModeCombo);
+      new PropertyController(this, "ShowObjects").BindTo(mMainForm.GridViewShowObjectsCheck);
 
       mMainForm.ViewerTabControl.KeyPress += new KeyPressEventHandler(this.ViewerTabControl_KeyPress);
 
@@ -125,6 +127,13 @@ namespace MMEd.Viewers
             Console.Error.WriteLine(err);
           }
         }
+      }
+
+      //draw objects?
+      if (ShowObjects)
+      {
+        mSubject.GetEntities(mMainForm.Level, MMEd.Viewers.ThreeDee.eTextureMode.WireFrame, eTexMetaDataEntries.Zero);
+        //qq:rtb TODO
       }
 
       //highlight editable square
@@ -695,13 +704,30 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
     {
       get { return mSelectedMeta; }
       set
-      {
+      {        
         mSelectedMeta = value;
         if (OnSelectedMetaChanged != null) OnSelectedMetaChanged(this, null);
         InvalidateGridDisplay();
       }
     }
     public event EventHandler OnSelectedMetaChanged;
+
+    #endregion
+
+    #region ShowObjects property
+
+    private bool mShowObjects = false;
+    public bool ShowObjects
+    {
+      get { return mShowObjects; }
+      set
+      {
+        mShowObjects = value;
+        if (OnShowObjectsChanged != null) OnShowObjectsChanged(this, null);
+        InvalidateGridDisplay();
+      }
+    }
+    public event EventHandler OnShowObjectsChanged;
 
     #endregion
 

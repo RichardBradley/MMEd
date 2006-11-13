@@ -431,17 +431,6 @@ namespace GLTK
           throw new Exception("No rendering contexts exist");
         }
 
-        //qq disabled because:
-        // 1) the Flat textures were upside down
-        // 2) this function modifies the bitmap which is it passed, which
-        //    is bad and unexpected
-        // I don't know if (1) is inherent in GL (i.e. if this change is correct)
-        // or if it's because the z-axis is inverted in the levels (i.e. this change
-        // is incorrect)
-        // (2) needs to be fixed if the change to fix (1) is reverted.
-        //
-        //xiTexture.RotateFlip(RotateFlipType.RotateNoneFlipY);
-        //
         Rectangle rectangle = new Rectangle(0, 0, xiTexture.Width, xiTexture.Height);
         BitmapData lData = xiTexture.LockBits(
           new Rectangle(0, 0, xiTexture.Width, xiTexture.Height),

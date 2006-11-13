@@ -38,12 +38,16 @@ namespace MMEd
           this.ChunkTreeView = new System.Windows.Forms.TreeView();
           this.ViewerTabControl = new System.Windows.Forms.TabControl();
           this.ViewTabActions = new System.Windows.Forms.TabPage();
+          this.label1 = new System.Windows.Forms.Label();
+          this.ActionsTabReindexBumpButton = new System.Windows.Forms.Button();
+          this.label9 = new System.Windows.Forms.Label();
+          this.ActionsTabCloneFlatButton = new System.Windows.Forms.Button();
           this.ViewTabXML = new System.Windows.Forms.TabPage();
           this.XMLViewerCommitBtn = new System.Windows.Forms.Button();
           this.XMLTextBox = new System.Windows.Forms.TextBox();
           this.ViewTabFlat = new System.Windows.Forms.TabPage();
           this.FlatViewerCommitBtn = new System.Windows.Forms.Button();
-          this.FlatPanel = new Util.FlatEditorPanel();
+          this.FlatPanel = new MMEd.Util.FlatEditorPanel();
           this.ViewTabImg = new System.Windows.Forms.TabPage();
           this.ImgPictureBox = new System.Windows.Forms.PictureBox();
           this.ViewTabGrid = new System.Windows.Forms.TabPage();
@@ -94,10 +98,7 @@ namespace MMEd
           this.Viewer3DRenderingSurfaceTopRight = new GLTK.RenderingSurface();
           this.Viewer3DRenderingSurfaceBottomRight = new GLTK.RenderingSurface();
           this.ToolTip = new System.Windows.Forms.ToolTip(this.components);
-          this.ActionsTabReindexBumpButton = new System.Windows.Forms.Button();
-          this.label1 = new System.Windows.Forms.Label();
-          this.ActionsTabCloneFlatButton = new System.Windows.Forms.Button();
-          this.label9 = new System.Windows.Forms.Label();
+          this.GridViewShowObjectsCheck = new System.Windows.Forms.CheckBox();
           this.mMenuStrip.SuspendLayout();
           this.MainSplitter.Panel1.SuspendLayout();
           this.MainSplitter.Panel2.SuspendLayout();
@@ -240,6 +241,44 @@ namespace MMEd
           this.ViewTabActions.Text = "Actions";
           this.ViewTabActions.UseVisualStyleBackColor = true;
           // 
+          // label1
+          // 
+          this.label1.AutoSize = true;
+          this.label1.Location = new System.Drawing.Point(163, 16);
+          this.label1.Name = "label1";
+          this.label1.Size = new System.Drawing.Size(300, 39);
+          this.label1.TabIndex = 1;
+          this.label1.Text = "Coalesce repeated bump map images, and update references \r\nto the removed bump im" +
+              "ages from any Flats which use them.\r\nPlease select the top node in the file tree" +
+              " before doing this.";
+          // 
+          // ActionsTabReindexBumpButton
+          // 
+          this.ActionsTabReindexBumpButton.Location = new System.Drawing.Point(15, 16);
+          this.ActionsTabReindexBumpButton.Name = "ActionsTabReindexBumpButton";
+          this.ActionsTabReindexBumpButton.Size = new System.Drawing.Size(142, 23);
+          this.ActionsTabReindexBumpButton.TabIndex = 0;
+          this.ActionsTabReindexBumpButton.Text = "Re-index bump map";
+          this.ActionsTabReindexBumpButton.UseVisualStyleBackColor = true;
+          // 
+          // label9
+          // 
+          this.label9.AutoSize = true;
+          this.label9.Location = new System.Drawing.Point(163, 80);
+          this.label9.Name = "label9";
+          this.label9.Size = new System.Drawing.Size(209, 13);
+          this.label9.TabIndex = 3;
+          this.label9.Text = "Clone the selected Flat and all its contents.";
+          // 
+          // ActionsTabCloneFlatButton
+          // 
+          this.ActionsTabCloneFlatButton.Location = new System.Drawing.Point(15, 80);
+          this.ActionsTabCloneFlatButton.Name = "ActionsTabCloneFlatButton";
+          this.ActionsTabCloneFlatButton.Size = new System.Drawing.Size(142, 23);
+          this.ActionsTabCloneFlatButton.TabIndex = 2;
+          this.ActionsTabCloneFlatButton.Text = "Clone flat";
+          this.ActionsTabCloneFlatButton.UseVisualStyleBackColor = true;
+          // 
           // ViewTabXML
           // 
           this.ViewTabXML.Controls.Add(this.XMLViewerCommitBtn);
@@ -305,11 +344,11 @@ namespace MMEd
           this.FlatPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                       | System.Windows.Forms.AnchorStyles.Left)
                       | System.Windows.Forms.AnchorStyles.Right)));
+          this.FlatPanel.AutoScroll = true;
           this.FlatPanel.Location = new System.Drawing.Point(0, 0);
           this.FlatPanel.Name = "FlatPanel";
           this.FlatPanel.Size = new System.Drawing.Size(637, 471);
           this.FlatPanel.TabIndex = 0;
-          this.FlatPanel.AutoScroll = true;
           // 
           // ViewTabImg
           // 
@@ -354,9 +393,9 @@ namespace MMEd
           this.GridViewSelImageGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                       | System.Windows.Forms.AnchorStyles.Right)));
           this.GridViewSelImageGroupBox.Controls.Add(this.GridViewSelPanelHolder);
-          this.GridViewSelImageGroupBox.Location = new System.Drawing.Point(504, 121);
+          this.GridViewSelImageGroupBox.Location = new System.Drawing.Point(504, 153);
           this.GridViewSelImageGroupBox.Name = "GridViewSelImageGroupBox";
-          this.GridViewSelImageGroupBox.Size = new System.Drawing.Size(133, 249);
+          this.GridViewSelImageGroupBox.Size = new System.Drawing.Size(133, 217);
           this.GridViewSelImageGroupBox.TabIndex = 4;
           this.GridViewSelImageGroupBox.TabStop = false;
           this.GridViewSelImageGroupBox.Text = "Selected Images";
@@ -370,7 +409,7 @@ namespace MMEd
           this.GridViewSelPanelHolder.Controls.Add(this.GridViewSelPanel);
           this.GridViewSelPanelHolder.Location = new System.Drawing.Point(6, 19);
           this.GridViewSelPanelHolder.Name = "GridViewSelPanelHolder";
-          this.GridViewSelPanelHolder.Size = new System.Drawing.Size(121, 224);
+          this.GridViewSelPanelHolder.Size = new System.Drawing.Size(121, 192);
           this.GridViewSelPanelHolder.TabIndex = 0;
           // 
           // GridViewSelPanel
@@ -509,12 +548,13 @@ namespace MMEd
           // groupBox1
           // 
           this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+          this.groupBox1.Controls.Add(this.GridViewShowObjectsCheck);
           this.groupBox1.Controls.Add(this.GridViewTransparencySlider);
           this.groupBox1.Controls.Add(this.GridViewViewModeCombo);
           this.groupBox1.Controls.Add(this.GridViewMetaTypeCombo);
           this.groupBox1.Location = new System.Drawing.Point(504, 0);
           this.groupBox1.Name = "groupBox1";
-          this.groupBox1.Size = new System.Drawing.Size(133, 118);
+          this.groupBox1.Size = new System.Drawing.Size(133, 147);
           this.groupBox1.TabIndex = 0;
           this.groupBox1.TabStop = false;
           this.groupBox1.Text = "View Options";
@@ -523,7 +563,7 @@ namespace MMEd
           // 
           this.GridViewTransparencySlider.Location = new System.Drawing.Point(5, 73);
           this.GridViewTransparencySlider.Name = "GridViewTransparencySlider";
-          this.GridViewTransparencySlider.Size = new System.Drawing.Size(122, 42);
+          this.GridViewTransparencySlider.Size = new System.Drawing.Size(122, 45);
           this.GridViewTransparencySlider.TabIndex = 4;
           this.ToolTip.SetToolTip(this.GridViewTransparencySlider, "Set the transparency level for overlaid textures (bump, odd)");
           this.GridViewTransparencySlider.Value = 5;
@@ -840,43 +880,15 @@ namespace MMEd
           this.Viewer3DRenderingSurfaceBottomRight.TabIndex = 0;
           this.Viewer3DRenderingSurfaceBottomRight.Text = "renderingSurface4";
           // 
-          // ActionsTabReindexBumpButton
+          // GridViewShowObjectsCheck
           // 
-          this.ActionsTabReindexBumpButton.Location = new System.Drawing.Point(15, 16);
-          this.ActionsTabReindexBumpButton.Name = "ActionsTabReindexBumpButton";
-          this.ActionsTabReindexBumpButton.Size = new System.Drawing.Size(142, 23);
-          this.ActionsTabReindexBumpButton.TabIndex = 0;
-          this.ActionsTabReindexBumpButton.Text = "Re-index bump map";
-          this.ActionsTabReindexBumpButton.UseVisualStyleBackColor = true;
-          // 
-          // label1
-          // 
-          this.label1.AutoSize = true;
-          this.label1.Location = new System.Drawing.Point(163, 16);
-          this.label1.Name = "label1";
-          this.label1.Size = new System.Drawing.Size(300, 39);
-          this.label1.TabIndex = 1;
-          this.label1.Text = "Coalesce repeated bump map images, and update references \r\nto the removed bump im" +
-              "ages from any Flats which use them.\r\nPlease select the top node in the file tree" +
-              " before doing this.";
-          // 
-          // ActionsTabCloneFlatButton
-          // 
-          this.ActionsTabCloneFlatButton.Location = new System.Drawing.Point(15, 80);
-          this.ActionsTabCloneFlatButton.Name = "ActionsTabCloneFlatButton";
-          this.ActionsTabCloneFlatButton.Size = new System.Drawing.Size(142, 23);
-          this.ActionsTabCloneFlatButton.TabIndex = 2;
-          this.ActionsTabCloneFlatButton.Text = "Clone flat";
-          this.ActionsTabCloneFlatButton.UseVisualStyleBackColor = true;
-          // 
-          // label9
-          // 
-          this.label9.AutoSize = true;
-          this.label9.Location = new System.Drawing.Point(163, 80);
-          this.label9.Name = "label9";
-          this.label9.Size = new System.Drawing.Size(300, 39);
-          this.label9.TabIndex = 3;
-          this.label9.Text = "Clone the selected Flat and all its contents.";
+          this.GridViewShowObjectsCheck.AutoSize = true;
+          this.GridViewShowObjectsCheck.Location = new System.Drawing.Point(5, 124);
+          this.GridViewShowObjectsCheck.Name = "GridViewShowObjectsCheck";
+          this.GridViewShowObjectsCheck.Size = new System.Drawing.Size(90, 17);
+          this.GridViewShowObjectsCheck.TabIndex = 5;
+          this.GridViewShowObjectsCheck.Text = "Show objects";
+          this.GridViewShowObjectsCheck.UseVisualStyleBackColor = true;
           // 
           // MainForm
           // 
@@ -899,7 +911,6 @@ namespace MMEd
           this.ViewTabXML.ResumeLayout(false);
           this.ViewTabXML.PerformLayout();
           this.ViewTabFlat.ResumeLayout(false);
-          this.ViewTabFlat.PerformLayout();
           this.ViewTabImg.ResumeLayout(false);
           this.ViewTabImg.PerformLayout();
           ((System.ComponentModel.ISupportInitialize)(this.ImgPictureBox)).EndInit();
@@ -1013,6 +1024,7 @@ namespace MMEd
       private System.Windows.Forms.Label label9;
       public System.Windows.Forms.Button ActionsTabCloneFlatButton;
       public System.Windows.Forms.TabPage ViewTabActions;
+      public System.Windows.Forms.CheckBox GridViewShowObjectsCheck;
     }
 }
 

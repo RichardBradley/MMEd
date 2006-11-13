@@ -43,13 +43,19 @@ namespace MMEd.Chunks
     }
 
     Bitmap mBitmapCache;
+
     public Image ToImage()
     {
-        if (mBitmapCache == null)
-        {
-            mBitmapCache = ToBitmapUncached();
-        }
-        return mBitmapCache;
+      return ToBitmap();
+    }
+
+    public Bitmap ToBitmap()
+    {
+      if (mBitmapCache == null)
+      {
+        mBitmapCache = ToBitmapUncached();
+      }
+      return mBitmapCache;
     }
 
     public Bitmap ToBitmapUncached()

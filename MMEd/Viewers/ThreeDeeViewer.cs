@@ -362,11 +362,6 @@ namespace MMEd.Viewers
       get { return mTextureMode; }
       set
       {
-        if (value == eTextureMode.BumpmapTextures)
-        {
-          MessageBox.Show("Not implemented yet");
-          return;
-        }
         mTextureMode = value;
         if (OnTextureModeChanged != null) OnTextureModeChanged(this, null);
         RebuildScene();

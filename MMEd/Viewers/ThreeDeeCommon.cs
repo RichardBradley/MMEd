@@ -31,7 +31,8 @@ namespace MMEd.Viewers.ThreeDee
   {
     NormalTextures,
     NormalTexturesWithMetadata,
-    BumpmapTextures
+    BumpmapTextures,
+    WireFrame
   }
 
   //indicates that an object can provide an enumeration of GLTK.Entity objects

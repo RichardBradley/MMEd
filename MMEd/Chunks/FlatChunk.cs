@@ -641,7 +641,7 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
 
     public IEnumerable<GLTK.Entity> GetEntities(Level xiLevel, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata)
     {
-      //qq hack:
+      //a bit hacky:
       if (this.TreeNode.Checked)
       {
         return new Entity[0];
@@ -678,66 +678,87 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
             new Vertex(new Point(x + 1, y + 1, -GetTerrainHeightSafe(x + 1, y + 1)), 1, 1),
             new Vertex(new Point(x, y + 1, -GetTerrainHeightSafe(x, y + 1)), 0, 1));
 
-          if (this.TreeNode.Checked) //(inactive)
+          switch (xiTextureMode)
           {
-            lSquare.RenderMode = RenderMode.Wireframe;
-          }
-          else
-          {
-            TIMChunk lTIM = xiLevel.GetTileById(TextureIds[x][y]);
+            case eTextureMode.WireFrame:
+              lSquare.RenderMode = RenderMode.Wireframe;
+              break;
 
-            if (lTIM != null)
-            {
-              //some TIMs can't be loaded yet: they're null
-              Bitmap lTexture = lTIM.ToBitmap();
-              if (xiTextureMode == eTextureMode.NormalTexturesWithMetadata
-                  && TexMetaData != null)
+            // normal textures, optionally with metadata drawn on
+            case eTextureMode.NormalTextures:
+            case eTextureMode.NormalTexturesWithMetadata:
+              TIMChunk lTIM = xiLevel.GetTileById(TextureIds[x][y]);
+
+              if (lTIM != null)
               {
-                byte lVal = TexMetaData[x][y][(int)xiSelectedMetadata];
-
-                if (lVal != 0)
+                //some TIMs can't be loaded yet: they're null
+                Bitmap lTexture = lTIM.ToBitmap();
+                if (xiTextureMode == eTextureMode.NormalTexturesWithMetadata
+                    && TexMetaData != null)
                 {
-                  lTexture = new Bitmap(lTexture); //should make it non-indexed, too                  
+                  byte lVal = TexMetaData[x][y][(int)xiSelectedMetadata];
 
-                  Graphics g = Graphics.FromImage(lTexture);
-
-                  string lText = string.Format("{0:x}", lVal);
-
-                  SizeF size = g.MeasureString(lText, lNumberFont);
-
-                  float xf = lTexture.Width / 2.0f - size.Width / 2.0f;
-                  float yf = lTexture.Height / 2.0f - size.Height / 2.0f;
-
-                  g.FillRectangle(lNumberBGBrush, xf, yf, size.Width, size.Height);
-
-                  g.DrawString(
-                      lText,
-                      lNumberFont,
-                      lNumberFGBrush,
-                      xf,
-                      yf);
-
-                  if (xiSelectedMetadata == eTexMetaDataEntries.Waypoint)
+                  if (lVal != 0)
                   {
-                    Pen lPen = xiLevel.WaypointIsKeyWaypoint(lVal)
-                        ? lKeyWaypointPen
-                        : lWaypointPen;
+                    // we create a new bitmap based on the given texture
+                    // a) so that we can modify it freely
+                    // and b) to change it from indexed to full colour mode, to allow us 
+                    // to draw on it (otherwise we'll get an exception)
+                    lTexture = new Bitmap(lTexture);
 
-                    g.DrawRectangle(
-                        lPen,
-                        0, 0, lTexture.Width - 1, lTexture.Height - 1);
+                    Graphics g = Graphics.FromImage(lTexture);
 
+                    string lText = string.Format("{0:x}", lVal);
+
+                    SizeF size = g.MeasureString(lText, lNumberFont);
+
+                    float xf = lTexture.Width / 2.0f - size.Width / 2.0f;
+                    float yf = lTexture.Height / 2.0f - size.Height / 2.0f;
+
+                    g.FillRectangle(lNumberBGBrush, xf, yf, size.Width, size.Height);
+
+                    g.DrawString(
+                        lText,
+                        lNumberFont,
+                        lNumberFGBrush,
+                        xf,
+                        yf);
+
+                    if (xiSelectedMetadata == eTexMetaDataEntries.Waypoint)
+                    {
+                      Pen lPen = xiLevel.WaypointIsKeyWaypoint(lVal)
+                          ? lKeyWaypointPen
+                          : lWaypointPen;
+
+                      g.DrawRectangle(
+                          lPen,
+                          0, 0, lTexture.Width - 1, lTexture.Height - 1);
+
+                    }
                   }
                 }
-              }
-              else if (xiTextureMode == eTextureMode.BumpmapTextures)
-              {
-                throw new Exception("TODO");
-              }
 
-              lSquare.Texture = AbstractRenderer.ImageToTextureId(lTexture);
-            }
-          }
+                lSquare.Texture = AbstractRenderer.ImageToTextureId(lTexture);
+              }
+              break;
+
+            //draw the bumpmap textures on:
+            case eTextureMode.BumpmapTextures:
+              if (TexMetaData != null)
+              {
+                BumpImageChunk lBIC = xiLevel.GetBumpById(TexMetaData[x][y][(int)eTexMetaDataEntries.Bumpmap]);
+
+                if (lBIC != null)
+                {
+                  Bitmap lTexture = lBIC.ToBitmap();
+                  lSquare.Texture = AbstractRenderer.ImageToTextureId(lTexture);
+                }
+              }
+              break;
+
+            default: throw new Exception("Unexpected case");
+
+          } //end switch
 
           lSurface.Meshes.Add(lSquare);
         }

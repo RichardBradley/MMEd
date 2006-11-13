@@ -376,6 +376,8 @@ namespace MMEd.Viewers
 
     public override void SetSubject(Chunk xiChunk)
     {
+      mOptionsMenu.Visible = (mSubject != null);
+
       if (xiChunk == null)
       {
         // the view has switched to another tab - reset the tree
@@ -390,7 +392,6 @@ namespace MMEd.Viewers
         ResetCamera();
       }
 
-      mOptionsMenu.Visible = (mSubject != null);
       mMainForm.ChunkTreeView.CheckBoxes = (mSubject != null);
 
       ActiveObject = xiChunk;
@@ -504,11 +505,6 @@ namespace MMEd.Viewers
       get { return mTextureMode; }
       set
       {
-        if (value == eTextureMode.BumpmapTextures)
-        {
-          MessageBox.Show("Not implemented yet");
-          return;
-        }
         mTextureMode = value;
         if (OnTextureModeChanged != null) OnTextureModeChanged(this, null);
         RebuildScene();

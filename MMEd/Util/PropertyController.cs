@@ -168,6 +168,28 @@ namespace MMEd.Util
 
     #endregion
 
+    #region CheckBox
+
+    private CheckBox mCheckBox;
+    public void BindTo(CheckBox xiCheckBox)
+    {
+      if (mCheckBox != null) throw new Exception("Can't bind to more than one check box");
+      if (mProperty.PropertyType != typeof(bool)) throw new Exception("Only boolean properties can use check box");
+      mCheckBox = xiCheckBox;
+
+      mCheckBox.CheckedChanged += new EventHandler(this.CheckBoxChangedHandler);
+      ValueChangeHandler(null, null);
+    }
+
+    public void CheckBoxChangedHandler(object xiSender, EventArgs xiArgs)
+    {
+      bool lNewValue = mCheckBox.Checked;
+      mProperty.SetValue(mTarget, lNewValue, null);
+      ValueChangeHandler(null, null);
+    }
+
+    #endregion
+
     #region ToolStripComboBox
 
     private ToolStripComboBox mToolStripComboBox;
@@ -291,9 +313,20 @@ namespace MMEd.Util
           mComboBox.SelectedItem = new NamedValueHolder(null, lNewValue);
         }
       }
+      else if (mProperty.PropertyType == typeof(bool))
+      {
+        if (mToolStripItems != null)
+        {
+          mToolStripItems[0].Checked = (bool)mProperty.GetValue(mTarget, null);
+        }
+        if (mCheckBox != null)
+        {
+          mCheckBox.Checked = (bool)mProperty.GetValue(mTarget, null);
+        }
+      }
       else
       {
-        mToolStripItems[0].Checked = (bool)mProperty.GetValue(mTarget, null);
+        throw new Exception(string.Format("Unexpected type: {0}", mProperty.PropertyType));
       }
     }
   }

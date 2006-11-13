@@ -213,6 +213,7 @@ namespace MMEd.Chunks
       int lTexPageId = int.MinValue;
 
       //qq move all this into Face class?
+      //qq add quad mode meshes (needs separate meshes currently...)
       Vertex[] lVBuff = new Vertex[4];
       foreach (Face f in Faces)
       {
@@ -248,14 +249,23 @@ namespace MMEd.Chunks
             if (lTexturedMesh == null)
             {
               lTexturedMesh = new OwnedMesh(xiMeshOwner);
-              lTexturedMesh.RenderMode = RenderMode.Textured;
-              int lThisFacePageId = f.mTSB & 0xff; //qq TODO ren TSB
+              int lThisFacePageId = f.mTexPage;
               if (lTexPageId != int.MinValue && lThisFacePageId != lTexPageId)
               {
                 throw new Exception("Object refers to multiple texture pages!");
               }
               lTexPageId = lThisFacePageId;
-              lTexturedMesh.Texture = AbstractRenderer.ImageToTextureId(xiLevel.GetTexturePageById(lTexPageId)); 
+
+              if (xiTextureMode == eTextureMode.NormalTextures
+                || xiTextureMode == eTextureMode.NormalTexturesWithMetadata)
+              {
+                lTexturedMesh.RenderMode = RenderMode.Textured;
+                lTexturedMesh.Texture = AbstractRenderer.ImageToTextureId(xiLevel.GetTexturePageById(lTexPageId));
+              }
+              else
+              {
+                lTexturedMesh.RenderMode = RenderMode.Wireframe;
+              }
             }
             lMesh = lTexturedMesh;
           }
@@ -264,7 +274,16 @@ namespace MMEd.Chunks
             if (lColouredMesh == null)
             {
               lColouredMesh = new OwnedMesh(xiMeshOwner);
-              lColouredMesh.RenderMode = RenderMode.Filled;
+
+              if (xiTextureMode == eTextureMode.NormalTextures
+                || xiTextureMode == eTextureMode.NormalTexturesWithMetadata)
+              {
+                lColouredMesh.RenderMode = RenderMode.Filled;
+              }
+              else
+              {
+                lColouredMesh.RenderMode = RenderMode.Wireframe;
+              }
             }
             lMesh = lColouredMesh;
           }
@@ -370,7 +389,8 @@ namespace MMEd.Chunks
       public short[] mNormalIds;
       public short[] mVertexIds;
       public short mCBA; //dunno
-      public short mTSB; //dunno
+      public byte mTexPageHiByte; //dunno
+      public byte mTexPage; //which page to use for texturing this object
       public System.Drawing.Point[] mTexCoords;
 
       //for unknown type
@@ -450,12 +470,18 @@ namespace MMEd.Chunks
             for (int i = 0; i < lVertexCount; i++)
             {
               mTexCoords[i] = new System.Drawing.Point(bin.ReadByte(), bin.ReadByte());
-              short lTop = bin.ReadInt16();
               if (i == 0)
-                mCBA = lTop;
+                mCBA = bin.ReadInt16();
               else if (i == 1)
-                mTSB = lTop;
-              else if (lTop != 0) throw new DeserialisationException(string.Format("Expecting unused bytes to be zero, found {0:x}", lTop), bin.BaseStream.Position);
+              {
+                mTexPage = bin.ReadByte();
+                mTexPageHiByte = bin.ReadByte();
+              }
+              else
+              {
+                short lTop = bin.ReadInt16();
+                if (lTop != 0) throw new DeserialisationException(string.Format("Expecting unused bytes to be zero, found {0:x}", lTop), bin.BaseStream.Position);
+              }
             }
             break;
           default:
@@ -533,7 +559,10 @@ namespace MMEd.Chunks
             if (i == 0)
               bout.Write(mCBA);
             else if (i == 1)
-              bout.Write(mTSB);
+            {
+              bout.Write(mTexPage);
+              bout.Write(mTexPageHiByte);
+            }
             else
               bout.Write((short)0);
           }
