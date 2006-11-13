@@ -35,7 +35,7 @@ namespace MMEd.Chunks
 
     [Description(@"Camera position arrays. I forget which way round these go. 
 Each entry has three components, which are height, pitch and yaw, in some order")]
-    public short[][] CameraPositions;
+    public GroupingChunk CameraPositions;
 
     public GroupingChunk BumpImages;
 
@@ -81,15 +81,12 @@ Each entry has three components, which are height, pitch and yaw, in some order"
 
       //now some camera positions:
       short cameraPositionCount = bin.ReadInt16();
-      CameraPositions = new short[cameraPositionCount][];
+      CameraPosChunk[] cameraPositions = new CameraPosChunk[cameraPositionCount];
       for (int i = 0; i < cameraPositionCount; i++)
       {
-        CameraPositions[i] = new short[3];
-        for (int j = 0; j < 3; j++)
-        {
-          CameraPositions[i][j] = bin.ReadInt16();
-        }
+        cameraPositions[i] = new CameraPosChunk(i, bin);
       }
+      this.CameraPositions = new GroupingChunk("CameraPositions", cameraPositions);
 
       //now the bump map prototypes. These are referred to by TexMetaData[6]
       short bumpImgCount = bin.ReadInt16();
@@ -134,14 +131,8 @@ Each entry has three components, which are height, pitch and yaw, in some order"
       OddImages.Serialise(outStr);
 
       //now some camera positions:
-      bout.Write((short)CameraPositions.Length);
-      for (int i = 0; i < CameraPositions.Length; i++)
-      {
-        for (int j = 0; j < 3; j++)
-        {
-          bout.Write(CameraPositions[i][j]);
-        }
-      }
+      bout.Write((short)CameraPositions.mChildren.Length);
+      CameraPositions.Serialise(outStr);
 
       //now the bumpImages 
       //TODO: could add a method to GroupingChunk to do this pattern
@@ -165,6 +156,7 @@ Each entry has three components, which are height, pitch and yaw, in some order"
       ArrayList acc = new ArrayList();
       acc.AddRange(Flats);
       acc.Add(KeyWaypoints);
+      acc.Add(CameraPositions);
       acc.Add(OddImages);
       acc.Add(BumpImages);
       return (Chunk[])acc.ToArray(typeof(Chunk));
@@ -185,6 +177,10 @@ Each entry has three components, which are height, pitch and yaw, in some order"
       else if (xiFrom == KeyWaypoints)
       {
         KeyWaypoints = (KeyWaypointsChunk)xiTo;
+      }
+      else if (xiFrom == CameraPositions)
+      {
+        CameraPositions = (GroupingChunk)xiFrom;
       }
       else if (xiFrom == OddImages)
       {

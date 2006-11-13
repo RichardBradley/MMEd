@@ -19,6 +19,7 @@ namespace MMEd.Chunks
   // include types which the XMLserialiser can't infer via strongly typed 
   // member variables:
   [XmlInclude(typeof(NamedImageGroup)), XmlInclude(typeof(TIMChunk)),
+  XmlInclude(typeof(CameraPosChunk)), XmlInclude(typeof(CameraPosChunk)),
   XmlInclude(typeof(OddImageChunk)), XmlInclude(typeof(BumpImageChunk)),
   XmlInclude(typeof(TMDChunk)), XmlInclude(typeof(TypedRawDataChunk))]
   public class Level : Chunk, Viewers.ThreeDee.IEntityProvider
