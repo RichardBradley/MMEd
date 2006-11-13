@@ -4,6 +4,7 @@ using System.Text;
 using System.IO;
 using System.ComponentModel;
 using System.Drawing;
+using System.Collections;
 using MMEd.Util;
 using MMEd.Viewers;
 using GLTK;
@@ -417,7 +418,7 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
       }
     }
 
-    public class ObjectEntry : IPositionable, IRotatable
+    public class ObjectEntry : Chunk, IPositionable, IRotatable, IEntityProvider
     {
       [Description("The position of the origin of the object, in the co-ordinate space of the parent Flat")]
       public Short3Coord OriginPosition
@@ -469,8 +470,9 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
         bout.Write(ShortUnknown);
       }
 
-      public Entity GetEntity(Level xiLevel, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata)
+      public IEnumerable<GLTK.Entity> GetEntities(Level xiLevel, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata)
       {
+        List<GLTK.Entity> lRet = new List<Entity>();
         TMDChunk lObjt = xiLevel.GetObjtById(this.ObjtType);
         if (lObjt != null)
         {
@@ -492,15 +494,32 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
 
           //return to right handed coords
           lE.Scale(1, 1, -1);
-
-          return lE;
+          
+          lRet.Add(lE);
         }
 
-        return null;
+        return lRet;
+      }
+
+      // Note: serialisation and deserialisation are handled by FlatChunk
+      public override void Serialise(Stream outStr)
+      {
+        throw new Exception("The method or operation is not implemented.");
+      }
+
+      public override void Deserialise(Stream inStr)
+      {
+        throw new Exception("The method or operation is not implemented.");
+      }
+
+      // qq could perhaps do better than this
+      public override string Name
+      {
+        get { return string.Format("Object - Type:{0}", this.ObjtType); }
       }
     }
 
-    public class WeaponEntry : IPositionable
+    public class WeaponEntry : Chunk, IPositionable, IEntityProvider
     {
       [Description("The type of the weapon. See enum eWeaponType")]
       public eWeaponType WeaponType;
@@ -538,7 +557,7 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
         OriginPosition.WriteShort3Coord64(bout);
       }
 
-      public Entity GetEntity(Level xiLevel, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata)
+      public IEnumerable<GLTK.Entity> GetEntities(Level xiLevel, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata)
       {
         Entity lWeaponEntity = xiLevel.GetObjtById(TMDChunk.OBJT_ID_FOR_WEAPONS_BOX)
           .GetEntity(xiLevel, xiTextureMode, xiSelectedMetadata, this);
@@ -547,7 +566,25 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
         Point lWeaponPosition = ThreeDeeViewer.Short3CoordToPoint(this.OriginPosition);
         lWeaponEntity.Position = new Point(lWeaponPosition.x, lWeaponPosition.y, -lWeaponPosition.z);
 
-        return lWeaponEntity;
+        List<GLTK.Entity> lRet = new List<Entity>();
+        lRet.Add(lWeaponEntity);
+        return lRet;
+      }
+
+      // Note: serialisation and deserialisation are handled by FlatChunk
+      public override void Serialise(Stream outStr)
+      {
+        throw new Exception("The method or operation is not implemented.");
+      }
+
+      public override void Deserialise(Stream inStr)
+      {
+        throw new Exception("The method or operation is not implemented.");
+      }
+
+      public override string Name
+      {
+        get { return string.Format("Weapon - {0}", this.WeaponType); }
       }
     }
 
@@ -556,7 +593,38 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
 
     public override void ReplaceChild(Chunk xiFrom, Chunk xiTo)
     {
-      throw new Exception("The method or operation is not implemented.");
+      if (xiFrom is ObjectEntry)
+      {
+        for (int i = 0; i < Objects.Length; i++)
+          if (xiFrom == Objects[i])
+          {
+            Objects[i] = (ObjectEntry)xiTo;
+            return;
+          }
+        throw new ArgumentException("xifrom not found!");
+      }
+      else if (xiFrom is WeaponEntry)
+      {
+        for (int i = 0; i < Weapons.Length; i++)
+          if (xiFrom == Weapons[i])
+          {
+            Weapons[i] = (WeaponEntry)xiTo;
+            return;
+          }
+        throw new ArgumentException("xifrom not found!");
+      }
+      else
+      {
+        throw new ArgumentException("xifrom not found!");
+      }
+    }
+
+    public override Chunk[] GetChildren()
+    {
+      ArrayList acc = new ArrayList();
+      if (Weapons != null) acc.AddRange(Weapons);
+      if (Objects != null) acc.AddRange(Objects);
+      return (Chunk[])acc.ToArray(typeof(Chunk));
     }
 
     private short GetTerrainHeightSafe(int x, int y)
@@ -700,7 +768,7 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
       {
         foreach (WeaponEntry lWeapon in Weapons)
         {
-          lAcc.Add(lWeapon.GetEntity(xiLevel, xiTextureMode, xiSelectedMetadata));
+          lAcc.AddRange(lWeapon.GetEntities(xiLevel, xiTextureMode, xiSelectedMetadata));
         }
       }
 
@@ -710,12 +778,7 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
       {
         foreach (ObjectEntry oe in Objects)
         {
-          Entity lE = oe.GetEntity(xiLevel, xiTextureMode, xiSelectedMetadata);
-
-          if (lE != null)
-          {
-            lAcc.Add(lE);
-          }
+          lAcc.AddRange(oe.GetEntities(xiLevel, xiTextureMode, xiSelectedMetadata));
         }
       }
 

@@ -19,6 +19,8 @@ namespace MMEd.Viewers
     private ThreeDeeEditor(MainForm xiMainForm)
       : base(xiMainForm)
     {
+      MoveScale = 100;
+
       mMainForm.KeyPreview = true;
       mMainForm.DialogKey +=new KeyEventHandler(MainForm_KeyDown);
       mMainForm.FormClosing += new FormClosingEventHandler(mMainForm_FormClosing);
@@ -62,6 +64,13 @@ namespace MMEd.Viewers
       //
       mOptionsMenu.DropDownItems.Add(new ToolStripMenuItem("Hide all Flats without FlgD", null, new EventHandler(this.HideAllFlatsWithoutFlgDClicked)));
       mMainForm.mMenuStrip.Items.Add(mOptionsMenu);
+
+      ResetCamera();
+
+      MovementMode = eMovementMode.FlyMode;
+      DrawNormalsMode = eDrawNormalsMode.HideNormals;
+      TextureMode = eTextureMode.NormalTextures;
+      SelectedMetadata = eTexMetaDataEntries.Waypoint;
     }
 
     void CreateView(RenderingSurface xiSurface, Scene xiScene, Camera xiCamera, RenderMode xiFixedRenderMode)
@@ -143,7 +152,8 @@ namespace MMEd.Viewers
           if (lObject != null)
           {
             double lDelta = (double)(lNewMousePoint.Y - mLastMouseDown.Y);
-            lObject.RotationVector = Matrix.Rotation(lDelta / 100, lCamera.ZAxis) * lObject.RotationVector.ToRotationMatrix();
+            lObject.RotationVector = Utils.RotationMatrixToShort3Coord(
+              Matrix.Rotation(lDelta / 100, lCamera.ZAxis) * Utils.Short3CoordToRotationMatrix(lObject.RotationVector));
             RebuildObject(lObject);
             InvalidateAllViewers();
           }
@@ -278,7 +288,8 @@ namespace MMEd.Viewers
           lDelta /= 5;
         }
 
-        lObject.RotationVector = lObject.RotationVector.ToRotationMatrix() * Matrix.Rotation(lDelta, lCamera.ZAxis);
+        lObject.RotationVector = Utils.RotationMatrixToShort3Coord(
+          Matrix.Rotation(lDelta, lCamera.ZAxis) * Utils.Short3CoordToRotationMatrix(lObject.RotationVector));
         RebuildObject(lObject);
         InvalidateAllViewers();
       }
@@ -337,12 +348,7 @@ namespace MMEd.Viewers
 
     public void HideAllFlatsWithoutFlgDClicked(object xiSender, EventArgs xiArgs)
     {
-      if (!(mSubject is Level))
-      {
-        MessageBox.Show("This action only applicable when viewing Levels");
-        return;
-      }
-      foreach (FlatChunk f in ((Level)mSubject).SHET.Flats)
+      foreach (FlatChunk f in mSubject.SHET.Flats)
       {
         f.TreeNode.Checked = !f.FlgD;
       }
@@ -361,7 +367,7 @@ namespace MMEd.Viewers
       return new ThreeDeeEditor(xiMainForm);
     }
 
-    private IEntityProvider mSubject = null;
+    private Level mSubject = null;
 
     MMEdScene mScene;
     Dictionary<RenderingSurface, MMEdView> mViews = new Dictionary<RenderingSurface, MMEdView>();
@@ -370,65 +376,43 @@ namespace MMEd.Viewers
 
     public override void SetSubject(Chunk xiChunk)
     {
-      if (!(xiChunk is IEntityProvider)) xiChunk = null;
-      mOptionsMenu.Visible = (xiChunk != null);
-      if (mSubject == xiChunk) return;
-      bool lResetViewMode = true;
-      if (xiChunk != null && mSubject != null && xiChunk.GetType() == mSubject.GetType())
-        lResetViewMode = false;
-      mSubject = (IEntityProvider)xiChunk;
-
-      MoveScale = xiChunk is Level ? 100 : 100;
-
-      Cursor prevCursor = mMainForm.Viewer3DRenderingSurfaceTopRight.Cursor;
-      mMainForm.Viewer3DRenderingSurfaceTopRight.Cursor = Cursors.WaitCursor;
-      RebuildScene();
-      if (mSubject != null)
+      if (xiChunk == null)
       {
-        MMEdView lTR = mViews[mMainForm.Viewer3DRenderingSurfaceTopRight];
-        lTR.Camera.Position = new GLTK.Point(-3 * MoveScale, -3 * MoveScale, 3 * MoveScale);
-        lTR.Camera.LookAt(new GLTK.Point(3 * MoveScale, 3 * MoveScale, 0), new GLTK.Vector(0, 0, 1));
-
-        MMEdView lTL = mViews[mMainForm.Viewer3DRenderingSurfaceTopLeft];
-        lTL.Camera.Position = new GLTK.Point(0, 0, -5000);
-        lTL.Camera.LookAt(new GLTK.Point(0, 0, 0), GLTK.Vector.XAxis);
-
-        MMEdView lBL = mViews[mMainForm.Viewer3DRenderingSurfaceBottomLeft];
-        lBL.Camera.Position = new GLTK.Point(-5000, 0, 0);
-        lBL.Camera.LookAt(new GLTK.Point(0, 0, 0), GLTK.Vector.ZAxis);
-
-        MMEdView lBR = mViews[mMainForm.Viewer3DRenderingSurfaceBottomRight];
-        lBR.Camera.Position = new GLTK.Point(0, -5000, 0);
-        lBR.Camera.LookAt(new GLTK.Point(0, 0, 0), GLTK.Vector.ZAxis);
-
-        //set defaults
-        if (lResetViewMode)
-        {
-          if (mSubject is TMDChunk)
-          {
-            MovementMode = eMovementMode.InspectMode;
-            DrawNormalsMode = eDrawNormalsMode.HideNormals;
-            TextureMode = eTextureMode.NormalTextures;
-            SelectedMetadata = eTexMetaDataEntries.Waypoint;
-          }
-          else
-          {
-            MovementMode = eMovementMode.FlyMode;
-            DrawNormalsMode = eDrawNormalsMode.HideNormals;
-            TextureMode = eTextureMode.NormalTextures;
-            SelectedMetadata = eTexMetaDataEntries.Waypoint;
-          }
-        }
-
-        mMainForm.ChunkTreeView.CheckBoxes = (mSubject is Level);
-      }
-      else
-      {
+        // the view has switched to another tab - reset the tree
         mMainForm.ChunkTreeView.CheckBoxes = false;
+        return;
       }
-      mMainForm.Viewer3DRenderingSurfaceTopRight.Cursor = prevCursor;
 
-      InvalidateAllViewers();
+      if (mSubject != mMainForm.Level)
+      {
+        mSubject = mMainForm.Level;
+        RebuildScene();
+        ResetCamera();
+      }
+
+      mOptionsMenu.Visible = (mSubject != null);
+      mMainForm.ChunkTreeView.CheckBoxes = (mSubject != null);
+
+      ActiveObject = xiChunk;
+    }
+
+    private void ResetCamera()
+    {
+      MMEdView lTR = mViews[mMainForm.Viewer3DRenderingSurfaceTopRight];
+      lTR.Camera.Position = new GLTK.Point(-3 * MoveScale, -3 * MoveScale, 3 * MoveScale);
+      lTR.Camera.LookAt(new GLTK.Point(3 * MoveScale, 3 * MoveScale, 0), new GLTK.Vector(0, 0, 1));
+
+      MMEdView lTL = mViews[mMainForm.Viewer3DRenderingSurfaceTopLeft];
+      lTL.Camera.Position = new GLTK.Point(0, 0, -5000);
+      lTL.Camera.LookAt(new GLTK.Point(0, 0, 0), GLTK.Vector.XAxis);
+
+      MMEdView lBL = mViews[mMainForm.Viewer3DRenderingSurfaceBottomLeft];
+      lBL.Camera.Position = new GLTK.Point(-5000, 0, 0);
+      lBL.Camera.LookAt(new GLTK.Point(0, 0, 0), GLTK.Vector.ZAxis);
+
+      MMEdView lBR = mViews[mMainForm.Viewer3DRenderingSurfaceBottomRight];
+      lBR.Camera.Position = new GLTK.Point(0, -5000, 0);
+      lBR.Camera.LookAt(new GLTK.Point(0, 0, 0), GLTK.Vector.ZAxis);
     }
 
     private void RebuildScene()
@@ -440,26 +424,21 @@ namespace MMEd.Viewers
 
     private void RebuildObject(object xiObject)
     {
-      if (mSubject is Level)
+      IEntityProvider lObject = xiObject as IEntityProvider;
+      if (lObject != null)
       {
-        if (xiObject is FlatChunk.ObjectEntry)
+        IEnumerable<Entity> lNew = lObject.GetEntities(mSubject, TextureMode, SelectedMetadata);
+        //qq this hacky
+        foreach (Entity lNewEntity in lNew)
         {
           mScene.RemoveMMEdObject(xiObject);
-          mScene.AddObject(((FlatChunk.ObjectEntry)xiObject).GetEntity(mSubject as Level, TextureMode, SelectedMetadata));
+          mScene.AddObject(lNewEntity);
           UpdateActiveObjectStatus(xiObject);
+          return;
         }
-        else if (xiObject is FlatChunk.WeaponEntry)
-        {
-          mScene.RemoveMMEdObject(xiObject);
-          mScene.AddObject(((FlatChunk.WeaponEntry)xiObject).GetEntity(mSubject as Level, TextureMode, SelectedMetadata));
-          UpdateActiveObjectStatus(xiObject);
-        }
-        else if (xiObject is FlatChunk)
-        {
-          //qq improve the efficiency of this
-          RebuildScene();
-          UpdateActiveObjectStatus(xiObject);
-        }
+
+        RebuildScene();
+        UpdateActiveObjectStatus(xiObject);
       }
     }
 
