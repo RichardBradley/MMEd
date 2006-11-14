@@ -115,7 +115,7 @@ namespace MMEd.Chunks
     {
       mBumpTypes = new BumpTypeInfo[64];
       mBumpTypes[0x00] = new BumpTypeInfo("plain", 0x000000);
-      mBumpTypes[0x01] = new BumpTypeInfo("wall", 0xcccccc);
+      mBumpTypes[0x01] = new BumpTypeInfo("wall", 0xff00ff, "Impassable wall");
       mBumpTypes[0x02] = new BumpTypeInfo("milk", 0xf8e8d8);
       mBumpTypes[0x03] = new BumpTypeInfo("syrup", 0xa87020);
       mBumpTypes[0x04] = new BumpTypeInfo("ketchup", 0xff0000);
@@ -126,29 +126,33 @@ namespace MMEd.Chunks
       mBumpTypes[0x09] = new BumpTypeInfo("lilyPad", 0x33ff33, "NB This doesn't do much on a random pool course");
       mBumpTypes[0x0A] = new BumpTypeInfo("grassStalk", 0x00ff00);
       mBumpTypes[0x0B] = new BumpTypeInfo("jumpWoosh3", 0xffd400, "A super speedup if you're going fast enough (found on the jump between tables in Rack)");
-      mBumpTypes[0x0C] = new BumpTypeInfo("unknown0C", 0xff00ff, "This is present in Rack & Roll, but driving over it has no discernable effect");
+      mBumpTypes[0x0C] = new BumpTypeInfo("unknown0C", 0x606060, "This is present in Rack & Roll, but driving over it has no discernable effect");
       mBumpTypes[0x0D] = new BumpTypeInfo("roadBorderPool", 0x89cbde, "Edge of the track in a pool table course");
       mBumpTypes[0x0E] = new BumpTypeInfo("poolPocket", 0xeeeeee, "A pool pocket - death trap");
       mBumpTypes[0x0F] = new BumpTypeInfo("lowSurvivalHeight", 0x00dddd, "Driving off the edge of this means you die even if you don't fall very far. (Also without it,the edge of the Rack & Roll table sometimes appears over the car rather than under it)");
-      //10?
+      mBumpTypes[0x10] = new BumpTypeInfo("SwapVehicle", 0x229022, "Toggle between player 1 and 2 cars");
       mBumpTypes[0x11] = new BumpTypeInfo("clearGoo", 0xffeedd);
       mBumpTypes[0x12] = new BumpTypeInfo("powderSpill", 0x3333ff);
       mBumpTypes[0x13] = new BumpTypeInfo("greenGoo", 0x33ff33);
       mBumpTypes[0x14] = new BumpTypeInfo("redGoo", 0xff3333);
       mBumpTypes[0x15] = new BumpTypeInfo("roadBorderLab", 0x89cbfd);
       mBumpTypes[0x16] = new BumpTypeInfo("jumpWoosh", 0xffe400);
-      //17-18?
+      mBumpTypes[0x17] = new BumpTypeInfo("unknown17", 0x707070);
+      mBumpTypes[0x18] = new BumpTypeInfo("unknown18", 0x787878);
       mBumpTypes[0x19] = new BumpTypeInfo("enterTestTube", 0xff9900);
-      //1a-1b?
+      mBumpTypes[0x1a] = new BumpTypeInfo("unknown1a", 0x808080);
+      mBumpTypes[0x1b] = new BumpTypeInfo("unknown1b", 0x888888);
       mBumpTypes[0x1C] = new BumpTypeInfo("microGooEdge", 0xaaaa00);
       mBumpTypes[0x1D] = new BumpTypeInfo("microGooMiddle", 0x888800);
       mBumpTypes[0x1E] = new BumpTypeInfo("exitMicroscope", 0xff7700);
-      //1f?
+      mBumpTypes[0x1F] = new BumpTypeInfo("unknown1f", 0x909090);
       mBumpTypes[0x20] = new BumpTypeInfo("jumpWhoosh2", 0xfff400, "Allegedly like jumpWhoosh. But appears to have a one-way property in some cases, and energetic attempts to violate this result in a \"splash\"");
       mBumpTypes[0x21] = new BumpTypeInfo("enterTeleport", 0xff8800);
-      //22?
+      mBumpTypes[0x22] = new BumpTypeInfo("unknown22", 0x989898);
       mBumpTypes[0x23] = new BumpTypeInfo("sand", 0xc9b549);
-      //24-26?
+      mBumpTypes[0x24] = new BumpTypeInfo("unknown1f", 0xa0a0a0);
+      mBumpTypes[0x25] = new BumpTypeInfo("unknown1f", 0xa8a8a8);
+      mBumpTypes[0x26] = new BumpTypeInfo("unknown1f", 0xb0b0b0);
       mBumpTypes[0x27] = new BumpTypeInfo("unknown27", 0xff00ff, "Driving over this has no discernable effect in Rack & Roll.");
       mBumpTypes[0x28] = new BumpTypeInfo("teleport1", 0xffaa00, "Teleport. Destination unknown.");
       mBumpTypes[0x29] = new BumpTypeInfo("teleport2", 0xffdd00, "Teleport. Destination unknown.");
