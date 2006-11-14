@@ -209,8 +209,7 @@ namespace MMEd.Chunks
     {
       MMEdEntity lAcc = new MMEdEntity(xiMeshOwner);
       Mesh lColouredMesh = null;
-      Mesh lTexturedMesh = null;
-      int lTexPageId = int.MinValue;
+      Dictionary<int, Mesh> lPageIdToTexturedMeshMap = new Dictionary<int, Mesh>();
 
       //qq move all this into Face class?
       //qq add quad mode meshes (needs separate meshes currently...)
@@ -246,28 +245,26 @@ namespace MMEd.Chunks
           Mesh lMesh;
           if (f.mTexCoords != null)
           {
-            if (lTexturedMesh == null)
+            if (!lPageIdToTexturedMeshMap.ContainsKey(f.mTexPage))
             {
-              lTexturedMesh = new OwnedMesh(xiMeshOwner);
-              int lThisFacePageId = f.mTexPage;
-              if (lTexPageId != int.MinValue && lThisFacePageId != lTexPageId)
-              {
-                throw new Exception("Object refers to multiple texture pages!");
-              }
-              lTexPageId = lThisFacePageId;
+              lMesh = new OwnedMesh(xiMeshOwner);
+              lPageIdToTexturedMeshMap[f.mTexPage] = lMesh;
 
               if (xiTextureMode == eTextureMode.NormalTextures
                 || xiTextureMode == eTextureMode.NormalTexturesWithMetadata)
               {
-                lTexturedMesh.RenderMode = RenderMode.Textured;
-                lTexturedMesh.Texture = AbstractRenderer.ImageToTextureId(xiLevel.GetTexturePageById(lTexPageId));
+                lMesh.RenderMode = RenderMode.Textured;
+                lMesh.Texture = AbstractRenderer.ImageToTextureId(xiLevel.GetTexturePageById(f.mTexPage));
               }
               else
               {
-                lTexturedMesh.RenderMode = RenderMode.Wireframe;
+                lMesh.RenderMode = RenderMode.Wireframe;
               }
             }
-            lMesh = lTexturedMesh;
+            else
+            {
+              lMesh = lPageIdToTexturedMeshMap[f.mTexPage];
+            }
           }
           else
           {
@@ -300,7 +297,10 @@ namespace MMEd.Chunks
         }
       }
 
-      if (lTexturedMesh != null) lAcc.Meshes.Add(lTexturedMesh);
+      foreach (Mesh lTexturedMesh in lPageIdToTexturedMeshMap.Values)
+      {
+        lAcc.Meshes.Add(lTexturedMesh);
+      }
       if (lColouredMesh != null) lAcc.Meshes.Add(lColouredMesh);
 
       lAcc.Scale(1, 1, -1);

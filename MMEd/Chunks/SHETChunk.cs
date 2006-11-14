@@ -156,8 +156,8 @@ Each entry has three components, which are height, pitch and yaw, in some order"
       ArrayList acc = new ArrayList();
       acc.AddRange(Flats);
       acc.Add(KeyWaypoints);
-      acc.Add(CameraPositions);
       acc.Add(OddImages);
+      acc.Add(CameraPositions);
       acc.Add(BumpImages);
       return (Chunk[])acc.ToArray(typeof(Chunk));
     }
@@ -178,17 +178,17 @@ Each entry has three components, which are height, pitch and yaw, in some order"
       {
         KeyWaypoints = (KeyWaypointsChunk)xiTo;
       }
-      else if (xiFrom == CameraPositions)
-      {
-        CameraPositions = (GroupingChunk)xiFrom;
-      }
       else if (xiFrom == OddImages)
       {
-        OddImages = (GroupingChunk)xiFrom;
+        OddImages = (GroupingChunk)xiTo;
+      }
+      else if (xiFrom == CameraPositions)
+      {
+        CameraPositions = (GroupingChunk)xiTo;
       }
       else if (xiFrom == BumpImages)
       {
-        BumpImages = (GroupingChunk)xiFrom;
+        BumpImages = (GroupingChunk)xiTo;
       }
       else
       {

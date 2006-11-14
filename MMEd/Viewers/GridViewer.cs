@@ -161,8 +161,8 @@ namespace MMEd.Viewers
           //    the tex squares are at integer coords from (0,0) to (mSubject.Width, mSubject.Height)
           // 3) Flat coords. This is the simple flat coords scaled up by (mSubject.ScaleX, mSubject.ScaleY)
           //    These are the coords which appear on the status bar as "Flat Coord"
-          // 4) Paint coords. This is the coord space the flat is painted onto the gird in, in which
-          //    the tex squares are at integer coords from (0,0) 
+          // 4) Paint coords. This is the coord space in which the flat is painted onto the grid, which has
+          //    the tex squares at integer coords from (0,0) 
           //    to (mSubject.Width+*mSubjectTileWidth, mSubject.Height*mSubjectTileHeight)
           //
           // The objects are defined in World coords (1), and the GLTK display matrix for the flat is (2) -> (1)
