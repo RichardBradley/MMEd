@@ -241,6 +241,7 @@ namespace MMEd.Viewers
         Panel.FlagDCheckBox.Checked = mSubject.FlgD;
         Panel.FlagECheckBox.Checked = mSubject.FlgE;
         Panel.NextNTextBox.Text = ArrayToString(mSubject.NextN);
+        Panel.ByteSizeLabel.Text = string.Format("{0} bytes ({1} bytes free)", mSubject.ByteSize, mMainForm.Level.SHET.TrailingZeroByteCount);
 
         //=====================================================================
         // Set up the Weapons section
@@ -254,9 +255,12 @@ namespace MMEd.Viewers
           }
         }
 
-        foreach (FlatChunk.WeaponEntry lWeapon in mSubject.Weapons)
+        if (mSubject.Weapons != null)
         {
-          AddWeaponToTable(lWeapon);
+          foreach (FlatChunk.WeaponEntry lWeapon in mSubject.Weapons)
+          {
+            AddWeaponToTable(lWeapon);
+          }
         }
 
         //=====================================================================
@@ -271,9 +275,12 @@ namespace MMEd.Viewers
           }
         }
 
-        foreach (FlatChunk.ObjectEntry lObject in mSubject.Objects)
+        if (mSubject.Objects != null)
         {
-          AddObjectToTable(lObject);
+          foreach (FlatChunk.ObjectEntry lObject in mSubject.Objects)
+          {
+            AddObjectToTable(lObject);
+          }
         }
 
         Panel.ObjectsTable.ResumeLayout();

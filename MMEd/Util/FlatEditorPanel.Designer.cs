@@ -65,22 +65,24 @@ namespace MMEd.Util
       this.label11 = new System.Windows.Forms.Label();
       this.label10 = new System.Windows.Forms.Label();
       this.label9 = new System.Windows.Forms.Label();
+      this.label24 = new System.Windows.Forms.Label();
       this.groupBox3 = new System.Windows.Forms.GroupBox();
       this.AddObjectLink = new System.Windows.Forms.LinkLabel();
       this.panel2 = new System.Windows.Forms.Panel();
       this.ObjectsTable = new System.Windows.Forms.TableLayoutPanel();
-      this.label14 = new System.Windows.Forms.Label();
-      this.label15 = new System.Windows.Forms.Label();
-      this.label16 = new System.Windows.Forms.Label();
-      this.label17 = new System.Windows.Forms.Label();
-      this.label18 = new System.Windows.Forms.Label();
-      this.label19 = new System.Windows.Forms.Label();
-      this.label20 = new System.Windows.Forms.Label();
       this.label21 = new System.Windows.Forms.Label();
+      this.label18 = new System.Windows.Forms.Label();
+      this.label16 = new System.Windows.Forms.Label();
+      this.label20 = new System.Windows.Forms.Label();
+      this.label19 = new System.Windows.Forms.Label();
+      this.label15 = new System.Windows.Forms.Label();
+      this.label14 = new System.Windows.Forms.Label();
       this.label22 = new System.Windows.Forms.Label();
+      this.label17 = new System.Windows.Forms.Label();
       this.label23 = new System.Windows.Forms.Label();
-      this.label24 = new System.Windows.Forms.Label();
       this.label25 = new System.Windows.Forms.Label();
+      this.label26 = new System.Windows.Forms.Label();
+      this.ByteSizeLabel = new System.Windows.Forms.Label();
       this.tableLayoutPanel1.SuspendLayout();
       this.groupBox1.SuspendLayout();
       this.groupBox2.SuspendLayout();
@@ -136,6 +138,7 @@ namespace MMEd.Util
       this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
       this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
       this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+      this.tableLayoutPanel1.Controls.Add(this.label26, 0, 8);
       this.tableLayoutPanel1.Controls.Add(this.label7, 0, 6);
       this.tableLayoutPanel1.Controls.Add(this.NameTextBox, 1, 1);
       this.tableLayoutPanel1.Controls.Add(this.label6, 0, 5);
@@ -162,9 +165,10 @@ namespace MMEd.Util
       this.tableLayoutPanel1.Controls.Add(this.FlagECheckBox, 5, 6);
       this.tableLayoutPanel1.Controls.Add(this.label8, 0, 7);
       this.tableLayoutPanel1.Controls.Add(this.NextNTextBox, 1, 7);
+      this.tableLayoutPanel1.Controls.Add(this.ByteSizeLabel, 1, 8);
       this.tableLayoutPanel1.Location = new System.Drawing.Point(6, 19);
       this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-      this.tableLayoutPanel1.RowCount = 8;
+      this.tableLayoutPanel1.RowCount = 9;
       this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
       this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
       this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -172,8 +176,9 @@ namespace MMEd.Util
       this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
       this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
       this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-      this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-      this.tableLayoutPanel1.Size = new System.Drawing.Size(280, 214);
+      this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+      this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+      this.tableLayoutPanel1.Size = new System.Drawing.Size(280, 234);
       this.tableLayoutPanel1.TabIndex = 4;
       // 
       // label7
@@ -364,7 +369,7 @@ namespace MMEd.Util
       this.groupBox1.Controls.Add(this.tableLayoutPanel1);
       this.groupBox1.Location = new System.Drawing.Point(3, 3);
       this.groupBox1.Name = "groupBox1";
-      this.groupBox1.Size = new System.Drawing.Size(295, 242);
+      this.groupBox1.Size = new System.Drawing.Size(295, 259);
       this.groupBox1.TabIndex = 5;
       this.groupBox1.TabStop = false;
       this.groupBox1.Text = "Flat Properties";
@@ -375,7 +380,7 @@ namespace MMEd.Util
                   | System.Windows.Forms.AnchorStyles.Right)));
       this.groupBox2.Controls.Add(this.AddWeaponLink);
       this.groupBox2.Controls.Add(this.panel1);
-      this.groupBox2.Location = new System.Drawing.Point(3, 251);
+      this.groupBox2.Location = new System.Drawing.Point(3, 268);
       this.groupBox2.Name = "groupBox2";
       this.groupBox2.Size = new System.Drawing.Size(548, 145);
       this.groupBox2.TabIndex = 6;
@@ -478,6 +483,14 @@ namespace MMEd.Util
       this.label9.TabIndex = 0;
       this.label9.Text = "Type";
       // 
+      // label24
+      // 
+      this.label24.AutoSize = true;
+      this.label24.Location = new System.Drawing.Point(173, 0);
+      this.label24.Name = "label24";
+      this.label24.Size = new System.Drawing.Size(0, 13);
+      this.label24.TabIndex = 5;
+      // 
       // groupBox3
       // 
       this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
@@ -485,9 +498,9 @@ namespace MMEd.Util
                   | System.Windows.Forms.AnchorStyles.Right)));
       this.groupBox3.Controls.Add(this.AddObjectLink);
       this.groupBox3.Controls.Add(this.panel2);
-      this.groupBox3.Location = new System.Drawing.Point(3, 402);
+      this.groupBox3.Location = new System.Drawing.Point(3, 419);
       this.groupBox3.Name = "groupBox3";
-      this.groupBox3.Size = new System.Drawing.Size(548, 202);
+      this.groupBox3.Size = new System.Drawing.Size(548, 185);
       this.groupBox3.TabIndex = 7;
       this.groupBox3.TabStop = false;
       this.groupBox3.Text = "Objects";
@@ -496,7 +509,7 @@ namespace MMEd.Util
       // 
       this.AddObjectLink.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.AddObjectLink.AutoSize = true;
-      this.AddObjectLink.Location = new System.Drawing.Point(6, 185);
+      this.AddObjectLink.Location = new System.Drawing.Point(6, 168);
       this.AddObjectLink.Name = "AddObjectLink";
       this.AddObjectLink.Size = new System.Drawing.Size(85, 13);
       this.AddObjectLink.TabIndex = 1;
@@ -512,7 +525,7 @@ namespace MMEd.Util
       this.panel2.Controls.Add(this.ObjectsTable);
       this.panel2.Location = new System.Drawing.Point(6, 19);
       this.panel2.Name = "panel2";
-      this.panel2.Size = new System.Drawing.Size(536, 164);
+      this.panel2.Size = new System.Drawing.Size(536, 147);
       this.panel2.TabIndex = 0;
       // 
       // ObjectsTable
@@ -549,45 +562,15 @@ namespace MMEd.Util
       this.ObjectsTable.Size = new System.Drawing.Size(298, 13);
       this.ObjectsTable.TabIndex = 0;
       // 
-      // label14
+      // label21
       // 
-      this.label14.AutoSize = true;
-      this.label14.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.label14.Location = new System.Drawing.Point(157, 0);
-      this.label14.Name = "label14";
-      this.label14.Size = new System.Drawing.Size(19, 13);
-      this.label14.TabIndex = 4;
-      this.label14.Text = "rZ";
-      // 
-      // label15
-      // 
-      this.label15.AutoSize = true;
-      this.label15.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.label15.Location = new System.Drawing.Point(132, 0);
-      this.label15.Name = "label15";
-      this.label15.Size = new System.Drawing.Size(19, 13);
-      this.label15.TabIndex = 3;
-      this.label15.Text = "rY";
-      // 
-      // label16
-      // 
-      this.label16.AutoSize = true;
-      this.label16.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.label16.Location = new System.Drawing.Point(86, 0);
-      this.label16.Name = "label16";
-      this.label16.Size = new System.Drawing.Size(15, 13);
-      this.label16.TabIndex = 2;
-      this.label16.Text = "Z";
-      // 
-      // label17
-      // 
-      this.label17.AutoSize = true;
-      this.label17.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.label17.Location = new System.Drawing.Point(223, 0);
-      this.label17.Name = "label17";
-      this.label17.Size = new System.Drawing.Size(30, 13);
-      this.label17.TabIndex = 1;
-      this.label17.Text = "Unk";
+      this.label21.AutoSize = true;
+      this.label21.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.label21.Location = new System.Drawing.Point(44, 0);
+      this.label21.Name = "label21";
+      this.label21.Size = new System.Drawing.Size(15, 13);
+      this.label21.TabIndex = 7;
+      this.label21.Text = "X";
       // 
       // label18
       // 
@@ -599,15 +582,15 @@ namespace MMEd.Util
       this.label18.TabIndex = 0;
       this.label18.Text = "Type";
       // 
-      // label19
+      // label16
       // 
-      this.label19.AutoSize = true;
-      this.label19.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.label19.Location = new System.Drawing.Point(107, 0);
-      this.label19.Name = "label19";
-      this.label19.Size = new System.Drawing.Size(19, 13);
-      this.label19.TabIndex = 5;
-      this.label19.Text = "rX";
+      this.label16.AutoSize = true;
+      this.label16.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.label16.Location = new System.Drawing.Point(86, 0);
+      this.label16.Name = "label16";
+      this.label16.Size = new System.Drawing.Size(15, 13);
+      this.label16.TabIndex = 2;
+      this.label16.Text = "Z";
       // 
       // label20
       // 
@@ -619,15 +602,35 @@ namespace MMEd.Util
       this.label20.TabIndex = 6;
       this.label20.Text = "Y";
       // 
-      // label21
+      // label19
       // 
-      this.label21.AutoSize = true;
-      this.label21.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.label21.Location = new System.Drawing.Point(44, 0);
-      this.label21.Name = "label21";
-      this.label21.Size = new System.Drawing.Size(15, 13);
-      this.label21.TabIndex = 7;
-      this.label21.Text = "X";
+      this.label19.AutoSize = true;
+      this.label19.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.label19.Location = new System.Drawing.Point(107, 0);
+      this.label19.Name = "label19";
+      this.label19.Size = new System.Drawing.Size(19, 13);
+      this.label19.TabIndex = 5;
+      this.label19.Text = "rX";
+      // 
+      // label15
+      // 
+      this.label15.AutoSize = true;
+      this.label15.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.label15.Location = new System.Drawing.Point(132, 0);
+      this.label15.Name = "label15";
+      this.label15.Size = new System.Drawing.Size(19, 13);
+      this.label15.TabIndex = 3;
+      this.label15.Text = "rY";
+      // 
+      // label14
+      // 
+      this.label14.AutoSize = true;
+      this.label14.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.label14.Location = new System.Drawing.Point(157, 0);
+      this.label14.Name = "label14";
+      this.label14.Size = new System.Drawing.Size(19, 13);
+      this.label14.TabIndex = 4;
+      this.label14.Text = "rZ";
       // 
       // label22
       // 
@@ -639,6 +642,16 @@ namespace MMEd.Util
       this.label22.TabIndex = 8;
       this.label22.Text = "Solid";
       // 
+      // label17
+      // 
+      this.label17.AutoSize = true;
+      this.label17.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.label17.Location = new System.Drawing.Point(223, 0);
+      this.label17.Name = "label17";
+      this.label17.Size = new System.Drawing.Size(30, 13);
+      this.label17.TabIndex = 1;
+      this.label17.Text = "Unk";
+      // 
       // label23
       // 
       this.label23.AutoSize = true;
@@ -649,14 +662,6 @@ namespace MMEd.Util
       this.label23.TabIndex = 9;
       this.label23.Text = "Unk";
       // 
-      // label24
-      // 
-      this.label24.AutoSize = true;
-      this.label24.Location = new System.Drawing.Point(173, 0);
-      this.label24.Name = "label24";
-      this.label24.Size = new System.Drawing.Size(0, 13);
-      this.label24.TabIndex = 5;
-      // 
       // label25
       // 
       this.label25.AutoSize = true;
@@ -664,6 +669,24 @@ namespace MMEd.Util
       this.label25.Name = "label25";
       this.label25.Size = new System.Drawing.Size(0, 13);
       this.label25.TabIndex = 10;
+      // 
+      // label26
+      // 
+      this.label26.AutoSize = true;
+      this.label26.Location = new System.Drawing.Point(3, 205);
+      this.label26.Name = "label26";
+      this.label26.Size = new System.Drawing.Size(36, 13);
+      this.label26.TabIndex = 26;
+      this.label26.Text = "Bytes:";
+      // 
+      // ByteSizeLabel
+      // 
+      this.ByteSizeLabel.AutoSize = true;
+      this.tableLayoutPanel1.SetColumnSpan(this.ByteSizeLabel, 5);
+      this.ByteSizeLabel.Location = new System.Drawing.Point(59, 205);
+      this.ByteSizeLabel.Name = "ByteSizeLabel";
+      this.ByteSizeLabel.Size = new System.Drawing.Size(0, 13);
+      this.ByteSizeLabel.TabIndex = 27;
       // 
       // FlatEditorPanel
       // 
@@ -748,5 +771,7 @@ namespace MMEd.Util
     private System.Windows.Forms.Label label23;
     private System.Windows.Forms.Label label24;
     private System.Windows.Forms.Label label25;
+    private System.Windows.Forms.Label label26;
+    internal System.Windows.Forms.Label ByteSizeLabel;
   }
 }

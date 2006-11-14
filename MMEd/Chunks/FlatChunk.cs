@@ -194,9 +194,18 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
     ///========================================================================
     public int ReplaceWeapons(IList<WeaponEntry> xiNewWeapons)
     {
-      int lSizeIncrease = (xiNewWeapons.Count - Weapons.Length) * 12;
-      Weapons = new WeaponEntry[xiNewWeapons.Count];
-      xiNewWeapons.CopyTo(Weapons, 0);
+      int lSizeIncrease = (xiNewWeapons.Count - (Weapons == null ? 0 : Weapons.Length)) * 12;
+
+      if (xiNewWeapons.Count > 0 || FlgA)
+      {
+        Weapons = new WeaponEntry[xiNewWeapons.Count];
+        xiNewWeapons.CopyTo(Weapons, 0);
+      }
+      else
+      {
+        Weapons = null;
+      }
+
       return lSizeIncrease;
     }
 
@@ -211,9 +220,18 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
     ///========================================================================
     public int ReplaceObjects(IList<ObjectEntry> xiNewObjects)
     {
-      int lSizeIncrease = (xiNewObjects.Count - Objects.Length) * 22;
-      Objects = new ObjectEntry[xiNewObjects.Count];
-      xiNewObjects.CopyTo(Objects, 0);
+      int lSizeIncrease = (xiNewObjects.Count - (Objects == null ? 0 : Objects.Length)) * 22;
+
+      if (xiNewObjects.Count > 0 || FlgA)
+      {
+        Objects = new ObjectEntry[xiNewObjects.Count];
+        xiNewObjects.CopyTo(Objects, 0);
+      }
+      else
+      {
+        Objects = null;
+      }
+
       return lSizeIncrease;
     }
 
