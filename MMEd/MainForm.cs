@@ -160,6 +160,11 @@ namespace MMEd
             }
         }
 
+      public LocalSettings LocalSettings
+      {
+        get { return mLocalSettings; }
+      }
+
 
         GlobalSettings mGlobalSettings;
         LocalSettings mLocalSettings;

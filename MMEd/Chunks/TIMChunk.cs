@@ -221,6 +221,11 @@ namespace MMEd.Chunks
       }
     }
 
+    public void InvalidateBitmapCache()
+    {
+      mBitmapCache = null;
+    }
+
     public Image ToImage()
     {
       return ToBitmap();
@@ -268,6 +273,16 @@ namespace MMEd.Chunks
     //calling an unmanaged function to load it
     private Bitmap CreateBitmapUnmanaged4bpp()
     {
+      return new Bitmap(CreatePalettedBMPStream());
+    }
+
+    public Stream CreatePalettedBMPStream()
+    {
+      if (this.BPP != TimBPP._4BPP)
+      {
+        throw new Exception("Only 4BPP supported");
+      }
+
       //create a BMP stream
       int lFileSize = 54 + 16 * 4 + ImageData.Length;
       MemoryStream mem = new MemoryStream(lFileSize);
@@ -280,10 +295,10 @@ namespace MMEd.Chunks
       bout.Write(40); //biSize
       bout.Write((int)ImageWidth);//biWidth
       bout.Write((int)ImageHeight);//biHeight
-      bout.Write((short)0);//biPlanes
+      bout.Write((short)1);//biPlanes
       bout.Write((short)4);//biBitCount
       bout.Write((int)0);//biCompression
-      bout.Write((int)0);//biSizeImage (0 is valid when no compression)
+      bout.Write((int)(ImageWidth * ImageHeight / 2));//biSizeImage (0 is valid when no compression)
       bout.Write((int)0);//biXPelsPerMeter
       bout.Write((int)0);//biYPelsPerMeter
       bout.Write((int)0);//biClrUsed (0 = derived from biBitCount)
@@ -308,7 +323,7 @@ namespace MMEd.Chunks
       if (mem.Length != lFileSize) throw new Exception();
       mem.Seek(0, SeekOrigin.Begin);
 
-      return new Bitmap(mem);
+      return mem;
     }
 
     Bitmap mBitmapCache;

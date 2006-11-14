@@ -68,6 +68,7 @@ namespace MMEd
           this.GridDisplayPanelHolder = new MMEd.Util.SmoothScrollingPanel();
           this.GridDisplayPanel = new MMEd.Util.UserPaintDoubleBufferedPanel();
           this.groupBox1 = new System.Windows.Forms.GroupBox();
+          this.GridViewShowObjectsCheck = new System.Windows.Forms.CheckBox();
           this.GridViewTransparencySlider = new System.Windows.Forms.TrackBar();
           this.GridViewViewModeCombo = new System.Windows.Forms.ComboBox();
           this.GridViewMetaTypeCombo = new System.Windows.Forms.ComboBox();
@@ -98,7 +99,13 @@ namespace MMEd
           this.Viewer3DRenderingSurfaceTopRight = new GLTK.RenderingSurface();
           this.Viewer3DRenderingSurfaceBottomRight = new GLTK.RenderingSurface();
           this.ToolTip = new System.Windows.Forms.ToolTip(this.components);
-          this.GridViewShowObjectsCheck = new System.Windows.Forms.CheckBox();
+          this.groupBox3 = new System.Windows.Forms.GroupBox();
+          this.groupBox4 = new System.Windows.Forms.GroupBox();
+          this.groupBox5 = new System.Windows.Forms.GroupBox();
+          this.ActionsTabExportTIMButton = new System.Windows.Forms.Button();
+          this.label10 = new System.Windows.Forms.Label();
+          this.ActionsTabImportTIMButton = new System.Windows.Forms.Button();
+          this.label11 = new System.Windows.Forms.Label();
           this.mMenuStrip.SuspendLayout();
           this.MainSplitter.Panel1.SuspendLayout();
           this.MainSplitter.Panel2.SuspendLayout();
@@ -136,6 +143,9 @@ namespace MMEd
           this.RightHandSplit.Panel1.SuspendLayout();
           this.RightHandSplit.Panel2.SuspendLayout();
           this.RightHandSplit.SuspendLayout();
+          this.groupBox3.SuspendLayout();
+          this.groupBox4.SuspendLayout();
+          this.groupBox5.SuspendLayout();
           this.SuspendLayout();
           // 
           // mMenuStrip
@@ -229,10 +239,9 @@ namespace MMEd
           // 
           // ViewTabActions
           // 
-          this.ViewTabActions.Controls.Add(this.label1);
-          this.ViewTabActions.Controls.Add(this.ActionsTabReindexBumpButton);
-          this.ViewTabActions.Controls.Add(this.label9);
-          this.ViewTabActions.Controls.Add(this.ActionsTabCloneFlatButton);
+          this.ViewTabActions.Controls.Add(this.groupBox5);
+          this.ViewTabActions.Controls.Add(this.groupBox4);
+          this.ViewTabActions.Controls.Add(this.groupBox3);
           this.ViewTabActions.Location = new System.Drawing.Point(4, 22);
           this.ViewTabActions.Name = "ViewTabActions";
           this.ViewTabActions.Padding = new System.Windows.Forms.Padding(3);
@@ -244,7 +253,7 @@ namespace MMEd
           // label1
           // 
           this.label1.AutoSize = true;
-          this.label1.Location = new System.Drawing.Point(163, 16);
+          this.label1.Location = new System.Drawing.Point(157, 19);
           this.label1.Name = "label1";
           this.label1.Size = new System.Drawing.Size(300, 39);
           this.label1.TabIndex = 1;
@@ -254,7 +263,7 @@ namespace MMEd
           // 
           // ActionsTabReindexBumpButton
           // 
-          this.ActionsTabReindexBumpButton.Location = new System.Drawing.Point(15, 16);
+          this.ActionsTabReindexBumpButton.Location = new System.Drawing.Point(9, 19);
           this.ActionsTabReindexBumpButton.Name = "ActionsTabReindexBumpButton";
           this.ActionsTabReindexBumpButton.Size = new System.Drawing.Size(142, 23);
           this.ActionsTabReindexBumpButton.TabIndex = 0;
@@ -264,7 +273,7 @@ namespace MMEd
           // label9
           // 
           this.label9.AutoSize = true;
-          this.label9.Location = new System.Drawing.Point(163, 80);
+          this.label9.Location = new System.Drawing.Point(157, 19);
           this.label9.Name = "label9";
           this.label9.Size = new System.Drawing.Size(209, 13);
           this.label9.TabIndex = 3;
@@ -272,7 +281,7 @@ namespace MMEd
           // 
           // ActionsTabCloneFlatButton
           // 
-          this.ActionsTabCloneFlatButton.Location = new System.Drawing.Point(15, 80);
+          this.ActionsTabCloneFlatButton.Location = new System.Drawing.Point(9, 19);
           this.ActionsTabCloneFlatButton.Name = "ActionsTabCloneFlatButton";
           this.ActionsTabCloneFlatButton.Size = new System.Drawing.Size(142, 23);
           this.ActionsTabCloneFlatButton.TabIndex = 2;
@@ -558,6 +567,16 @@ namespace MMEd
           this.groupBox1.TabIndex = 0;
           this.groupBox1.TabStop = false;
           this.groupBox1.Text = "View Options";
+          // 
+          // GridViewShowObjectsCheck
+          // 
+          this.GridViewShowObjectsCheck.AutoSize = true;
+          this.GridViewShowObjectsCheck.Location = new System.Drawing.Point(5, 124);
+          this.GridViewShowObjectsCheck.Name = "GridViewShowObjectsCheck";
+          this.GridViewShowObjectsCheck.Size = new System.Drawing.Size(90, 17);
+          this.GridViewShowObjectsCheck.TabIndex = 5;
+          this.GridViewShowObjectsCheck.Text = "Show objects";
+          this.GridViewShowObjectsCheck.UseVisualStyleBackColor = true;
           // 
           // GridViewTransparencySlider
           // 
@@ -880,15 +899,77 @@ namespace MMEd
           this.Viewer3DRenderingSurfaceBottomRight.TabIndex = 0;
           this.Viewer3DRenderingSurfaceBottomRight.Text = "renderingSurface4";
           // 
-          // GridViewShowObjectsCheck
+          // groupBox3
           // 
-          this.GridViewShowObjectsCheck.AutoSize = true;
-          this.GridViewShowObjectsCheck.Location = new System.Drawing.Point(5, 124);
-          this.GridViewShowObjectsCheck.Name = "GridViewShowObjectsCheck";
-          this.GridViewShowObjectsCheck.Size = new System.Drawing.Size(90, 17);
-          this.GridViewShowObjectsCheck.TabIndex = 5;
-          this.GridViewShowObjectsCheck.Text = "Show objects";
-          this.GridViewShowObjectsCheck.UseVisualStyleBackColor = true;
+          this.groupBox3.Controls.Add(this.ActionsTabReindexBumpButton);
+          this.groupBox3.Controls.Add(this.label1);
+          this.groupBox3.Location = new System.Drawing.Point(1, 6);
+          this.groupBox3.Name = "groupBox3";
+          this.groupBox3.Size = new System.Drawing.Size(627, 73);
+          this.groupBox3.TabIndex = 4;
+          this.groupBox3.TabStop = false;
+          this.groupBox3.Text = "Level";
+          // 
+          // groupBox4
+          // 
+          this.groupBox4.Controls.Add(this.ActionsTabCloneFlatButton);
+          this.groupBox4.Controls.Add(this.label9);
+          this.groupBox4.Location = new System.Drawing.Point(1, 85);
+          this.groupBox4.Name = "groupBox4";
+          this.groupBox4.Size = new System.Drawing.Size(627, 55);
+          this.groupBox4.TabIndex = 5;
+          this.groupBox4.TabStop = false;
+          this.groupBox4.Text = "Flats";
+          // 
+          // groupBox5
+          // 
+          this.groupBox5.Controls.Add(this.ActionsTabImportTIMButton);
+          this.groupBox5.Controls.Add(this.label11);
+          this.groupBox5.Controls.Add(this.ActionsTabExportTIMButton);
+          this.groupBox5.Controls.Add(this.label10);
+          this.groupBox5.Location = new System.Drawing.Point(1, 146);
+          this.groupBox5.Name = "groupBox5";
+          this.groupBox5.Size = new System.Drawing.Size(627, 111);
+          this.groupBox5.TabIndex = 6;
+          this.groupBox5.TabStop = false;
+          this.groupBox5.Text = "TIM Images";
+          // 
+          // ActionsTabExportTIMButton
+          // 
+          this.ActionsTabExportTIMButton.Location = new System.Drawing.Point(9, 19);
+          this.ActionsTabExportTIMButton.Name = "ActionsTabExportTIMButton";
+          this.ActionsTabExportTIMButton.Size = new System.Drawing.Size(142, 23);
+          this.ActionsTabExportTIMButton.TabIndex = 2;
+          this.ActionsTabExportTIMButton.Text = "Export TIM to BMP";
+          this.ActionsTabExportTIMButton.UseVisualStyleBackColor = true;
+          // 
+          // label10
+          // 
+          this.label10.AutoSize = true;
+          this.label10.Location = new System.Drawing.Point(157, 19);
+          this.label10.Name = "label10";
+          this.label10.Size = new System.Drawing.Size(250, 13);
+          this.label10.TabIndex = 3;
+          this.label10.Text = "Save the selected TIM image to a paletted BMP file";
+          // 
+          // ActionsTabImportTIMButton
+          // 
+          this.ActionsTabImportTIMButton.Location = new System.Drawing.Point(9, 57);
+          this.ActionsTabImportTIMButton.Name = "ActionsTabImportTIMButton";
+          this.ActionsTabImportTIMButton.Size = new System.Drawing.Size(142, 23);
+          this.ActionsTabImportTIMButton.TabIndex = 4;
+          this.ActionsTabImportTIMButton.Text = "Import TIM from BMP";
+          this.ActionsTabImportTIMButton.UseVisualStyleBackColor = true;
+          // 
+          // label11
+          // 
+          this.label11.AutoSize = true;
+          this.label11.Location = new System.Drawing.Point(157, 57);
+          this.label11.Name = "label11";
+          this.label11.Size = new System.Drawing.Size(301, 39);
+          this.label11.TabIndex = 5;
+          this.label11.Text = "Overwrite the selected TIM image from a paletted BMP file.\r\nThe BMP must be the s" +
+              "ame size, and use the same palette as \r\nthe TIM which you are replacing.";
           // 
           // MainForm
           // 
@@ -907,7 +988,6 @@ namespace MMEd
           this.MainSplitter.ResumeLayout(false);
           this.ViewerTabControl.ResumeLayout(false);
           this.ViewTabActions.ResumeLayout(false);
-          this.ViewTabActions.PerformLayout();
           this.ViewTabXML.ResumeLayout(false);
           this.ViewTabXML.PerformLayout();
           this.ViewTabFlat.ResumeLayout(false);
@@ -949,6 +1029,12 @@ namespace MMEd
           this.RightHandSplit.Panel1.ResumeLayout(false);
           this.RightHandSplit.Panel2.ResumeLayout(false);
           this.RightHandSplit.ResumeLayout(false);
+          this.groupBox3.ResumeLayout(false);
+          this.groupBox3.PerformLayout();
+          this.groupBox4.ResumeLayout(false);
+          this.groupBox4.PerformLayout();
+          this.groupBox5.ResumeLayout(false);
+          this.groupBox5.PerformLayout();
           this.ResumeLayout(false);
           this.PerformLayout();
 
@@ -1025,6 +1111,13 @@ namespace MMEd
       public System.Windows.Forms.Button ActionsTabCloneFlatButton;
       public System.Windows.Forms.TabPage ViewTabActions;
       public System.Windows.Forms.CheckBox GridViewShowObjectsCheck;
+      private System.Windows.Forms.GroupBox groupBox5;
+      public System.Windows.Forms.Button ActionsTabImportTIMButton;
+      private System.Windows.Forms.Label label11;
+      public System.Windows.Forms.Button ActionsTabExportTIMButton;
+      private System.Windows.Forms.Label label10;
+      private System.Windows.Forms.GroupBox groupBox4;
+      private System.Windows.Forms.GroupBox groupBox3;
     }
 }
 

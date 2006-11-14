@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using MMEd;
+using MMEd.Util;
 using MMEd.Chunks;
 using System.Drawing;
 using System.Windows.Forms;
@@ -14,7 +15,7 @@ namespace MMEd.Viewers
 {
   public class ActionsViewer : Viewer
   {
-    #region actions
+    #region Reindex Bump Action
 
     public void ReindexBumpImages()
     {
@@ -133,8 +134,12 @@ namespace MMEd.Viewers
       public override int Compare(BumpImageChunk a, BumpImageChunk b)
       {
         return Util.ByteArrayComparer.CompareStatic(a.Data, b.Data);
-      } 
+      }
     }
+
+    #endregion 
+
+    #region Clone Flat Action
 
     public void CloneFlat()
     {
@@ -180,11 +185,138 @@ namespace MMEd.Viewers
 
     #endregion
 
+    #region Export TIM Action
+
+    void ActionsTabExportTIMButton_Click(object sender, EventArgs e)
+    {
+      if (mSubject as TIMChunk != null)
+      {
+        SaveFileDialog sfd = new SaveFileDialog();
+        sfd.FileName = mMainForm.LocalSettings.LastTIMFile;
+        DialogResult res = sfd.ShowDialog(mMainForm);
+        if (res == DialogResult.OK)
+        {
+          string lExceptionWhen = "opening the file";
+          try
+          {
+            using (FileStream fs = File.Create(sfd.FileName))
+            {
+              lExceptionWhen = "writing the file";
+              StreamUtils.Pipe(((TIMChunk)mSubject).CreatePalettedBMPStream(), fs);
+            }
+          }
+          catch (Exception err)
+          {
+            MessageBox.Show(string.Format("Exception occurred while {0}: {1}", lExceptionWhen, err.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return;
+          }
+        }
+        mMainForm.LocalSettings.LastTIMFile = sfd.FileName;
+      }
+      else
+      {
+        MessageBox.Show("Error: mSubject is null!");
+      }
+    }
+
+    #endregion
+
+    #region Import TIM Action 
+
+    void ActionsTabImportTIMButton_Click(object sender, EventArgs e)
+    {
+      if (mSubject as TIMChunk != null)
+      {
+        OpenFileDialog ofd = new OpenFileDialog();
+        ofd.FileName = mMainForm.LocalSettings.LastTIMFile;
+        DialogResult res = ofd.ShowDialog(mMainForm);
+        if (res == DialogResult.OK)
+        {
+          string lExceptionWhen = "opening the file";
+          try
+          {
+            using (FileStream fs = File.OpenRead(ofd.FileName))
+            {
+              lExceptionWhen = "loading a bitmap from the file";
+              Bitmap lBmp = new Bitmap(fs);
+              lExceptionWhen = "turning the bitmap into a TIM";
+              FillTIMFromBMP(((TIMChunk)mSubject), lBmp);
+            }
+          }
+          catch (Exception err)
+          {
+            MessageBox.Show(string.Format("Exception occurred while {0}: {1}", lExceptionWhen, err.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return;
+          }
+        }
+        mMainForm.LocalSettings.LastTIMFile = ofd.FileName;
+      }
+      else
+      {
+        MessageBox.Show("Error: mSubject is null!");
+      }
+    }
+
+    public static void FillTIMFromBMP(TIMChunk xiTIM, Bitmap xiBmp)
+    {
+      //simple checks:
+      if (xiBmp.Width != xiTIM.ImageWidth
+        || xiBmp.Height != xiTIM.ImageHeight)
+      {
+        throw new Exception(string.Format("BMP is different size to TIM ({0} vs ({1},{2}))",
+          xiBmp.Size, xiTIM.ImageWidth, xiTIM.ImageHeight));
+      }
+
+      if (xiTIM.BPP != TIMChunk.TimBPP._4BPP)
+      {
+        throw new Exception("Only 4BPP TIMs supported");
+      }
+
+      //we don't insist that the BMP is paletted, just that it only uses colours in the palette
+      Dictionary<int, int> lColorToPaletteIdx = new Dictionary<int, int>();
+      for (int i = xiTIM.Palette.Length - 1; i >= 0; i--)
+      {
+        lColorToPaletteIdx[xiTIM.Palette[i]] = i;
+      }
+
+      int w = xiBmp.Width;
+      int rowLen = w/2;
+      int h = xiBmp.Height;
+      int x = -1, y = -1; 
+      Color c = Color.Black;
+      try
+      {
+        for (y = 0; y < h; y++)
+        {
+          for (x = 0; x < w; x+=2)
+          {
+            c = xiBmp.GetPixel(x, y);
+            int left = lColorToPaletteIdx[c.ToArgb()];
+            c = xiBmp.GetPixel(x+1, y);
+            int right = lColorToPaletteIdx[c.ToArgb()];
+            byte b = (byte)(left | (right << 4));
+            xiTIM.ImageData[y * rowLen + x / 2] = b;
+          }
+        }
+      }
+      catch (KeyNotFoundException e)
+      {
+        throw new Exception(string.Format("The color 0x{0:x} is used in the BMP at ({1},{2}), but doesn't appear in the TIM palette",
+          c.ToArgb(), x, y));
+      }
+
+      xiTIM.InvalidateBitmapCache();
+    }
+
+    #endregion
+
     private ActionsViewer(MainForm xiMainForm)
       : base(xiMainForm) 
     {
       mMainForm.ActionsTabReindexBumpButton.Click += new EventHandler(ActionsTabReindexBumpButton_Click);
       mMainForm.ActionsTabCloneFlatButton.Click += new EventHandler(ActionsTabCloneFlatButton_Click);
+      mMainForm.ActionsTabExportTIMButton.Click += new EventHandler(ActionsTabExportTIMButton_Click);
+      mMainForm.ActionsTabImportTIMButton.Click += new EventHandler(ActionsTabImportTIMButton_Click);
       SetSubject(null);
     }
 
@@ -218,6 +350,8 @@ namespace MMEd.Viewers
       mSubject = xiChunk;
       mMainForm.ActionsTabReindexBumpButton.Enabled = (mSubject is Level);
       mMainForm.ActionsTabCloneFlatButton.Enabled = (mSubject is FlatChunk);
+      mMainForm.ActionsTabImportTIMButton.Enabled = (mSubject is TIMChunk);
+      mMainForm.ActionsTabExportTIMButton.Enabled = (mSubject is TIMChunk);
     }
 
     public override System.Windows.Forms.TabPage Tab

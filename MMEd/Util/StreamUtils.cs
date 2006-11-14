@@ -155,5 +155,17 @@ namespace MMEd.Util
     {
       bout.Write(xiValue ? (byte)1 : (byte)0);
     }
+
+    //writes all the data found in steam xiFrom into stream xiTo
+    //(surely there's a library function to do that?)
+    public static void Pipe(Stream xiFrom, Stream xiTo)
+    {
+      byte[] lBuff = new byte[256];
+      int lReadCount;
+      while (0 != (lReadCount = xiFrom.Read(lBuff, 0, lBuff.Length)))
+      {
+        xiTo.Write(lBuff, 0, lReadCount);
+      }
+    }
   }
 }

@@ -20,6 +20,7 @@ namespace MMEd
 
     public string LastOpenedFile;
     public string LastSavedFile;
+    public string LastTIMFile;
 
     // loads the local settings found on this machine,
     // or creates a new instance
