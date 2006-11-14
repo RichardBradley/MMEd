@@ -519,6 +519,12 @@ namespace MMEd.Viewers
     {
       byte lBumpImageIdx = mSubject.TexMetaData[xiTexX][xiTexY][(int)eTexMetaDataEntries.Bumpmap];
 
+      if (lBumpImageIdx >= mBumpImageUsageCountArray.Length)
+      {
+        MessageBox.Show("Cannot edit that bump square: it indexes a non-existant bump. Please edit it numerically first");
+        return;
+      }
+
       //how to update the bump pix depends on how many tex squares
       //use that bump pix
       switch (mBumpImageUsageCountArray[lBumpImageIdx])
@@ -793,7 +799,17 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
               {
                 foreach (byte[] entry in row)
                 {
-                  mBumpImageUsageCountArray[entry[lBumpIdx]]++;
+                  int lBumpId = entry[lBumpIdx];
+                  if (lBumpId < mBumpImageUsageCountArray.Length)
+                  {
+                    mBumpImageUsageCountArray[lBumpId]++;
+                  }
+                  else
+                  {
+                    Console.Error.WriteLine("Tex square in Flat {0} references non-existant bump id {1}",
+                      flat.Name,
+                      lBumpId);
+                  }
                 }
               }
             }
