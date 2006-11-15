@@ -128,6 +128,9 @@ namespace MMEd.Chunks
       return false;
     }
 
+    public Level() { }
+    public Level(Stream inStr) { Deserialise(inStr); }
+
     public override void Deserialise(Stream inStr)
     {
       if (inStr is FileStream)
@@ -314,13 +317,18 @@ namespace MMEd.Chunks
       }
     }
 
-    public IEnumerable<GLTK.Entity> GetEntities(Level xiLevel, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata)
+    public IEnumerable<GLTK.Entity> GetEntities(Chunk xiRootChunk, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata)
     {
+      if (!(xiRootChunk is Level))
+      {
+        throw new Exception("xiRootChunk must be Level for Level.GetEntities");
+      }
+
       List<Entity> lAcc = new List<Entity>();
 
       foreach (FlatChunk fl in SHET.Flats)
       {
-        lAcc.AddRange(fl.GetEntities(xiLevel, xiTextureMode, xiSelectedMetadata));
+        lAcc.AddRange(fl.GetEntities((Level)xiRootChunk, xiTextureMode, xiSelectedMetadata));
       }
 
       return lAcc;

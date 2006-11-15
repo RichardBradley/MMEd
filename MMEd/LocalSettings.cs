@@ -19,6 +19,7 @@ namespace MMEd
     }
 
     public string LastOpenedFile;
+    public MainForm.eOpenType LastOpenedType = MainForm.eOpenType.LevelBinary;
     public string LastSavedFile;
     public string LastTIMFile;
 

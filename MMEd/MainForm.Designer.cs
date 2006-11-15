@@ -32,8 +32,12 @@ namespace MMEd
           System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
           this.mMenuStrip = new System.Windows.Forms.MenuStrip();
           this.MnuFile = new System.Windows.Forms.ToolStripMenuItem();
-          this.MnuiFileOpen = new System.Windows.Forms.ToolStripMenuItem();
+          this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+          this.MnuiFileOpenLevel = new System.Windows.Forms.ToolStripMenuItem();
+          this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
+          this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
           this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+          this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
           this.MainSplitter = new System.Windows.Forms.SplitContainer();
           this.ChunkTreeView = new System.Windows.Forms.TreeView();
           this.ViewerTabControl = new System.Windows.Forms.TabControl();
@@ -76,6 +80,7 @@ namespace MMEd
           this.GridDisplayPanel = new MMEd.Util.UserPaintDoubleBufferedPanel();
           this.groupBox1 = new System.Windows.Forms.GroupBox();
           this.GridViewShowObjectsCheck = new System.Windows.Forms.CheckBox();
+          this.GridViewZoomSlider = new System.Windows.Forms.TrackBar();
           this.GridViewTransparencySlider = new System.Windows.Forms.TrackBar();
           this.GridViewViewModeCombo = new System.Windows.Forms.ComboBox();
           this.GridViewMetaTypeCombo = new System.Windows.Forms.ComboBox();
@@ -106,7 +111,6 @@ namespace MMEd
           this.Viewer3DRenderingSurfaceTopRight = new GLTK.RenderingSurface();
           this.Viewer3DRenderingSurfaceBottomRight = new GLTK.RenderingSurface();
           this.ToolTip = new System.Windows.Forms.ToolTip(this.components);
-          this.GridViewZoomSlider = new System.Windows.Forms.TrackBar();
           this.mMenuStrip.SuspendLayout();
           this.MainSplitter.Panel1.SuspendLayout();
           this.MainSplitter.Panel2.SuspendLayout();
@@ -128,6 +132,7 @@ namespace MMEd
           this.smoothScrollingPanel1.SuspendLayout();
           this.GridDisplayPanelHolder.SuspendLayout();
           this.groupBox1.SuspendLayout();
+          ((System.ComponentModel.ISupportInitialize)(this.GridViewZoomSlider)).BeginInit();
           ((System.ComponentModel.ISupportInitialize)(this.GridViewTransparencySlider)).BeginInit();
           this.ViewTab3D.SuspendLayout();
           this.ViewTabBump.SuspendLayout();
@@ -147,7 +152,6 @@ namespace MMEd
           this.RightHandSplit.Panel1.SuspendLayout();
           this.RightHandSplit.Panel2.SuspendLayout();
           this.RightHandSplit.SuspendLayout();
-          ((System.ComponentModel.ISupportInitialize)(this.GridViewZoomSlider)).BeginInit();
           this.SuspendLayout();
           // 
           // mMenuStrip
@@ -163,21 +167,50 @@ namespace MMEd
           // MnuFile
           // 
           this.MnuFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.MnuiFileOpen,
-            this.saveToolStripMenuItem});
+            this.toolStripMenuItem1,
+            this.MnuiFileOpenLevel,
+            this.toolStripMenuItem3,
+            this.toolStripSeparator1,
+            this.saveToolStripMenuItem,
+            this.toolStripMenuItem2});
           this.MnuFile.Name = "MnuFile";
           this.MnuFile.Size = new System.Drawing.Size(35, 20);
           this.MnuFile.Text = "&File";
           // 
-          // MnuiFileOpen
+          // toolStripMenuItem1
           // 
-          this.MnuiFileOpen.Image = ((System.Drawing.Image)(resources.GetObject("MnuiFileOpen.Image")));
-          this.MnuiFileOpen.ImageTransparentColor = System.Drawing.Color.Magenta;
-          this.MnuiFileOpen.Name = "MnuiFileOpen";
-          this.MnuiFileOpen.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-          this.MnuiFileOpen.Size = new System.Drawing.Size(174, 22);
-          this.MnuiFileOpen.Text = "&Open";
-          this.MnuiFileOpen.Click += new System.EventHandler(this.MnuiFileOpen_Click);
+          this.toolStripMenuItem1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripMenuItem1.Image")));
+          this.toolStripMenuItem1.ImageTransparentColor = System.Drawing.Color.Magenta;
+          this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+          this.toolStripMenuItem1.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
+          this.toolStripMenuItem1.Size = new System.Drawing.Size(224, 22);
+          this.toolStripMenuItem1.Text = "&Open Level Binary...";
+          this.toolStripMenuItem1.ToolTipText = "Opens an MMv3 level file, as extracted from the CD";
+          this.toolStripMenuItem1.Click += new System.EventHandler(this.OpenLevelBinaryClick);
+          // 
+          // MnuiFileOpenLevel
+          // 
+          this.MnuiFileOpenLevel.ImageTransparentColor = System.Drawing.Color.Magenta;
+          this.MnuiFileOpenLevel.Name = "MnuiFileOpenLevel";
+          this.MnuiFileOpenLevel.Size = new System.Drawing.Size(224, 22);
+          this.MnuiFileOpenLevel.Text = "&Open Unknown Binary...";
+          this.MnuiFileOpenLevel.ToolTipText = "Opens any old binary file, and searches through it for recognisable MMv3 datastru" +
+              "ctures";
+          this.MnuiFileOpenLevel.Click += new System.EventHandler(this.OpenUnknownBinaryClick);
+          // 
+          // toolStripMenuItem3
+          // 
+          this.toolStripMenuItem3.ImageTransparentColor = System.Drawing.Color.Magenta;
+          this.toolStripMenuItem3.Name = "toolStripMenuItem3";
+          this.toolStripMenuItem3.Size = new System.Drawing.Size(224, 22);
+          this.toolStripMenuItem3.Text = "&Open XML...";
+          this.toolStripMenuItem3.ToolTipText = "Opens an XML file saved from this program";
+          this.toolStripMenuItem3.Click += new System.EventHandler(this.OpenXmlClick);
+          // 
+          // toolStripSeparator1
+          // 
+          this.toolStripSeparator1.Name = "toolStripSeparator1";
+          this.toolStripSeparator1.Size = new System.Drawing.Size(221, 6);
           // 
           // saveToolStripMenuItem
           // 
@@ -185,9 +218,20 @@ namespace MMEd
           this.saveToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
           this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
           this.saveToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-          this.saveToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
-          this.saveToolStripMenuItem.Text = "&Save As...";
-          this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
+          this.saveToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+          this.saveToolStripMenuItem.Text = "&Save As Binary...";
+          this.saveToolStripMenuItem.ToolTipText = "Saves this file in an MMv3 binary format";
+          this.saveToolStripMenuItem.Click += new System.EventHandler(this.SaveAsBinaryClick);
+          // 
+          // toolStripMenuItem2
+          // 
+          this.toolStripMenuItem2.ImageTransparentColor = System.Drawing.Color.Magenta;
+          this.toolStripMenuItem2.Name = "toolStripMenuItem2";
+          this.toolStripMenuItem2.Size = new System.Drawing.Size(224, 22);
+          this.toolStripMenuItem2.Text = "&Save As XML...";
+          this.toolStripMenuItem2.ToolTipText = "Saves this file as an XML tree\r\nCAUTION: the resulting file may not be openable\r\n" +
+              "by future versions of MMEd!";
+          this.toolStripMenuItem2.Click += new System.EventHandler(this.SaveAsXmlClick);
           // 
           // MainSplitter
           // 
@@ -653,6 +697,16 @@ namespace MMEd
           this.GridViewShowObjectsCheck.Text = "Show objects";
           this.GridViewShowObjectsCheck.UseVisualStyleBackColor = true;
           // 
+          // GridViewZoomSlider
+          // 
+          this.GridViewZoomSlider.Location = new System.Drawing.Point(5, 108);
+          this.GridViewZoomSlider.Maximum = 5;
+          this.GridViewZoomSlider.Minimum = -5;
+          this.GridViewZoomSlider.Name = "GridViewZoomSlider";
+          this.GridViewZoomSlider.Size = new System.Drawing.Size(122, 45);
+          this.GridViewZoomSlider.TabIndex = 6;
+          this.ToolTip.SetToolTip(this.GridViewZoomSlider, "Set the zoom level");
+          // 
           // GridViewTransparencySlider
           // 
           this.GridViewTransparencySlider.Location = new System.Drawing.Point(5, 73);
@@ -974,16 +1028,6 @@ namespace MMEd
           this.Viewer3DRenderingSurfaceBottomRight.TabIndex = 0;
           this.Viewer3DRenderingSurfaceBottomRight.Text = "renderingSurface4";
           // 
-          // GridViewZoomSlider
-          // 
-          this.GridViewZoomSlider.Location = new System.Drawing.Point(5, 108);
-          this.GridViewZoomSlider.Maximum = 5;
-          this.GridViewZoomSlider.Minimum = -5;
-          this.GridViewZoomSlider.Name = "GridViewZoomSlider";
-          this.GridViewZoomSlider.Size = new System.Drawing.Size(122, 45);
-          this.GridViewZoomSlider.TabIndex = 6;
-          this.ToolTip.SetToolTip(this.GridViewZoomSlider, "Set the zoom level");
-          // 
           // MainForm
           // 
           this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1025,6 +1069,7 @@ namespace MMEd
           this.GridDisplayPanelHolder.ResumeLayout(false);
           this.groupBox1.ResumeLayout(false);
           this.groupBox1.PerformLayout();
+          ((System.ComponentModel.ISupportInitialize)(this.GridViewZoomSlider)).EndInit();
           ((System.ComponentModel.ISupportInitialize)(this.GridViewTransparencySlider)).EndInit();
           this.ViewTab3D.ResumeLayout(false);
           this.ViewTabBump.ResumeLayout(false);
@@ -1048,7 +1093,6 @@ namespace MMEd
           this.RightHandSplit.Panel1.ResumeLayout(false);
           this.RightHandSplit.Panel2.ResumeLayout(false);
           this.RightHandSplit.ResumeLayout(false);
-          ((System.ComponentModel.ISupportInitialize)(this.GridViewZoomSlider)).EndInit();
           this.ResumeLayout(false);
           this.PerformLayout();
 
@@ -1059,7 +1103,7 @@ namespace MMEd
         private System.Windows.Forms.ToolStripMenuItem MnuFile;
         private System.Windows.Forms.SplitContainer MainSplitter;
         public System.Windows.Forms.TreeView ChunkTreeView;
-        private System.Windows.Forms.ToolStripMenuItem MnuiFileOpen;
+        private System.Windows.Forms.ToolStripMenuItem MnuiFileOpenLevel;
         private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
         public System.Windows.Forms.MenuStrip mMenuStrip;
       public System.Windows.Forms.TabControl ViewerTabControl;
@@ -1133,6 +1177,10 @@ namespace MMEd
       private System.Windows.Forms.GroupBox groupBox4;
       private System.Windows.Forms.GroupBox groupBox3;
       public System.Windows.Forms.TrackBar GridViewZoomSlider;
+      private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+      private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
+      private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem3;
+      private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
     }
 }
 

@@ -65,7 +65,7 @@ namespace MMEd.Viewers
           {
             // Draw the main texture for the square (all views)
             e.Graphics.DrawImageUnscaled(
-                mMainForm.Level.GetTileById(mSubject.TextureIds[x][y]).ToBitmap(),
+                ((Level)mMainForm.RootChunk).GetTileById(mSubject.TextureIds[x][y]).ToBitmap(),
                 x * mSubjectTileWidth,
                 y * mSubjectTileHeight);
 
@@ -77,7 +77,7 @@ namespace MMEd.Viewers
                     y * mSubjectTileHeight,
                     mSubjectTileWidth,
                     mSubjectTileHeight);
-                OddImageChunk oic = mMainForm.Level.GetOddById(mSubject.TexMetaData[x][y][(int)SelectedMeta]);
+                OddImageChunk oic = ((Level)mMainForm.RootChunk).GetOddById(mSubject.TexMetaData[x][y][(int)SelectedMeta]);
 
                 // If we don't have an odd to draw here, bic is null
                 // and nothing is drawn - just leave the base texture as-is.
@@ -96,7 +96,7 @@ namespace MMEd.Viewers
                     y * mSubjectTileHeight,
                     mSubjectTileWidth,
                     mSubjectTileHeight);
-                BumpImageChunk bic = mMainForm.Level.GetBumpById(mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.Bumpmap]);
+                BumpImageChunk bic = ((Level)mMainForm.RootChunk).GetBumpById(mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.Bumpmap]);
 
                 if (bic != null)
                 {
@@ -110,7 +110,7 @@ namespace MMEd.Viewers
                     y * mSubjectTileHeight,
                     mSubjectTileWidth,
                     mSubjectTileHeight);
-                CameraPosChunk cpc = mMainForm.Level.GetCameraById(mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.CameraPos]);
+                CameraPosChunk cpc = ((Level)mMainForm.RootChunk).GetCameraById(mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.CameraPos]);
 
                 if (cpc != null)
                 {
@@ -118,7 +118,7 @@ namespace MMEd.Viewers
                   {
                     // If the camera pos ID is less than 51 it won't be used 
                     // for multiplayer games, and pos ID 0 will be used instead.
-                    cpc = mMainForm.Level.GetCameraById(0);
+                    cpc = ((Level)mMainForm.RootChunk).GetCameraById(0);
                   }
 
                   DrawTransparentImage(e, cpc.ToImage(), lCameraDest);
@@ -160,7 +160,7 @@ namespace MMEd.Viewers
           mWireFrameCache = new List<ColoredPolygon>();
 
           IEnumerable<Entity> lScene
-            = mSubject.GetEntities(mMainForm.Level, MMEd.Viewers.ThreeDee.eTextureMode.WireFrame, eTexMetaDataEntries.Zero);
+            = mSubject.GetEntities(((Level)mMainForm.RootChunk), MMEd.Viewers.ThreeDee.eTextureMode.WireFrame, eTexMetaDataEntries.Zero);
 
           //find the entity correspoding to mSubject
           Entity lSubjectsEntity = null;
@@ -375,7 +375,7 @@ namespace MMEd.Viewers
       {
         //find the width and height of the tex components
         short topLeftTexIdx = mSubject.TextureIds[0][0];
-        TIMChunk firstTim = mMainForm.Level.GetTileById(topLeftTexIdx);
+        TIMChunk firstTim = ((Level)mMainForm.RootChunk).GetTileById(topLeftTexIdx);
         mSubjectTileHeight = firstTim.ImageHeight;
         mSubjectTileWidth = firstTim.ImageWidth;
 
@@ -555,7 +555,7 @@ namespace MMEd.Viewers
           throw new Exception("Interal error: unreachable statement!");
 
         case 1:
-          BumpImageChunk bic = mMainForm.Level.GetBumpById(lBumpImageIdx);
+          BumpImageChunk bic = ((Level)mMainForm.RootChunk).GetBumpById(lBumpImageIdx);
           bic.SetPixelType(xiBumpPxX, xiBumpPxY, xiNewVal);
           break;
 
@@ -565,8 +565,8 @@ namespace MMEd.Viewers
           {
             if (mBumpImageUsageCountArray[lNewBumpImageIdx] == 0)
             {
-              BumpImageChunk newBump = mMainForm.Level.GetBumpById(lNewBumpImageIdx);
-              BumpImageChunk oldBump = mMainForm.Level.GetBumpById(lBumpImageIdx);
+              BumpImageChunk newBump = ((Level)mMainForm.RootChunk).GetBumpById(lNewBumpImageIdx);
+              BumpImageChunk oldBump = ((Level)mMainForm.RootChunk).GetBumpById(lBumpImageIdx);
               newBump.CopyFrom(oldBump);
               newBump.SetPixelType(xiBumpPxX, xiBumpPxY, xiNewVal);
               mSubject.TexMetaData[xiTexX][xiTexY][(int)eTexMetaDataEntries.Bumpmap]
@@ -719,7 +719,7 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
             //fetch or create the appropriate palette image for the byte value "i"
             if (ViewMode == eViewMode.EditTextures)
             {
-              TIMChunk c = mMainForm.Level.GetTileById(i);
+              TIMChunk c = ((Level)mMainForm.RootChunk).GetTileById(i);
               if (c != null) im = c.ToImage();
               if (im.Width != this.mSubjectTileWidth
                || im.Height != this.mSubjectTileHeight)
@@ -729,7 +729,7 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
             }
             else if (ViewMode == eViewMode.EditBumpSquares)
             {
-              BumpImageChunk bim = mMainForm.Level.GetBumpById(i);
+              BumpImageChunk bim = ((Level)mMainForm.RootChunk).GetBumpById(i);
               if (bim != null) im = bim.ToImage();
             }
             else if (ViewMode == eViewMode.EditBumpPixels)
@@ -811,9 +811,9 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
         // in editing the bump map, pixel by pixel
         if (ViewMode == eViewMode.EditBumpPixels)
         {
-          mBumpImageUsageCountArray = new int[mMainForm.Level.SHET.BumpImages.mChildren.Length];
+          mBumpImageUsageCountArray = new int[((Level)mMainForm.RootChunk).SHET.BumpImages.mChildren.Length];
           int lBumpIdx = (int)eTexMetaDataEntries.Bumpmap;
-          foreach (FlatChunk flat in mMainForm.Level.SHET.Flats)
+          foreach (FlatChunk flat in ((Level)mMainForm.RootChunk).SHET.Flats)
           {
             if (flat.TexMetaData != null)
             {

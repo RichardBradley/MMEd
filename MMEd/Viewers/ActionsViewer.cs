@@ -19,10 +19,17 @@ namespace MMEd.Viewers
 
     public void ReindexBumpImages()
     {
+      Level lLevel = mMainForm.RootChunk as Level;
+      if (lLevel == null)
+      {
+        MessageBox.Show("Must have a level open for this action");
+        return;
+      }
+
       // count how many times each bump image is currently in use
-      int[] lUseCount = new int[mMainForm.Level.SHET.BumpImages.mChildren.Length];
+      int[] lUseCount = new int[lLevel.SHET.BumpImages.mChildren.Length];
       const int lBumpIdx = (int)eTexMetaDataEntries.Bumpmap;
-      foreach (FlatChunk flat in mMainForm.Level.SHET.Flats)
+      foreach (FlatChunk flat in lLevel.SHET.Flats)
       {
         if (flat.TexMetaData != null)
         {
@@ -36,7 +43,7 @@ namespace MMEd.Viewers
         }
       }
 
-      Chunk[] lChunkArray = mMainForm.Level.SHET.BumpImages.mChildren;
+      Chunk[] lChunkArray = lLevel.SHET.BumpImages.mChildren;
       BumpImageChunk[] lBumpArray = new BumpImageChunk[lChunkArray.Length];
       Array.Copy(lChunkArray, lBumpArray, lChunkArray.Length);
 
@@ -106,7 +113,7 @@ namespace MMEd.Viewers
       }
 
       //now update all the bumps in the Flats
-      foreach (FlatChunk flat in mMainForm.Level.SHET.Flats)
+      foreach (FlatChunk flat in lLevel.SHET.Flats)
       {
         if (flat.TexMetaData != null)
         {
@@ -143,6 +150,13 @@ namespace MMEd.Viewers
 
     public void CloneFlat()
     {
+      Level lLevel = mMainForm.RootChunk as Level;
+      if (lLevel == null)
+      {
+        MessageBox.Show("Must have a level open for this action");
+        return;
+      }
+
       FlatChunk lSource = mSubject as FlatChunk;
       if (lSource == null) return;
 
@@ -161,7 +175,7 @@ namespace MMEd.Viewers
       //=======================================================================
       lDest.DeclaredName = "NewFlat1";
       short lMaxIdx = 0;
-      foreach (FlatChunk lExistingFlat in mMainForm.Level.SHET.Flats)
+      foreach (FlatChunk lExistingFlat in lLevel.SHET.Flats)
       {
         if (lExistingFlat.DeclaredIdx > lMaxIdx)
         {
@@ -169,17 +183,17 @@ namespace MMEd.Viewers
         }
       }
       lDest.DeclaredIdx = (short)(1 + lMaxIdx);
-      int lSizeIncrease = mMainForm.Level.SHET.AddFlat(lDest);
-      mMainForm.Level.SHET.TrailingZeroByteCount -= lSizeIncrease;
+      int lSizeIncrease = lLevel.SHET.AddFlat(lDest);
+      lLevel.SHET.TrailingZeroByteCount -= lSizeIncrease;
 
       //=======================================================================
       // Refresh the tree view
       //=======================================================================
-      mMainForm.Level = mMainForm.Level;
+      mMainForm.RootChunk = mMainForm.RootChunk;
 
       MessageBox.Show("Flat cloned successfully. " +
-        (mMainForm.Level.SHET.TrailingZeroByteCount < 0 ? 
-        string.Format("Note that you have run out of space in your level file - you will need to free up {0} bytes before you can save your changes.", -mMainForm.Level.SHET.TrailingZeroByteCount) : 
+        (lLevel.SHET.TrailingZeroByteCount < 0 ? 
+        string.Format("Note that you have run out of space in your level file - you will need to free up {0} bytes before you can save your changes.", -lLevel.SHET.TrailingZeroByteCount) : 
         ""));
     }
 

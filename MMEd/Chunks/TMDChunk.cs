@@ -50,6 +50,9 @@ namespace MMEd.Chunks
 
     private int mDataLength;
 
+    public TMDChunk() { }
+    public TMDChunk(System.IO.Stream inStr, string xiName) { mName = xiName; Deserialise(inStr); }
+
     public override void Deserialise(System.IO.Stream inStr)
     {
       long lStartingOffset = inStr.Position;
@@ -200,12 +203,12 @@ namespace MMEd.Chunks
       }
     }
 
-    public IEnumerable<GLTK.Entity> GetEntities(Level xiLevel, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata)
+    public IEnumerable<GLTK.Entity> GetEntities(Chunk xiRootChunk, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata)
     {
-      return new Entity[] { GetEntity(xiLevel, xiTextureMode, xiSelectedMetadata, this) };
+      return new Entity[] { GetEntity(xiRootChunk, xiTextureMode, xiSelectedMetadata, this) };
     }
 
-    public Entity GetEntity(Level xiLevel, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata, object xiMeshOwner)
+    public Entity GetEntity(Chunk xiRootChunk, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata, object xiMeshOwner)
     {
       MMEdEntity lAcc = new MMEdEntity(xiMeshOwner);
       Mesh lColouredMesh = null;
@@ -254,7 +257,8 @@ namespace MMEd.Chunks
                 || xiTextureMode == eTextureMode.NormalTexturesWithMetadata)
               {
                 lMesh.RenderMode = RenderMode.Textured;
-                lMesh.Texture = AbstractRenderer.ImageToTextureId(xiLevel.GetTexturePageById(f.mTexPage));
+                lMesh.Texture = AbstractRenderer.ImageToTextureId(
+                  VRAMViewer.GetInstance().GetTexturePage(xiRootChunk, f.mTexPage));
               }
               else
               {
@@ -308,18 +312,21 @@ namespace MMEd.Chunks
       return lAcc;
     }
 
+    private string mName;
     public override string Name
     {
       get
       {
-        return mIdx >= 0 
-          ? string.Format("[{0}] TMD", mIdx) 
-          : "TMD";
+        return mName == null
+        ? (mIdx >= 0
+          ? string.Format("[{0}] TMD", mIdx)
+          : "TMD")
+        : mName;
       }
     }
 
     int mIdx = -1;
-    public TMDChunk() { }
+
     public TMDChunk(int xiIdx, Stream xiInStr)
     {
       mIdx = xiIdx;

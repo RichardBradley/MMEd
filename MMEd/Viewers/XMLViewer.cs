@@ -32,16 +32,12 @@ namespace MMEd.Viewers
         TreeNode parentNode = selNode.Parent;
         if (parentNode == null)
         {
-          if (!(lReplacement is Level))
-          {
-            throw new Exception("Only the level node should have a null parent!");
-          }
-          mMainForm.Level = (Level)lReplacement;
+          mMainForm.RootChunk = lReplacement;
         }
         else
         {
           ((Chunk)parentNode.Tag).ReplaceChild(mSubject, lReplacement);
-          mMainForm.Level = mMainForm.Level;
+          mMainForm.RootChunk = mMainForm.RootChunk;
         }
       }
       catch (Exception e)

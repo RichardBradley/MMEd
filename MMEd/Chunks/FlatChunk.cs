@@ -488,13 +488,13 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
         bout.Write(ShortUnknown);
       }
 
-      public IEnumerable<GLTK.Entity> GetEntities(Level xiLevel, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata)
+      public IEnumerable<GLTK.Entity> GetEntities(Chunk xiRootChunk, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata)
       {
         List<GLTK.Entity> lRet = new List<Entity>();
-        TMDChunk lObjt = xiLevel.GetObjtById(this.ObjtType);
+        TMDChunk lObjt = ((Level)xiRootChunk).GetObjtById(this.ObjtType);
         if (lObjt != null)
         {
-          Entity lE = lObjt.GetEntity(xiLevel, xiTextureMode, xiSelectedMetadata, this);
+          Entity lE = lObjt.GetEntity(xiRootChunk, xiTextureMode, xiSelectedMetadata, this);
 
           //nasty, but required because the PS 3D world coords are left-handed,
           //and the OpenGl 3D coords are right handed
@@ -575,10 +575,10 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
         OriginPosition.WriteShort3Coord64(bout);
       }
 
-      public IEnumerable<GLTK.Entity> GetEntities(Level xiLevel, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata)
+      public IEnumerable<GLTK.Entity> GetEntities(Chunk xiRootChunk, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata)
       {
-        Entity lWeaponEntity = xiLevel.GetObjtById(TMDChunk.OBJT_ID_FOR_WEAPONS_BOX)
-          .GetEntity(xiLevel, xiTextureMode, xiSelectedMetadata, this);
+        Entity lWeaponEntity = ((Level)xiRootChunk).GetObjtById(TMDChunk.OBJT_ID_FOR_WEAPONS_BOX)
+          .GetEntity(xiRootChunk, xiTextureMode, xiSelectedMetadata, this);
 
         // Set the position.
         Point lWeaponPosition = ThreeDeeViewer.Short3CoordToPoint(this.OriginPosition);
@@ -655,6 +655,16 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
       {
         return TerrainHeight[x][y];
       }
+    }
+
+    public IEnumerable<GLTK.Entity> GetEntities(Chunk xiRootChunk, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata)
+    {
+      if (!(xiRootChunk is Level))
+      {
+        throw new Exception("xiRootChunk must be Level for Level.GetEntities");
+      }
+
+      return GetEntities((Level)xiRootChunk, xiTextureMode, xiSelectedMetadata);
     }
 
     public IEnumerable<GLTK.Entity> GetEntities(Level xiLevel, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata)

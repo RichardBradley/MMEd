@@ -36,6 +36,8 @@ namespace MMEd.Viewers
         return;
       }
 
+      Level lLevel = (Level)mMainForm.RootChunk;
+
       //=======================================================================
       // Warn about changing flags
       //=======================================================================
@@ -106,7 +108,7 @@ namespace MMEd.Viewers
       if (mSubject.Width != lNewWidth || mSubject.Height != lNewHeight || mSubject.FlgA != Panel.FlagACheckBox.Checked)
       {
         lSizeIncrease = mSubject.Resize(Panel.FlagACheckBox.Checked, lNewWidth, lNewHeight);
-        mMainForm.Level.SHET.TrailingZeroByteCount -= lSizeIncrease;
+        lLevel.SHET.TrailingZeroByteCount -= lSizeIncrease;
       }
 
       //=======================================================================
@@ -126,7 +128,7 @@ namespace MMEd.Viewers
       }
 
       lSizeIncrease = mSubject.ReplaceWeapons(lWeapons);
-      mMainForm.Level.SHET.TrailingZeroByteCount -= lSizeIncrease;
+      lLevel.SHET.TrailingZeroByteCount -= lSizeIncrease;
 
       //=======================================================================
       // Save objects
@@ -151,15 +153,15 @@ namespace MMEd.Viewers
       }
 
       lSizeIncrease = mSubject.ReplaceObjects(lObjects);
-      mMainForm.Level.SHET.TrailingZeroByteCount -= lSizeIncrease;
+      lLevel.SHET.TrailingZeroByteCount -= lSizeIncrease;
 
       //=======================================================================
       // Warn if we've run out of space
       //=======================================================================
-      if (mMainForm.Level.SHET.TrailingZeroByteCount < 0)
+      if (lLevel.SHET.TrailingZeroByteCount < 0)
       {
         MessageBox.Show("WARNING: You do not currently have enough spare space at the end of your level file. " +
-          string.Format("You will need to free up {0} bytes from the file before you can save to disk.", -mMainForm.Level.SHET.TrailingZeroByteCount),
+          string.Format("You will need to free up {0} bytes from the file before you can save to disk.", -lLevel.SHET.TrailingZeroByteCount),
           "MMEd", MessageBoxButtons.OK, MessageBoxIcon.Warning);
       }
     }
@@ -216,6 +218,8 @@ namespace MMEd.Viewers
 
       if (mSubject != null)
       {
+        Level lLevel = ((Level)mMainForm.RootChunk);
+
         Panel.SuspendLayout();
         Panel.WeaponsTable.SuspendLayout();
         Panel.ObjectsTable.SuspendLayout();
@@ -241,7 +245,7 @@ namespace MMEd.Viewers
         Panel.FlagDCheckBox.Checked = mSubject.FlgD;
         Panel.FlagECheckBox.Checked = mSubject.FlgE;
         Panel.NextNTextBox.Text = ArrayToString(mSubject.NextN);
-        Panel.ByteSizeLabel.Text = string.Format("{0} bytes ({1} bytes free)", mSubject.ByteSize, mMainForm.Level.SHET.TrailingZeroByteCount);
+        Panel.ByteSizeLabel.Text = string.Format("{0} bytes ({1} bytes free)", mSubject.ByteSize, lLevel.SHET.TrailingZeroByteCount);
 
         //=====================================================================
         // Set up the Weapons section

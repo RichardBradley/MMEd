@@ -74,6 +74,9 @@ namespace MMEd.Chunks
 
     #endregion
 
+    public TIMChunk() { }
+    public TIMChunk(System.IO.Stream inStr, string xiName) { mName = xiName;  Deserialise(inStr); }
+
     public void Deserialise(System.IO.Stream inStr, int xiExpectedDataSize)
     {
       long lStartOffset = xiExpectedDataSize >= 0 ? inStr.Position : -1;
@@ -210,14 +213,16 @@ namespace MMEd.Chunks
       }
     }
 
+    private string mName;
     public override string Name
     {
       get
       {
-        return
-      mIdx >= 0 ?
-
-      string.Format("[{0}] TIM", mIdx) : "TIM";
+        return mName == null
+        ? (mIdx >= 0 
+          ? string.Format("[{0}] TIM", mIdx) 
+          : "TIM")
+        : mName;
       }
     }
 
@@ -328,7 +333,7 @@ namespace MMEd.Chunks
 
     Bitmap mBitmapCache;
     int mIdx = -1;
-    public TIMChunk() { }
+
     public TIMChunk(int xiIdx, Stream xiInStr, int xiExpectedLength)
     {
       mIdx = xiIdx;

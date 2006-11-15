@@ -53,6 +53,7 @@
     <Compile Include="Chunk.cs" />
     <Compile Include="Chunks\BumpImageChunk.cs" />
     <Compile Include="Chunks\CameraPositionChunk.cs" />
+    <Compile Include="Chunks\FileChunk.cs" />
     <Compile Include="Chunks\OBJTChunk.cs" />
     <Compile Include="Chunks\TMDChunk.cs" />
     <Compile Include="Chunks\DeserialisationException.cs" />

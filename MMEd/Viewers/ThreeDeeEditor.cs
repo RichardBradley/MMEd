@@ -389,9 +389,9 @@ namespace MMEd.Viewers
         return;
       }
 
-      if (mSubject != mMainForm.Level)
+      if (mSubject != mMainForm.RootChunk)
       {
-        mSubject = mMainForm.Level;
+        mSubject = mMainForm.RootChunk as Level;
         RebuildScene();
         ResetCamera();
       }
@@ -424,7 +424,7 @@ namespace MMEd.Viewers
     {
       mScene.Clear();
       if (mSubject != null)
-        mScene.AddRange(mSubject.GetEntities(mMainForm.Level, TextureMode, SelectedMetadata));
+        mScene.AddRange(mSubject.GetEntities(mSubject, TextureMode, SelectedMetadata));
     }
 
     private void RebuildObject(object xiObject)
