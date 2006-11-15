@@ -104,6 +104,27 @@ namespace MMEd.Viewers
                 }
                 break;
 
+              case eViewMode.ViewCameras:
+                Rectangle lCameraDest = new Rectangle(
+                    x * mSubjectTileWidth,
+                    y * mSubjectTileHeight,
+                    mSubjectTileWidth,
+                    mSubjectTileHeight);
+                CameraPosChunk cpc = mMainForm.Level.GetCameraById(mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.CameraPos]);
+
+                if (cpc != null)
+                {
+                  if (cpc.Id < 51)
+                  {
+                    // If the camera pos ID is less than 51 it won't be used 
+                    // for multiplayer games, and pos ID 0 will be used instead.
+                    cpc = mMainForm.Level.GetCameraById(0);
+                  }
+
+                  DrawTransparentImage(e, cpc.ToImage(), lCameraDest);
+                }
+                break;
+
               case eViewMode.EditMetadata:
                 //draw the selected metadata on as text
                 string text = string.Format("{0}", mSubject.TexMetaData[x][y][(int)SelectedMeta]);
@@ -642,6 +663,7 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
       ViewOnly,
       ViewBump,
       ViewOdds,
+      ViewCameras,
       EditTextures,
       EditBumpSquares,
       EditBumpPixels,

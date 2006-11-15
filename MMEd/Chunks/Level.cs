@@ -73,6 +73,18 @@ namespace MMEd.Chunks
       }
     }
 
+    public CameraPosChunk GetCameraById(int xiId)
+    {
+      if (xiId < SHET.CameraPositions.mChildren.Length)
+      {
+        return (CameraPosChunk)SHET.CameraPositions.mChildren[xiId];
+      }
+      else
+      {
+        return null;
+      }
+    }
+
     public OddImageChunk GetOddById(int xiId)
     {
       if (xiId < SHET.OddImages.mChildren.Length)
