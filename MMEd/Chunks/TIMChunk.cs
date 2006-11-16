@@ -29,7 +29,7 @@ namespace MMEd.Chunks
 
     #region public fields
 
-    [Description(@"Bits per pixel. Only 4bpp supported in this implementation. 
+    [Description(@"Bits per pixel. Only a subset supported in this implementation. 
         It could be extended using the information in timgfx.txt")]
     public TimBPP BPP;
 
@@ -75,7 +75,7 @@ namespace MMEd.Chunks
     #endregion
 
     public TIMChunk() { }
-    public TIMChunk(System.IO.Stream inStr, string xiName) { mName = xiName;  Deserialise(inStr); }
+    public TIMChunk(System.IO.Stream inStr, string xiName) { mName = xiName; Deserialise(inStr); }
 
     public void Deserialise(System.IO.Stream inStr, int xiExpectedDataSize)
     {
@@ -90,53 +90,76 @@ namespace MMEd.Chunks
       }
 
       // bits per pixel
-      int lBpp = bin.ReadInt32();
-      if (lBpp != (int)TimBPP._4BPP)
+      BPP = (TimBPP)bin.ReadInt32();
+      if (BPP != TimBPP._4BPP
+        && BPP != TimBPP._8BPP
+        && BPP != TimBPP._16BPP)
       {
-        throw new TIMTypeNotImplementedException(string.Format("Only 4BPP (0x8) TIMs are supported. Found {0:x8}", lBpp), inStr.Position - 8);
+        throw new TIMTypeNotImplementedException(string.Format("Only 4BPP, 8BPP or 16BPP TIMs are supported. Found 0x{0:x8} BPP type", BPP), inStr.Position - 8);
       }
-      BPP = (TimBPP)lBpp;
 
-      // Now the main header:
-      ClutSize = bin.ReadInt32();
-      PaletteOrgX = bin.ReadInt16();
-      PaletteOrgY = bin.ReadInt16();
-      ClutColors = bin.ReadInt16();
-      ClutCount = bin.ReadInt16();
-
-      //sanity checks
-      if (ClutCount * ClutColors * 2 != ClutSize - 12)
-        throw new DeserialisationException("bad TIM: ClutCount*ClutColors*2 != ClutSize - 12", inStr.Position);
-
-      //TODO:
-      if (ClutCount != 1)
-        throw new DeserialisationException("Multi-clut TIMs are not yet supported. Please extend TIMChunk.cs using info from timgfx.txt");
-
-      //CLUT:
-      Palette = new int[ClutCount * ClutColors];
-      for (int i = 0; i < Palette.Length; i++)
+      if (BPP != TimBPP._16BPP)
       {
-        Palette[i] = Utils.PS16bitColorToARGB(bin.ReadInt16());
+        // Now the palette header:
+        ClutSize = bin.ReadInt32();
+        PaletteOrgX = bin.ReadInt16();
+        PaletteOrgY = bin.ReadInt16();
+        ClutColors = bin.ReadInt16();
+        ClutCount = bin.ReadInt16();
+
+        //sanity checks
+        if (ClutCount * ClutColors * 2 != ClutSize - 12)
+          throw new DeserialisationException("bad TIM: ClutCount*ClutColors*2 != ClutSize - 12", inStr.Position);
+
+        //TODO:
+        if (ClutCount != 1)
+          throw new DeserialisationException("Multi-clut TIMs are not yet supported. Please extend TIMChunk.cs using info from timgfx.txt");
+
+        //CLUT:
+        Palette = new int[ClutCount * ClutColors];
+        for (int i = 0; i < Palette.Length; i++)
+        {
+          Palette[i] = Utils.PS16bitColorToARGB(bin.ReadInt16());
+        }
+      }
+
+      //colour count
+      int lPixelsPerTwoBytes;
+      switch (BPP)
+      {
+        case TimBPP._4BPP:
+          if (ClutColors != 16) throw new DeserialisationException("bad TIM: ClutColors != 16, but BPP == 4", inStr.Position);
+          lPixelsPerTwoBytes = 4;
+          break;
+        case TimBPP._8BPP:
+          if (ClutColors != 256) throw new DeserialisationException("bad TIM: ClutColors != 256, but BPP == 8", inStr.Position);
+          lPixelsPerTwoBytes = 2;
+          break;
+        case TimBPP._16BPP:
+          if (ClutColors != 0) throw new DeserialisationException("bad TIM: ClutColors != 0, but BPP == 16", inStr.Position);
+          lPixelsPerTwoBytes = 1;
+          break;
+        default: throw new Exception("unreachable case");
       }
 
       //Second header:
       ImageDataSize = bin.ReadInt32();
       ImageOrgX = bin.ReadInt16();
       ImageOrgY = bin.ReadInt16();
-      //qq short * short is int !?!
-      ImageWidth = (short)(4 * bin.ReadInt16()); //qq may need changing when > 4bpp is supported
+      //short * short is int !?!
+      ImageWidth = (short)(lPixelsPerTwoBytes * bin.ReadInt16());
       ImageHeight = bin.ReadInt16();
 
       //sanity checks
       //some observed TIMs fail this check:
-      if (ImageWidth * ImageHeight / 2 != ImageDataSize - 12)
+      if (ImageWidth * ImageHeight / lPixelsPerTwoBytes * 2 != ImageDataSize - 12)
       {
         //throw new DeserialisationException
-        System.Diagnostics.Trace.WriteLine(string.Format("bad TIM: ImageWidth * ImageHeight / 2 != ImageDataSize - 12, near {0}", inStr.Position));
+        System.Diagnostics.Trace.WriteLine(string.Format("bad TIM: ImageWidth * ImageHeight / PixelsPerByte != ImageDataSize - 12, near {0}", inStr.Position));
       }
 
       //read the image data
-      ImageData = bin.ReadBytes(ImageWidth * ImageHeight / 2);
+      ImageData = bin.ReadBytes(ImageWidth * ImageHeight / lPixelsPerTwoBytes * 2);
 
       if (xiExpectedDataSize >= 0)
       {
@@ -170,28 +193,58 @@ namespace MMEd.Chunks
       // bits per pixel (fixed atm)
       bout.Write((int)BPP);
 
-      // Now the main header:
-      bout.Write(ClutSize);
-      bout.Write(PaletteOrgX);
-      bout.Write(PaletteOrgY);
-      bout.Write(ClutColors);
-      bout.Write(ClutCount);
-
-      //TODO:
-      if (ClutCount != 1)
-        throw new DeserialisationException("Multi-clut TIMs are not yet supported. Please extend TIMChunk.cs using info from timgfx.txt");
-
-      //CLUT:
-      for (int i = 0; i < Palette.Length; i++)
+      // bits per pixel
+      if (BPP != TimBPP._4BPP
+        && BPP != TimBPP._8BPP
+        && BPP != TimBPP._16BPP)
       {
-        bout.Write((short)Utils.ARGBColorToPS16bit(Palette[i]));
+        throw new Exception(string.Format("Only 4BPP, 8BPP or 16BPP TIMs are supported. Found 0x{0:x8} BPP type", BPP));
+      }
+
+      if (BPP != TimBPP._16BPP)
+      {
+        // Now the main header:
+        bout.Write(ClutSize);
+        bout.Write(PaletteOrgX);
+        bout.Write(PaletteOrgY);
+        bout.Write(ClutColors);
+        bout.Write(ClutCount);
+
+        //TODO:
+        if (ClutCount != 1)
+          throw new DeserialisationException("Multi-clut TIMs are not yet supported. Please extend TIMChunk.cs using info from timgfx.txt");
+
+        //CLUT:
+        for (int i = 0; i < Palette.Length; i++)
+        {
+          bout.Write((short)Utils.ARGBColorToPS16bit(Palette[i]));
+        }
+      }
+
+      //colour count
+      int lPixelsPerTwoBytes;
+      switch (BPP)
+      {
+        case TimBPP._4BPP:
+          if (ClutColors != 16) throw new Exception("bad TIM: ClutColors != 16, but BPP == 4");
+          lPixelsPerTwoBytes = 4;
+          break;
+        case TimBPP._8BPP:
+          if (ClutColors != 256) throw new Exception("bad TIM: ClutColors != 256, but BPP == 8");
+          lPixelsPerTwoBytes = 2;
+          break;
+        case TimBPP._16BPP:
+          if (ClutColors != 0) throw new Exception("bad TIM: ClutColors != 0, but BPP == 16");
+          lPixelsPerTwoBytes = 1;
+          break;
+        default: throw new Exception("unreachable case");
       }
 
       //Second header:
       bout.Write(ImageDataSize);
       bout.Write(ImageOrgX);
       bout.Write(ImageOrgY);
-      bout.Write((short)(ImageWidth / 4));
+      bout.Write((short)(ImageWidth / lPixelsPerTwoBytes));
       bout.Write(ImageHeight);
 
       //the image data. Not currently synched with ToBitmap()
@@ -208,6 +261,11 @@ namespace MMEd.Chunks
     {
       get
       {
+        if (BPP != TimBPP._4BPP)
+        {
+          throw new Exception(string.Format("Only 4BPP TIMs are supported. Found 0x{0:x8} BPP type", BPP));
+        }
+
         // (use ImageData.Length + 12, not ImageDataSize, because of occasionally failed consistency checks)
         return 8 + ClutSize + ImageData.Length + 12 + (ZeroPadding == null ? 0 : ZeroPadding.Length);
       }
@@ -219,8 +277,8 @@ namespace MMEd.Chunks
       get
       {
         return mName == null
-        ? (mIdx >= 0 
-          ? string.Format("[{0}] TIM", mIdx) 
+        ? (mIdx >= 0
+          ? string.Format("[{0}] TIM", mIdx)
           : "TIM")
         : mName;
       }
@@ -242,28 +300,39 @@ namespace MMEd.Chunks
       {
         try
         {
-          mBitmapCache = CreateBitmapUnmanaged4bpp();
+          mBitmapCache = new Bitmap(CreateBMPStream());
         }
         catch (Exception e)
         {
           //I seem to get a fair number of GDI+ exceptions from the
           //unmanaged call. Don't really know why.
           Console.Error.WriteLine(e);
-          mBitmapCache = CreateBitmapManaged();
+          switch (BPP)
+          {
+            case TimBPP._4BPP:
+              mBitmapCache = CreateBitmapManaged4bpp();
+              break;
+            case TimBPP._8BPP:
+              mBitmapCache = CreateBitmapManaged8bpp();
+              break;
+            case TimBPP._16BPP:
+              mBitmapCache = CreateBitmapManaged16bpp();
+              break;
+            default: throw new Exception(string.Format("Unsupported TIM type. Found 0x{0:x8} BPP type", BPP));
+          }
         }
       }
       return mBitmapCache;
     }
 
     //creates a bitmap using managed code only
-    private Bitmap CreateBitmapManaged()
+    private Bitmap CreateBitmapManaged4bpp()
     {
       Bitmap acc = new Bitmap(ImageWidth, ImageHeight, PixelFormat.Format32bppArgb);
       for (int y = 0; y < ImageHeight; y++)
       {
         for (int x = 0; x < ImageWidth; x += 2)
         {
-          //qq 4bpp only!
           byte v = ImageData[y * ImageWidth / 2 + x / 2];
           Color left = Color.FromArgb(Palette[v & 0xf]);
           Color right = Color.FromArgb((Palette[(v >> 4) & 0xf]));
@@ -274,55 +343,148 @@ namespace MMEd.Chunks
       return acc;
     }
 
-    //creates a bitmap by writing a BMP stream and
-    //calling an unmanaged function to load it
-    private Bitmap CreateBitmapUnmanaged4bpp()
+    //creates a bitmap using managed code only
+    private Bitmap CreateBitmapManaged8bpp()
     {
-      return new Bitmap(CreatePalettedBMPStream());
+      Bitmap acc = new Bitmap(ImageWidth, ImageHeight, PixelFormat.Format32bppArgb);
+      for (int y = 0; y < ImageHeight; y++)
+      {
+        for (int x = 0; x < ImageWidth; x++)
+        {
+          byte v = ImageData[y * ImageWidth + x];
+          Color c = Color.FromArgb(Palette[v]);
+          acc.SetPixel(x, y, c);
+        }
+      }
+      return acc;
     }
 
-    public Stream CreatePalettedBMPStream()
+    //creates a bitmap using managed code only
+    private Bitmap CreateBitmapManaged16bpp()
     {
-      if (this.BPP != TimBPP._4BPP)
+      Bitmap acc = new Bitmap(ImageWidth, ImageHeight, PixelFormat.Format32bppArgb);
+      for (int y = 0; y < ImageHeight; y++)
       {
-        throw new Exception("Only 4BPP supported");
+        for (int x = 0; x < ImageWidth; x++)
+        {
+          byte lo = ImageData[y * ImageWidth * 2 + x * 2];
+          byte hi = ImageData[y * ImageWidth * 2 + x * 2 + 1];
+
+          Color c = Color.FromArgb(Utils.PS16bitColorToARGB((short)(lo | (hi << 8))) | ~0xffffff);
+          acc.SetPixel(x, y, c);
+        }
+      }
+      return acc;
+    }
+
+    public Stream CreateBMPStream()
+    {
+      if (this.BPP != TimBPP._4BPP
+        && this.BPP != TimBPP._8BPP
+        && this.BPP != TimBPP._16BPP)
+      {
+        throw new Exception(string.Format("Unsupported TIM type. Found 0x{0:x8} BPP type", BPP));
       }
 
       //create a BMP stream
-      int lFileSize = 54 + 16 * 4 + ImageData.Length;
+      int lBpp;
+      int lDataOffset;
+      int lDataSize;
+      int lFileSize;
+      switch (BPP)
+      {
+        case TimBPP._4BPP:
+          lBpp = 4;
+          lDataOffset = 54 + 16 * 4;
+          lDataSize = ImageData.Length;
+          lFileSize = lDataOffset + lDataSize;
+          break;
+        case TimBPP._8BPP:
+          lBpp = 8;
+          lDataOffset = 54 + 256 * 4;
+          lDataSize = ImageData.Length;
+          lFileSize = lDataOffset + ImageData.Length;
+          break;
+        case TimBPP._16BPP:
+          lBpp = 32;
+          lDataOffset = 54;
+          lDataSize = ImageData.Length * 2;
+          lFileSize = lDataOffset + lDataSize;
+          break;
+        default: throw new Exception("unreachable case");
+      }
+
       MemoryStream mem = new MemoryStream(lFileSize);
       BinaryWriter bout = new BinaryWriter(mem);
       bout.Write((byte)'B'); //bfType[1]
       bout.Write((byte)'M'); //bfType[2]
       bout.Write(lFileSize); //bfSize
       bout.Write((int)0); //bfReserved1, bfReserved2
-      bout.Write(54 + 16 * 4); //bfOffBits
+      bout.Write(lDataOffset); //bfOffBits
       bout.Write(40); //biSize
       bout.Write((int)ImageWidth);//biWidth
       bout.Write((int)ImageHeight);//biHeight
       bout.Write((short)1);//biPlanes
-      bout.Write((short)4);//biBitCount
+      bout.Write((short)lBpp);//biBitCount
       bout.Write((int)0);//biCompression
-      bout.Write((int)(ImageWidth * ImageHeight / 2));//biSizeImage (0 is valid when no compression)
+      bout.Write((int)lDataSize);//biSizeImage (0 is valid when no compression)
       bout.Write((int)0);//biXPelsPerMeter
       bout.Write((int)0);//biYPelsPerMeter
       bout.Write((int)0);//biClrUsed (0 = derived from biBitCount)
       bout.Write((int)0);//biClrImportant
-      foreach (int c in Palette)
+      if (Palette != null)
       {
-        bout.Write((int)(c & 0xffffff));
+        foreach (int c in Palette)
+        {
+          bout.Write((int)(c & 0xffffff));
+        }
       }
 
-      int h = ImageHeight;
-      int w = ImageWidth / 2;
-
-      for (int y = h-1; y >= 0; y--)
+      switch (BPP)
       {
-        for (int x = 0; x < w; x++)
-        {
-          byte b = ImageData[y * w + x];
-          bout.Write((byte)(((b >> 4) & 0xf) | ((b << 4) & 0xf0)));
-        }
+        case TimBPP._4BPP:
+          {
+            int h = ImageHeight;
+            int w = ImageWidth / 2;
+
+            for (int y = h - 1; y >= 0; y--)
+            {
+              for (int x = 0; x < w; x++)
+              {
+                byte b = ImageData[y * w + x];
+                bout.Write((byte)(((b >> 4) & 0xf) | ((b << 4) & 0xf0)));
+              }
+            }
+          } break;
+
+        case TimBPP._8BPP:
+          {
+            int h = ImageHeight;
+            int w = ImageWidth;
+
+            for (int y = h - 1; y >= 0; y--)
+            {
+              for (int x = 0; x < w; x++)
+              {
+                bout.Write(ImageData[y * w + x]);
+              }
+            }
+          } break;
+
+        case TimBPP._16BPP:
+          for (int y = ImageHeight - 1; y >= 0; y--)
+          {
+            for (int x = 0; x < ImageWidth; x++)
+            {
+              byte lo = ImageData[y * ImageWidth * 2 + x * 2];
+              byte hi = ImageData[y * ImageWidth * 2 + x * 2 + 1];
+
+              bout.Write((int)(Utils.PS16bitColorToARGB((short)(lo | (hi << 8))) & 0xffffff));
+            }
+          }
+          break;
+
+        default: throw new Exception("unreachable case");
       }
 
       if (mem.Length != lFileSize) throw new Exception();
@@ -348,6 +510,100 @@ namespace MMEd.Chunks
     public class TIMTypeNotImplementedException : DeserialisationException
     {
       public TIMTypeNotImplementedException(string xiMessage, long xiOffset) : base(xiMessage, xiOffset) { }
+    }
+
+    public void FillDataFromBitmap(Bitmap xiBmp)
+    {
+      //simple checks:
+      if (xiBmp.Width != ImageWidth
+        || xiBmp.Height != ImageHeight)
+      {
+        throw new Exception(string.Format("BMP is different size to TIM ({0} vs ({1},{2}))",
+          xiBmp.Size, ImageWidth, ImageHeight));
+      }
+
+      if (BPP != TIMChunk.TimBPP._4BPP
+        && BPP != TIMChunk.TimBPP._8BPP
+        && BPP != TIMChunk.TimBPP._16BPP)
+      {
+        throw new Exception("Only 4BPP, 8BPP or 16BPP TIMs supported");
+      }
+
+      int w = xiBmp.Width;
+      int h = xiBmp.Height;
+      if (BPP == TimBPP._4BPP || BPP == TimBPP._8BPP)
+      {
+        //paletted:
+        //
+
+        //we don't insist that the BMP is paletted, just that it only uses colours in the palette
+        Dictionary<int, int> lColorToPaletteIdx = new Dictionary<int, int>();
+        for (int i = Palette.Length - 1; i >= 0; i--)
+        {
+          lColorToPaletteIdx[Palette[i]] = i;
+        }
+
+        int x = -1, y = -1;
+        Color c = Color.Black;
+        try
+        {
+          if (BPP == TimBPP._4BPP)
+          {
+            int rowLen = w / 2;
+            for (y = 0; y < h; y++)
+            {
+              for (x = 0; x < w; x += 2)
+              {
+                c = xiBmp.GetPixel(x, y);
+                int left = lColorToPaletteIdx[c.ToArgb()];
+                c = xiBmp.GetPixel(x + 1, y);
+                int right = lColorToPaletteIdx[c.ToArgb()];
+                byte b = (byte)(left | (right << 4));
+                ImageData[y * rowLen + x / 2] = b;
+              }
+            }
+          }
+          else if (BPP == TimBPP._8BPP)
+          {
+            int rowLen = w;
+            for (y = 0; y < h; y++)
+            {
+              for (x = 0; x < w; x++)
+              {
+                c = xiBmp.GetPixel(x, y);
+                int entry = lColorToPaletteIdx[c.ToArgb()];
+                byte b = (byte)entry;
+                ImageData[y * rowLen + x] = b;
+              }
+            }
+          }
+          else throw new Exception("unreachable case");
+        }
+        catch (KeyNotFoundException e)
+        {
+          throw new Exception(string.Format("The color 0x{0:x} is used in the BMP at ({1},{2}), but doesn't appear in the TIM palette",
+            c.ToArgb(), x, y));
+        }
+      }
+      else if (BPP == TimBPP._16BPP)
+      {
+        int rowLen = w * 2;
+        for (int y = 0; y < h; y++)
+        {
+          for (int x = 0; x < w; x++)
+          {
+            Color c = xiBmp.GetPixel(x, y);
+            short entry = Utils.ARGBColorToPS16bit(c.ToArgb());
+            byte lo = (byte)entry;
+            byte hi = (byte)(entry >> 8);
+            ImageData[y * rowLen + x * 2] = lo;
+            ImageData[y * rowLen + x * 2 + 1] = hi;
+          }
+        }
+      }
+      else throw new Exception("unreachable case");
+
+      InvalidateBitmapCache();
     }
   }
 }

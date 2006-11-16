@@ -71,6 +71,25 @@ namespace MMEd.Tests
       }
     }
 
+    //this is a weaker test than TestSerialisationIsInvertible
+    //but has been left here as it's sometimes handy for debugging
+    private void TestBinaryUnkSerialisationIsInvertible(string xiFilename)
+    {
+      Console.Out.WriteLine("Testing file {0}", xiFilename);
+      using (Stream inStr = File.OpenRead(xiFilename))
+      {
+        FileChunk deser = new FileChunk();
+        deser.Deserialise(inStr);
+        MemoryStream memStr = new MemoryStream();
+        inStr.Seek(0, SeekOrigin.Begin);
+        DebugOutputStreamWithExpectations outStr = new DebugOutputStreamWithExpectations(inStr, memStr);
+        deser.Serialise(outStr);
+        inStr.Seek(0, SeekOrigin.Begin);
+        memStr.Seek(0, SeekOrigin.Begin);
+        Assert.IsTrue(StreamUtils.StreamsAreEqual(inStr, memStr));
+      }
+    }
+
     //tests that both XML and Binary serialisation is invertible
     private void TestSerialisationIsInvertible(string xiFilename)
     {
@@ -100,6 +119,13 @@ namespace MMEd.Tests
         memStr.Seek(0, SeekOrigin.Begin);
         Assert.IsTrue(StreamUtils.StreamsAreEqual(inStr, memStr));
       }
+    }
+
+    //qq rtb tmp
+    [Test]
+    public void TestSerialisationCHOOSE()
+    {
+      TestBinaryUnkSerialisationIsInvertible(@"E:\MMs\mm3\public_html\MMs\FRONTEND\CHOOSE.DAT");
     }
 
     // There must be a way to dynamically generate tests for NUnit...

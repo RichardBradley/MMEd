@@ -92,51 +92,51 @@ namespace MMEd
     }
 
     private void LoadInternal(eOpenType xiOpenType, string xiFilename)
+    {
+      Chunk lNewRootChunk = null;
+      string lExceptionWhen = "opening file";
+      try
+      {
+        using (FileStream fs = File.OpenRead(xiFilename))
         {
-            Chunk lNewRootChunk = null;
-            string lExceptionWhen = "opening file";
-            try
-            {
-                using (FileStream fs = File.OpenRead(xiFilename))
-                {
-                    lExceptionWhen = "deserialising the file";
-                    switch (xiOpenType)
-                    {
-                      case eOpenType.LevelBinary:
-                        lNewRootChunk = new Level(fs);
-                        break;
-                      case eOpenType.UnknownBinary:
-                        lNewRootChunk = new FileChunk(fs);
-                        break;
-                      case eOpenType.Xml:
-                        break;
-                      default: throw new Exception("unreachable case");
-                    }
-
-                    if (fs.Length != fs.Position)
-                    {
-                        //check the whole file has been read
-                        throw new DeserialisationException(string.Format("Deserialisatoin terminated early at byte {0} of {1}", fs.Position, fs.Length));
-                    }
-                }
-            }
-            catch (Exception err)
-            {
-                Trace.WriteLine(err);
-                MessageBox.Show(string.Format("Exception occurred while {0}: {1}", lExceptionWhen, err.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            // level loaded OK, now fill tree:
-            RootChunk = lNewRootChunk;
-            mLocalSettings.LastOpenedFile = xiFilename;
-            mLocalSettings.LastOpenedType = xiOpenType;
+          lExceptionWhen = "deserialising the file";
+          switch (xiOpenType)
+          {
+            case eOpenType.LevelBinary:
+              lNewRootChunk = new Level(fs);
+              break;
+            case eOpenType.UnknownBinary:
+              lNewRootChunk = new FileChunk(fs);
+              break;
+            case eOpenType.Xml:
+              break;
+            default: throw new Exception("unreachable case");
           }
+
+          if (fs.Length != fs.Position)
+          {
+            //check the whole file has been read
+            throw new DeserialisationException(string.Format("Deserialisatoin terminated early at byte {0} of {1}", fs.Position, fs.Length));
+          }
+        }
+      }
+      catch (Exception err)
+      {
+        Trace.WriteLine(err);
+        MessageBox.Show(string.Format("Exception occurred while {0}: {1}", lExceptionWhen, err.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        return;
+      }
+      // level loaded OK, now fill tree:
+      RootChunk = lNewRootChunk;
+      mLocalSettings.LastOpenedFile = xiFilename;
+      mLocalSettings.LastOpenedType = xiOpenType;
+    }
 
     #endregion
 
-          #region save routines
+    #region save routines
 
-          private void SaveAsBinaryClick(object sender, EventArgs e)
+    private void SaveAsBinaryClick(object sender, EventArgs e)
     {
       SaveInternal(true);
     }
@@ -161,12 +161,14 @@ namespace MMEd
         string lExceptionWhen = "opening file";
         try
         {
-          using (FileStream fs = File.Create(sfd.FileName))
+          //using (FileStream fs = File.Create(sfd.FileName))
+          using (FileStream fs = File.OpenRead(sfd.FileName))
           {
             lExceptionWhen = "serialising the file";
             if (xiAsBinary)
             {
-              RootChunk.Serialise(fs);
+              Tests.DebugOutputStreamWithExpectations ds = new Tests.DebugOutputStreamWithExpectations(fs, new MemoryStream());
+              RootChunk.Serialise(ds);
             }
             else
             {
