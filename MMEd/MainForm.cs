@@ -161,14 +161,12 @@ namespace MMEd
         string lExceptionWhen = "opening file";
         try
         {
-          //using (FileStream fs = File.Create(sfd.FileName))
-          using (FileStream fs = File.OpenRead(sfd.FileName))
+          using (FileStream fs = File.Create(sfd.FileName))
           {
             lExceptionWhen = "serialising the file";
             if (xiAsBinary)
             {
-              Tests.DebugOutputStreamWithExpectations ds = new Tests.DebugOutputStreamWithExpectations(fs, new MemoryStream());
-              RootChunk.Serialise(ds);
+              RootChunk.Serialise(fs);
             }
             else
             {
