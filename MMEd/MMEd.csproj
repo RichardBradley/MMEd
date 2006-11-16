@@ -133,6 +133,7 @@
     <Compile Include="Viewers\MMEdView.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Viewers\OddViewer.cs" />
     <Compile Include="Viewers\ThreeDeeEditor.cs">
       <SubType>Code</SubType>
     </Compile>

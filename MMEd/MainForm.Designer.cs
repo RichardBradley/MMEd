@@ -87,15 +87,21 @@ namespace MMEd
           this.ViewTab3D = new System.Windows.Forms.TabPage();
           this.Viewer3DRenderingSurface = new GLTK.RenderingSurface();
           this.ViewTabBump = new System.Windows.Forms.TabPage();
+          this.ViewTabOdd = new System.Windows.Forms.TabPage();
           this.BumpEditFillButton = new System.Windows.Forms.Button();
+          this.OddEditFillButton = new System.Windows.Forms.Button();
           this.label8 = new System.Windows.Forms.Label();
           this.label7 = new System.Windows.Forms.Label();
           this.label6 = new System.Windows.Forms.Label();
           this.label5 = new System.Windows.Forms.Label();
           this.BumpTypeLabel = new System.Windows.Forms.Label();
+          this.OddTypeLabel = new System.Windows.Forms.Label();
           this.BumpViewPictureBox = new System.Windows.Forms.PictureBox();
+          this.OddViewPictureBox = new System.Windows.Forms.PictureBox();
           this.BumpCombo = new System.Windows.Forms.ComboBox();
+          this.OddCombo = new System.Windows.Forms.ComboBox();
           this.BumpEditPictureBox = new System.Windows.Forms.PictureBox();
+          this.OddEditPictureBox = new System.Windows.Forms.PictureBox();
           this.ViewTabVRAM = new System.Windows.Forms.TabPage();
           this.panel1 = new System.Windows.Forms.Panel();
           this.VRAMPictureBox = new System.Windows.Forms.PictureBox();
@@ -136,8 +142,11 @@ namespace MMEd
           ((System.ComponentModel.ISupportInitialize)(this.GridViewTransparencySlider)).BeginInit();
           this.ViewTab3D.SuspendLayout();
           this.ViewTabBump.SuspendLayout();
+          this.ViewTabOdd.SuspendLayout();
           ((System.ComponentModel.ISupportInitialize)(this.BumpViewPictureBox)).BeginInit();
           ((System.ComponentModel.ISupportInitialize)(this.BumpEditPictureBox)).BeginInit();
+          ((System.ComponentModel.ISupportInitialize)(this.OddViewPictureBox)).BeginInit();
+          ((System.ComponentModel.ISupportInitialize)(this.OddEditPictureBox)).BeginInit();
           this.ViewTabVRAM.SuspendLayout();
           this.panel1.SuspendLayout();
           ((System.ComponentModel.ISupportInitialize)(this.VRAMPictureBox)).BeginInit();
@@ -273,6 +282,7 @@ namespace MMEd
           this.ViewerTabControl.Controls.Add(this.ViewTabGrid);
           this.ViewerTabControl.Controls.Add(this.ViewTab3D);
           this.ViewerTabControl.Controls.Add(this.ViewTabBump);
+          this.ViewerTabControl.Controls.Add(this.ViewTabOdd);
           this.ViewerTabControl.Controls.Add(this.ViewTabVRAM);
           this.ViewerTabControl.Controls.Add(this.ViewTab3dEditor);
           this.ViewerTabControl.Location = new System.Drawing.Point(3, 3);
@@ -767,6 +777,7 @@ namespace MMEd
           this.ViewTabBump.Controls.Add(this.label5);
           this.ViewTabBump.Controls.Add(this.BumpTypeLabel);
           this.ViewTabBump.Controls.Add(this.BumpViewPictureBox);
+          this.ViewTabBump.Controls.Add(this.OddViewPictureBox);
           this.ViewTabBump.Controls.Add(this.BumpCombo);
           this.ViewTabBump.Controls.Add(this.BumpEditPictureBox);
           this.ViewTabBump.Location = new System.Drawing.Point(4, 22);
@@ -777,6 +788,25 @@ namespace MMEd
           this.ViewTabBump.Text = "Bump";
           this.ViewTabBump.UseVisualStyleBackColor = true;
           // 
+          // ViewTabOdd
+          // 
+          this.ViewTabOdd.Controls.Add(this.OddEditFillButton);
+          this.ViewTabOdd.Controls.Add(this.label8);
+          this.ViewTabOdd.Controls.Add(this.label7);
+          this.ViewTabOdd.Controls.Add(this.label6);
+          this.ViewTabOdd.Controls.Add(this.label5);
+          this.ViewTabOdd.Controls.Add(this.OddTypeLabel);
+          this.ViewTabOdd.Controls.Add(this.OddViewPictureBox);
+          this.ViewTabOdd.Controls.Add(this.OddCombo);
+          this.ViewTabOdd.Controls.Add(this.OddEditPictureBox);
+          this.ViewTabOdd.Location = new System.Drawing.Point(4, 22);
+          this.ViewTabOdd.Name = "ViewTabOdd";
+          this.ViewTabOdd.Padding = new System.Windows.Forms.Padding(3);
+          this.ViewTabOdd.Size = new System.Drawing.Size(636, 535);
+          this.ViewTabOdd.TabIndex = 5;
+          this.ViewTabOdd.Text = "Odd";
+          this.ViewTabOdd.UseVisualStyleBackColor = true;
+          // 
           // BumpEditFillButton
           // 
           this.BumpEditFillButton.Location = new System.Drawing.Point(261, 44);
@@ -785,6 +815,15 @@ namespace MMEd
           this.BumpEditFillButton.TabIndex = 8;
           this.BumpEditFillButton.Text = "Fill";
           this.BumpEditFillButton.UseVisualStyleBackColor = true;
+          // 
+          // OddEditFillButton
+          // 
+          this.OddEditFillButton.Location = new System.Drawing.Point(261, 44);
+          this.OddEditFillButton.Name = "OddEditFillButton";
+          this.OddEditFillButton.Size = new System.Drawing.Size(75, 23);
+          this.OddEditFillButton.TabIndex = 8;
+          this.OddEditFillButton.Text = "Fill";
+          this.OddEditFillButton.UseVisualStyleBackColor = true;
           // 
           // label8
           // 
@@ -833,6 +872,15 @@ namespace MMEd
           this.BumpTypeLabel.TabIndex = 3;
           this.BumpTypeLabel.Text = "BumpTypeLabel";
           // 
+          // OddTypeLabel
+          // 
+          this.OddTypeLabel.AutoSize = true;
+          this.OddTypeLabel.Location = new System.Drawing.Point(134, 260);
+          this.OddTypeLabel.Name = "OddTypeLabel";
+          this.OddTypeLabel.Size = new System.Drawing.Size(84, 13);
+          this.OddTypeLabel.TabIndex = 3;
+          this.OddTypeLabel.Text = "OddTypeLabel";
+          // 
           // BumpViewPictureBox
           // 
           this.BumpViewPictureBox.BackColor = System.Drawing.Color.White;
@@ -845,6 +893,18 @@ namespace MMEd
           this.BumpViewPictureBox.TabIndex = 2;
           this.BumpViewPictureBox.TabStop = false;
           // 
+          // OddViewPictureBox
+          // 
+          this.OddViewPictureBox.BackColor = System.Drawing.Color.White;
+          this.OddViewPictureBox.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+          this.OddViewPictureBox.InitialImage = null;
+          this.OddViewPictureBox.Location = new System.Drawing.Point(0, 260);
+          this.OddViewPictureBox.Name = "OddViewPictureBox";
+          this.OddViewPictureBox.Size = new System.Drawing.Size(128, 128);
+          this.OddViewPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+          this.OddViewPictureBox.TabIndex = 2;
+          this.OddViewPictureBox.TabStop = false;
+          // 
           // BumpCombo
           // 
           this.BumpCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -853,6 +913,15 @@ namespace MMEd
           this.BumpCombo.Name = "BumpCombo";
           this.BumpCombo.Size = new System.Drawing.Size(121, 21);
           this.BumpCombo.TabIndex = 1;
+          // 
+          // OddCombo
+          // 
+          this.OddCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+          this.OddCombo.FormattingEnabled = true;
+          this.OddCombo.Location = new System.Drawing.Point(134, 46);
+          this.OddCombo.Name = "OddCombo";
+          this.OddCombo.Size = new System.Drawing.Size(121, 21);
+          this.OddCombo.TabIndex = 1;
           // 
           // BumpEditPictureBox
           // 
@@ -865,6 +934,18 @@ namespace MMEd
           this.BumpEditPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
           this.BumpEditPictureBox.TabIndex = 0;
           this.BumpEditPictureBox.TabStop = false;
+          // 
+          // OddEditPictureBox
+          // 
+          this.OddEditPictureBox.BackColor = System.Drawing.Color.White;
+          this.OddEditPictureBox.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+          this.OddEditPictureBox.InitialImage = null;
+          this.OddEditPictureBox.Location = new System.Drawing.Point(0, 43);
+          this.OddEditPictureBox.Name = "OddEditPictureBox";
+          this.OddEditPictureBox.Size = new System.Drawing.Size(128, 128);
+          this.OddEditPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+          this.OddEditPictureBox.TabIndex = 0;
+          this.OddEditPictureBox.TabStop = false;
           // 
           // ViewTabVRAM
           // 
@@ -1074,6 +1155,8 @@ namespace MMEd
           this.ViewTab3D.ResumeLayout(false);
           this.ViewTabBump.ResumeLayout(false);
           this.ViewTabBump.PerformLayout();
+          this.ViewTabOdd.ResumeLayout(false);
+          this.ViewTabOdd.PerformLayout();
           ((System.ComponentModel.ISupportInitialize)(this.BumpViewPictureBox)).EndInit();
           ((System.ComponentModel.ISupportInitialize)(this.BumpEditPictureBox)).EndInit();
           this.ViewTabVRAM.ResumeLayout(false);
@@ -1124,18 +1207,23 @@ namespace MMEd
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.GroupBox groupBox1;
-      public System.Windows.Forms.ComboBox GridViewMetaTypeCombo;
+        public System.Windows.Forms.ComboBox GridViewMetaTypeCombo;
         public System.Windows.Forms.TabPage ViewTab3D;
         public GLTK.RenderingSurface Viewer3DRenderingSurface;
         public System.Windows.Forms.TabPage ViewTabBump;
+        public System.Windows.Forms.TabPage ViewTabOdd;
         public System.Windows.Forms.PictureBox BumpEditPictureBox;
+        public System.Windows.Forms.PictureBox OddEditPictureBox;
         public System.Windows.Forms.TabPage ViewTabVRAM;
         private System.Windows.Forms.Panel panel1;
         public System.Windows.Forms.PictureBox VRAMPictureBox;
         public System.Windows.Forms.StatusStrip VRAMStatusStrip;
         public System.Windows.Forms.ComboBox BumpCombo;
+        public System.Windows.Forms.ComboBox OddCombo;
         public System.Windows.Forms.PictureBox BumpViewPictureBox;
+        public System.Windows.Forms.PictureBox OddViewPictureBox;
         public System.Windows.Forms.Label BumpTypeLabel;
+        public System.Windows.Forms.Label OddTypeLabel;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label8;
@@ -1160,6 +1248,7 @@ namespace MMEd
       public System.Windows.Forms.ComboBox GridViewViewModeCombo;
       public System.Windows.Forms.TrackBar GridViewTransparencySlider;
       public System.Windows.Forms.Button BumpEditFillButton;
+      public System.Windows.Forms.Button OddEditFillButton;
       private System.Windows.Forms.Panel panel2;
       internal System.Windows.Forms.Label ThreeDeeEditorStatusLabel;
       public System.Windows.Forms.ToolTip ToolTip;

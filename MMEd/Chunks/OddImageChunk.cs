@@ -81,22 +81,63 @@ namespace MMEd.Chunks
       return lBmp;
     }
 
+    public static OddTypeInfo GetOddTypeInfo(byte xiVal)
+    {
+      if (xiVal > mOddTypes.Length)
+      {
+        return null;
+      }
+      else
+      {
+        return mOddTypes[(int)xiVal];
+      }
+    }
+
+    // Get the eBumpType for the supplied coordinates
+    public byte GetPixelType(int xiX, int xiY)
+    {
+      return Data[8 * xiX + xiY];
+    }
+
+    // Set the eBumpType for the supplied coordinates
+    public void SetPixelType(int xiX, int xiY, byte xiType)
+    {
+      Data[8 * xiX + xiY] = xiType;
+      mBitmapCache = null;
+    }
+
     private static Color[] mPalette = makePalette();
 
     private static Color[] makePalette()
     {
       Color[] acc = new Color[64];
-      for (int i = 0; i < 21; i++)
+
+      acc[0] = Color.FromArgb(255, 0, 0);
+      acc[1] = Color.FromArgb(255, 64, 0);
+      acc[2] = Color.FromArgb(255, 128, 0);
+      acc[3] = Color.FromArgb(255, 192, 0);
+      acc[4] = Color.FromArgb(255, 255, 0);
+      acc[5] = Color.FromArgb(192, 255, 64);
+      acc[6] = Color.FromArgb(128, 255, 128);
+      acc[7] = Color.FromArgb(64, 255, 192);
+      acc[8] = Color.FromArgb(0, 255, 255);
+      acc[9] = Color.FromArgb(0, 192, 255);
+      acc[10] = Color.FromArgb(0, 128, 255);
+      acc[11] = Color.FromArgb(0, 64, 255);
+      acc[12] = Color.FromArgb(0, 0, 255);
+      acc[13] = Color.FromArgb(64, 0, 192);
+      acc[14] = Color.FromArgb(128, 0, 128);
+      acc[15] = Color.FromArgb(192, 0, 64);
+
+      acc[16] = Color.FromArgb(255, 255, 255);
+      acc[17] = Color.FromArgb(224, 224, 224);
+      acc[18] = Color.FromArgb(192, 192, 192);
+      acc[19] = Color.FromArgb(160, 160, 160);
+      acc[20] = Color.FromArgb(128, 128, 128);
+
+      for (int i = 21; i < acc.Length; i++)
       {
-        acc[i] = Color.FromArgb((int)(255 * ((double)i/21)), 0, 0);
-      }
-      for (int i = 21; i < 42; i++)
-      {
-        acc[i] = Color.FromArgb(0, (int)(255 * ((double)(i - 21) / 21)), 0);
-      }
-      for (int i = 42; i < acc.Length; i++)
-      {
-        acc[i] = Color.FromArgb(0, 0, (int)(255 * ((double)(i - 42) / (acc.Length - 42))));
+        acc[i] = Color.FromArgb(0, 0, 0);
       }
       return acc;
     }
@@ -104,5 +145,42 @@ namespace MMEd.Chunks
     public const int SCALE = 16;
 
     #endregion
+
+    private static OddTypeInfo[] mOddTypes = MakeOddTypes();
+
+    private static OddTypeInfo[] MakeOddTypes()
+    {
+      mOddTypes = new OddTypeInfo[64];
+      for (int i = 0; i < 64; i++)
+      {
+        mOddTypes[i] = new OddTypeInfo(i.ToString(), mPalette[i], i.ToString());
+      }
+      return mOddTypes;
+    }
+    
+    // this wasn't necessary under the enum scheme, but I think it's
+    // preferable to having the list of types twice...
+    public const int HIGHEST_KNOWN_Odd_TYPE = 45;
+
+    public class OddTypeInfo
+    {
+      public Color Color;
+      public string Name;
+      public string Description;
+
+      public OddTypeInfo(string xiName, Color xiColor, string xiDescription)
+      {
+        Name = xiName;
+        Color = xiColor;
+        Description = xiDescription;
+      }
+
+      public OddTypeInfo(string xiName, int xiColor)
+        : this(xiName, xiColor, null) { }
+
+      public OddTypeInfo(string xiName, int xiColor, string xiDescription)
+        : this(xiName, Color.FromArgb(xiColor | ~0x00ffffff), xiDescription) { }
+    }
+
   }
 }
