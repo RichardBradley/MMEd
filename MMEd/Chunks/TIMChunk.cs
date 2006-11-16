@@ -86,7 +86,7 @@ namespace MMEd.Chunks
       int lTIMMagicNumber = bin.ReadInt32();
       if (TIM_MAGIC_NUMBER != lTIMMagicNumber)
       {
-        throw new DeserialisationException(string.Format("TIM should start with 4 byte magic number 0x10, found {0:x8}", lTIMMagicNumber), inStr.Position - 4);
+        throw new DeserialisationException(string.Format("TIM should start with 4 byte magic number 0x10, found 0x{0:x}", lTIMMagicNumber), inStr.Position - 4);
       }
 
       // bits per pixel
@@ -95,7 +95,7 @@ namespace MMEd.Chunks
         && BPP != TimBPP._8BPP
         && BPP != TimBPP._16BPP)
       {
-        throw new TIMTypeNotImplementedException(string.Format("Only 4BPP, 8BPP or 16BPP TIMs are supported. Found 0x{0:x8} BPP type", BPP), inStr.Position - 8);
+        throw new TIMTypeNotImplementedException(string.Format("Only 4BPP, 8BPP or 16BPP TIMs are supported. Found 0x{0:x} BPP type", BPP), inStr.Position - 8);
       }
 
       if (BPP != TimBPP._16BPP)

@@ -73,24 +73,25 @@ namespace MMEd.Tests
       get { return false; }
     }
 
-    #region overrides of abstract methods which are unsupported
-
     public override long Length
     {
-      get { throw new Exception("The method or operation is not implemented."); }
+      get { return mBaseStream.Length; }
     }
 
     public override long Position
     {
       get
       {
-        throw new Exception("The method or operation is not implemented.");
+        return mBaseStream.Position;
       }
       set
       {
-        throw new Exception("The method or operation is not implemented.");
+        mBaseStream.Position = value;
+        mExpectedStream.Position = value;
       }
     }
+
+    #region overrides of abstract methods which are unsupported
 
     public override long Seek(long offset, SeekOrigin origin)
     {

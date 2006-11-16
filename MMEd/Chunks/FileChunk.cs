@@ -23,6 +23,7 @@ namespace MMEd.Chunks
 
       List<Chunk> lChildren = new List<Chunk>();
       MemoryStream lUnparseableBuff = new MemoryStream();
+      long lUnparseableBuffStart = 0;
       int lNextRead = inStr.ReadByte();
 
       //what are bytes 1-8 of the two structs?
@@ -34,6 +35,7 @@ namespace MMEd.Chunks
       while (lNextRead != -1)
       {
         byte lNextByte = (byte)lNextRead;
+        bool lByteParsed = false;
 
         // might it be a TIM?
         if (lNextByte == (byte)TIMChunk.TIM_MAGIC_NUMBER)
@@ -45,13 +47,17 @@ namespace MMEd.Chunks
             if (SixOfSevenAreZero(lSevenBuff))
             {
               inStr.Seek(-8, SeekOrigin.Current);
-              TIMChunk lTIM = new TIMChunk(inStr, string.Format("TIM at {0}", lPos));
+              TIMChunk lTIM = new TIMChunk(inStr, string.Format("TIM at {0}", inStr.Position));
               if (lUnparseableBuff.Length != 0)
               {
-                lChildren.Add(new RawDataChunk("data", lUnparseableBuff.ToArray()));
+                lChildren.Add(new RawDataChunk(
+                  string.Format("data at {0}", lUnparseableBuffStart), 
+                  lUnparseableBuff.ToArray()));
                 lUnparseableBuff.SetLength(0);
+                lUnparseableBuffStart = inStr.Position;
               }
               lChildren.Add(lTIM);
+              lByteParsed = true;
             }
             else
             {
@@ -72,25 +78,30 @@ namespace MMEd.Chunks
             if (CompareSevenBytes(lSevenBuff, lTMDStart))
             {
               inStr.Seek(-8, SeekOrigin.Current);
-              TMDChunk lTMD = new TMDChunk(inStr, string.Format("TMD at {0}", lPos));
+              TMDChunk lTMD = new TMDChunk(inStr, string.Format("TMD at {0}", inStr.Position));
               if (lUnparseableBuff.Length != 0)
               {
-                lChildren.Add(new RawDataChunk("data", lUnparseableBuff.ToArray()));
+                lChildren.Add(new RawDataChunk(
+                  string.Format("data at {0}", lUnparseableBuffStart),
+                  lUnparseableBuff.ToArray()));
                 lUnparseableBuff.SetLength(0);
+                lUnparseableBuffStart = inStr.Position;
               }
               lChildren.Add(lTMD);
+              lByteParsed = true;
             }
             else
             {
               inStr.Seek(-7, SeekOrigin.Current);
             }
           }
-          catch (Exception e)
+          catch (Exception)
           {
             inStr.Seek(lPos, SeekOrigin.Begin);
           }
         }
-        else // dunno what this is
+
+        if (!lByteParsed) // dunno what this is
         {
           lUnparseableBuff.WriteByte(lNextByte);
         }
@@ -110,8 +121,11 @@ namespace MMEd.Chunks
 
     public override void Serialise(System.IO.Stream outStr)
     {
-      foreach (Chunk lChunk in mChildren)
+      //qq use for not foreach to get idx
+      //foreach (Chunk lChunk in mChildren)
+      for (int i=0; i<mChildren.Length; i++)
       {
+        Chunk lChunk = mChildren[i];
         lChunk.Serialise(outStr);
       }
     }
