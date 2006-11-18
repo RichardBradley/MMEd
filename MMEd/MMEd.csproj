@@ -127,6 +127,7 @@
     <Compile Include="Util\Utils.cs" />
     <Compile Include="Viewer.cs" />
     <Compile Include="Viewers\ActionsViewer.cs" />
+    <Compile Include="Viewers\CameraViewer.cs" />
     <Compile Include="Viewers\FlatViewer.cs" />
     <Compile Include="Viewers\MMEdEntity.cs" />
     <Compile Include="Viewers\MMEdScene.cs" />

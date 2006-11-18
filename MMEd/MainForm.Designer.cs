@@ -87,21 +87,31 @@ namespace MMEd
           this.ViewTab3D = new System.Windows.Forms.TabPage();
           this.Viewer3DRenderingSurface = new GLTK.RenderingSurface();
           this.ViewTabBump = new System.Windows.Forms.TabPage();
-          this.ViewTabOdd = new System.Windows.Forms.TabPage();
           this.BumpEditFillButton = new System.Windows.Forms.Button();
-          this.OddEditFillButton = new System.Windows.Forms.Button();
           this.label8 = new System.Windows.Forms.Label();
           this.label7 = new System.Windows.Forms.Label();
           this.label6 = new System.Windows.Forms.Label();
           this.label5 = new System.Windows.Forms.Label();
           this.BumpTypeLabel = new System.Windows.Forms.Label();
-          this.OddTypeLabel = new System.Windows.Forms.Label();
           this.BumpViewPictureBox = new System.Windows.Forms.PictureBox();
           this.OddViewPictureBox = new System.Windows.Forms.PictureBox();
           this.BumpCombo = new System.Windows.Forms.ComboBox();
-          this.OddCombo = new System.Windows.Forms.ComboBox();
           this.BumpEditPictureBox = new System.Windows.Forms.PictureBox();
+          this.ViewTabOdd = new System.Windows.Forms.TabPage();
+          this.OddEditFillButton = new System.Windows.Forms.Button();
+          this.OddTypeLabel = new System.Windows.Forms.Label();
+          this.OddCombo = new System.Windows.Forms.ComboBox();
           this.OddEditPictureBox = new System.Windows.Forms.PictureBox();
+          this.ViewTabCamera = new System.Windows.Forms.TabPage();
+          this.SliderElevation = new System.Windows.Forms.TrackBar();
+          this.TextElevation = new System.Windows.Forms.TextBox();
+          this.label14 = new System.Windows.Forms.Label();
+          this.SliderDistance = new System.Windows.Forms.TrackBar();
+          this.TextDistance = new System.Windows.Forms.TextBox();
+          this.label13 = new System.Windows.Forms.Label();
+          this.SliderDirection = new System.Windows.Forms.TrackBar();
+          this.TextDirection = new System.Windows.Forms.TextBox();
+          this.label12 = new System.Windows.Forms.Label();
           this.ViewTabVRAM = new System.Windows.Forms.TabPage();
           this.panel1 = new System.Windows.Forms.Panel();
           this.VRAMPictureBox = new System.Windows.Forms.PictureBox();
@@ -117,6 +127,10 @@ namespace MMEd
           this.Viewer3DRenderingSurfaceTopRight = new GLTK.RenderingSurface();
           this.Viewer3DRenderingSurfaceBottomRight = new GLTK.RenderingSurface();
           this.ToolTip = new System.Windows.Forms.ToolTip(this.components);
+          this.label15 = new System.Windows.Forms.Label();
+          this.label16 = new System.Windows.Forms.Label();
+          this.label17 = new System.Windows.Forms.Label();
+          this.label18 = new System.Windows.Forms.Label();
           this.mMenuStrip.SuspendLayout();
           this.MainSplitter.Panel1.SuspendLayout();
           this.MainSplitter.Panel2.SuspendLayout();
@@ -142,11 +156,15 @@ namespace MMEd
           ((System.ComponentModel.ISupportInitialize)(this.GridViewTransparencySlider)).BeginInit();
           this.ViewTab3D.SuspendLayout();
           this.ViewTabBump.SuspendLayout();
-          this.ViewTabOdd.SuspendLayout();
           ((System.ComponentModel.ISupportInitialize)(this.BumpViewPictureBox)).BeginInit();
-          ((System.ComponentModel.ISupportInitialize)(this.BumpEditPictureBox)).BeginInit();
           ((System.ComponentModel.ISupportInitialize)(this.OddViewPictureBox)).BeginInit();
+          ((System.ComponentModel.ISupportInitialize)(this.BumpEditPictureBox)).BeginInit();
+          this.ViewTabOdd.SuspendLayout();
           ((System.ComponentModel.ISupportInitialize)(this.OddEditPictureBox)).BeginInit();
+          this.ViewTabCamera.SuspendLayout();
+          ((System.ComponentModel.ISupportInitialize)(this.SliderElevation)).BeginInit();
+          ((System.ComponentModel.ISupportInitialize)(this.SliderDistance)).BeginInit();
+          ((System.ComponentModel.ISupportInitialize)(this.SliderDirection)).BeginInit();
           this.ViewTabVRAM.SuspendLayout();
           this.panel1.SuspendLayout();
           ((System.ComponentModel.ISupportInitialize)(this.VRAMPictureBox)).BeginInit();
@@ -183,7 +201,7 @@ namespace MMEd
             this.saveToolStripMenuItem,
             this.toolStripMenuItem2});
           this.MnuFile.Name = "MnuFile";
-          this.MnuFile.Size = new System.Drawing.Size(35, 20);
+          this.MnuFile.Size = new System.Drawing.Size(42, 20);
           this.MnuFile.Text = "&File";
           // 
           // toolStripMenuItem1
@@ -192,7 +210,7 @@ namespace MMEd
           this.toolStripMenuItem1.ImageTransparentColor = System.Drawing.Color.Magenta;
           this.toolStripMenuItem1.Name = "toolStripMenuItem1";
           this.toolStripMenuItem1.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-          this.toolStripMenuItem1.Size = new System.Drawing.Size(224, 22);
+          this.toolStripMenuItem1.Size = new System.Drawing.Size(243, 22);
           this.toolStripMenuItem1.Text = "&Open Level Binary...";
           this.toolStripMenuItem1.ToolTipText = "Opens an MMv3 level file, as extracted from the CD";
           this.toolStripMenuItem1.Click += new System.EventHandler(this.OpenLevelBinaryClick);
@@ -201,7 +219,7 @@ namespace MMEd
           // 
           this.MnuiFileOpenLevel.ImageTransparentColor = System.Drawing.Color.Magenta;
           this.MnuiFileOpenLevel.Name = "MnuiFileOpenLevel";
-          this.MnuiFileOpenLevel.Size = new System.Drawing.Size(224, 22);
+          this.MnuiFileOpenLevel.Size = new System.Drawing.Size(243, 22);
           this.MnuiFileOpenLevel.Text = "&Open Unknown Binary...";
           this.MnuiFileOpenLevel.ToolTipText = "Opens any old binary file, and searches through it for recognisable MMv3 datastru" +
               "ctures";
@@ -211,7 +229,7 @@ namespace MMEd
           // 
           this.toolStripMenuItem3.ImageTransparentColor = System.Drawing.Color.Magenta;
           this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-          this.toolStripMenuItem3.Size = new System.Drawing.Size(224, 22);
+          this.toolStripMenuItem3.Size = new System.Drawing.Size(243, 22);
           this.toolStripMenuItem3.Text = "&Open XML...";
           this.toolStripMenuItem3.ToolTipText = "Opens an XML file saved from this program";
           this.toolStripMenuItem3.Click += new System.EventHandler(this.OpenXmlClick);
@@ -219,7 +237,7 @@ namespace MMEd
           // toolStripSeparator1
           // 
           this.toolStripSeparator1.Name = "toolStripSeparator1";
-          this.toolStripSeparator1.Size = new System.Drawing.Size(221, 6);
+          this.toolStripSeparator1.Size = new System.Drawing.Size(240, 6);
           // 
           // saveToolStripMenuItem
           // 
@@ -227,7 +245,7 @@ namespace MMEd
           this.saveToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
           this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
           this.saveToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-          this.saveToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+          this.saveToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
           this.saveToolStripMenuItem.Text = "&Save As Binary...";
           this.saveToolStripMenuItem.ToolTipText = "Saves this file in an MMv3 binary format";
           this.saveToolStripMenuItem.Click += new System.EventHandler(this.SaveAsBinaryClick);
@@ -236,7 +254,7 @@ namespace MMEd
           // 
           this.toolStripMenuItem2.ImageTransparentColor = System.Drawing.Color.Magenta;
           this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-          this.toolStripMenuItem2.Size = new System.Drawing.Size(224, 22);
+          this.toolStripMenuItem2.Size = new System.Drawing.Size(243, 22);
           this.toolStripMenuItem2.Text = "&Save As XML...";
           this.toolStripMenuItem2.ToolTipText = "Saves this file as an XML tree\r\nCAUTION: the resulting file may not be openable\r\n" +
               "by future versions of MMEd!";
@@ -283,6 +301,7 @@ namespace MMEd
           this.ViewerTabControl.Controls.Add(this.ViewTab3D);
           this.ViewerTabControl.Controls.Add(this.ViewTabBump);
           this.ViewerTabControl.Controls.Add(this.ViewTabOdd);
+          this.ViewerTabControl.Controls.Add(this.ViewTabCamera);
           this.ViewerTabControl.Controls.Add(this.ViewTabVRAM);
           this.ViewerTabControl.Controls.Add(this.ViewTab3dEditor);
           this.ViewerTabControl.Location = new System.Drawing.Point(3, 3);
@@ -569,7 +588,7 @@ namespace MMEd
           // GridViewerStatusLabel
           // 
           this.GridViewerStatusLabel.Name = "GridViewerStatusLabel";
-          this.GridViewerStatusLabel.Size = new System.Drawing.Size(45, 17);
+          this.GridViewerStatusLabel.Size = new System.Drawing.Size(51, 17);
           this.GridViewerStatusLabel.Text = "(status)";
           // 
           // groupBox2
@@ -713,7 +732,7 @@ namespace MMEd
           this.GridViewZoomSlider.Maximum = 5;
           this.GridViewZoomSlider.Minimum = -5;
           this.GridViewZoomSlider.Name = "GridViewZoomSlider";
-          this.GridViewZoomSlider.Size = new System.Drawing.Size(122, 45);
+          this.GridViewZoomSlider.Size = new System.Drawing.Size(122, 48);
           this.GridViewZoomSlider.TabIndex = 6;
           this.ToolTip.SetToolTip(this.GridViewZoomSlider, "Set the zoom level");
           // 
@@ -721,7 +740,7 @@ namespace MMEd
           // 
           this.GridViewTransparencySlider.Location = new System.Drawing.Point(5, 73);
           this.GridViewTransparencySlider.Name = "GridViewTransparencySlider";
-          this.GridViewTransparencySlider.Size = new System.Drawing.Size(122, 45);
+          this.GridViewTransparencySlider.Size = new System.Drawing.Size(122, 48);
           this.GridViewTransparencySlider.TabIndex = 4;
           this.ToolTip.SetToolTip(this.GridViewTransparencySlider, "Set the transparency level for overlaid textures (bump, odd)");
           this.GridViewTransparencySlider.Value = 5;
@@ -770,14 +789,13 @@ namespace MMEd
           // 
           // ViewTabBump
           // 
+          this.ViewTabBump.Controls.Add(this.label18);
+          this.ViewTabBump.Controls.Add(this.label17);
+          this.ViewTabBump.Controls.Add(this.label16);
+          this.ViewTabBump.Controls.Add(this.label15);
           this.ViewTabBump.Controls.Add(this.BumpEditFillButton);
-          this.ViewTabBump.Controls.Add(this.label8);
-          this.ViewTabBump.Controls.Add(this.label7);
-          this.ViewTabBump.Controls.Add(this.label6);
-          this.ViewTabBump.Controls.Add(this.label5);
           this.ViewTabBump.Controls.Add(this.BumpTypeLabel);
           this.ViewTabBump.Controls.Add(this.BumpViewPictureBox);
-          this.ViewTabBump.Controls.Add(this.OddViewPictureBox);
           this.ViewTabBump.Controls.Add(this.BumpCombo);
           this.ViewTabBump.Controls.Add(this.BumpEditPictureBox);
           this.ViewTabBump.Location = new System.Drawing.Point(4, 22);
@@ -788,25 +806,6 @@ namespace MMEd
           this.ViewTabBump.Text = "Bump";
           this.ViewTabBump.UseVisualStyleBackColor = true;
           // 
-          // ViewTabOdd
-          // 
-          this.ViewTabOdd.Controls.Add(this.OddEditFillButton);
-          this.ViewTabOdd.Controls.Add(this.label8);
-          this.ViewTabOdd.Controls.Add(this.label7);
-          this.ViewTabOdd.Controls.Add(this.label6);
-          this.ViewTabOdd.Controls.Add(this.label5);
-          this.ViewTabOdd.Controls.Add(this.OddTypeLabel);
-          this.ViewTabOdd.Controls.Add(this.OddViewPictureBox);
-          this.ViewTabOdd.Controls.Add(this.OddCombo);
-          this.ViewTabOdd.Controls.Add(this.OddEditPictureBox);
-          this.ViewTabOdd.Location = new System.Drawing.Point(4, 22);
-          this.ViewTabOdd.Name = "ViewTabOdd";
-          this.ViewTabOdd.Padding = new System.Windows.Forms.Padding(3);
-          this.ViewTabOdd.Size = new System.Drawing.Size(636, 535);
-          this.ViewTabOdd.TabIndex = 5;
-          this.ViewTabOdd.Text = "Odd";
-          this.ViewTabOdd.UseVisualStyleBackColor = true;
-          // 
           // BumpEditFillButton
           // 
           this.BumpEditFillButton.Location = new System.Drawing.Point(261, 44);
@@ -815,15 +814,6 @@ namespace MMEd
           this.BumpEditFillButton.TabIndex = 8;
           this.BumpEditFillButton.Text = "Fill";
           this.BumpEditFillButton.UseVisualStyleBackColor = true;
-          // 
-          // OddEditFillButton
-          // 
-          this.OddEditFillButton.Location = new System.Drawing.Point(261, 44);
-          this.OddEditFillButton.Name = "OddEditFillButton";
-          this.OddEditFillButton.Size = new System.Drawing.Size(75, 23);
-          this.OddEditFillButton.TabIndex = 8;
-          this.OddEditFillButton.Text = "Fill";
-          this.OddEditFillButton.UseVisualStyleBackColor = true;
           // 
           // label8
           // 
@@ -872,15 +862,6 @@ namespace MMEd
           this.BumpTypeLabel.TabIndex = 3;
           this.BumpTypeLabel.Text = "BumpTypeLabel";
           // 
-          // OddTypeLabel
-          // 
-          this.OddTypeLabel.AutoSize = true;
-          this.OddTypeLabel.Location = new System.Drawing.Point(134, 260);
-          this.OddTypeLabel.Name = "OddTypeLabel";
-          this.OddTypeLabel.Size = new System.Drawing.Size(84, 13);
-          this.OddTypeLabel.TabIndex = 3;
-          this.OddTypeLabel.Text = "OddTypeLabel";
-          // 
           // BumpViewPictureBox
           // 
           this.BumpViewPictureBox.BackColor = System.Drawing.Color.White;
@@ -914,15 +895,6 @@ namespace MMEd
           this.BumpCombo.Size = new System.Drawing.Size(121, 21);
           this.BumpCombo.TabIndex = 1;
           // 
-          // OddCombo
-          // 
-          this.OddCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-          this.OddCombo.FormattingEnabled = true;
-          this.OddCombo.Location = new System.Drawing.Point(134, 46);
-          this.OddCombo.Name = "OddCombo";
-          this.OddCombo.Size = new System.Drawing.Size(121, 21);
-          this.OddCombo.TabIndex = 1;
-          // 
           // BumpEditPictureBox
           // 
           this.BumpEditPictureBox.BackColor = System.Drawing.Color.White;
@@ -935,6 +907,52 @@ namespace MMEd
           this.BumpEditPictureBox.TabIndex = 0;
           this.BumpEditPictureBox.TabStop = false;
           // 
+          // ViewTabOdd
+          // 
+          this.ViewTabOdd.Controls.Add(this.OddEditFillButton);
+          this.ViewTabOdd.Controls.Add(this.label8);
+          this.ViewTabOdd.Controls.Add(this.label7);
+          this.ViewTabOdd.Controls.Add(this.label6);
+          this.ViewTabOdd.Controls.Add(this.label5);
+          this.ViewTabOdd.Controls.Add(this.OddTypeLabel);
+          this.ViewTabOdd.Controls.Add(this.OddViewPictureBox);
+          this.ViewTabOdd.Controls.Add(this.OddCombo);
+          this.ViewTabOdd.Controls.Add(this.OddEditPictureBox);
+          this.ViewTabOdd.Location = new System.Drawing.Point(4, 22);
+          this.ViewTabOdd.Name = "ViewTabOdd";
+          this.ViewTabOdd.Padding = new System.Windows.Forms.Padding(3);
+          this.ViewTabOdd.Size = new System.Drawing.Size(636, 535);
+          this.ViewTabOdd.TabIndex = 5;
+          this.ViewTabOdd.Text = "Odd";
+          this.ViewTabOdd.UseVisualStyleBackColor = true;
+          // 
+          // OddEditFillButton
+          // 
+          this.OddEditFillButton.Location = new System.Drawing.Point(261, 44);
+          this.OddEditFillButton.Name = "OddEditFillButton";
+          this.OddEditFillButton.Size = new System.Drawing.Size(75, 23);
+          this.OddEditFillButton.TabIndex = 8;
+          this.OddEditFillButton.Text = "Fill";
+          this.OddEditFillButton.UseVisualStyleBackColor = true;
+          // 
+          // OddTypeLabel
+          // 
+          this.OddTypeLabel.AutoSize = true;
+          this.OddTypeLabel.Location = new System.Drawing.Point(134, 260);
+          this.OddTypeLabel.Name = "OddTypeLabel";
+          this.OddTypeLabel.Size = new System.Drawing.Size(77, 13);
+          this.OddTypeLabel.TabIndex = 3;
+          this.OddTypeLabel.Text = "OddTypeLabel";
+          // 
+          // OddCombo
+          // 
+          this.OddCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+          this.OddCombo.FormattingEnabled = true;
+          this.OddCombo.Location = new System.Drawing.Point(134, 46);
+          this.OddCombo.Name = "OddCombo";
+          this.OddCombo.Size = new System.Drawing.Size(121, 21);
+          this.OddCombo.TabIndex = 1;
+          // 
           // OddEditPictureBox
           // 
           this.OddEditPictureBox.BackColor = System.Drawing.Color.White;
@@ -946,6 +964,100 @@ namespace MMEd
           this.OddEditPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
           this.OddEditPictureBox.TabIndex = 0;
           this.OddEditPictureBox.TabStop = false;
+          // 
+          // ViewTabCamera
+          // 
+          this.ViewTabCamera.Controls.Add(this.SliderElevation);
+          this.ViewTabCamera.Controls.Add(this.TextElevation);
+          this.ViewTabCamera.Controls.Add(this.label14);
+          this.ViewTabCamera.Controls.Add(this.SliderDistance);
+          this.ViewTabCamera.Controls.Add(this.TextDistance);
+          this.ViewTabCamera.Controls.Add(this.label13);
+          this.ViewTabCamera.Controls.Add(this.SliderDirection);
+          this.ViewTabCamera.Controls.Add(this.TextDirection);
+          this.ViewTabCamera.Controls.Add(this.label12);
+          this.ViewTabCamera.Location = new System.Drawing.Point(4, 22);
+          this.ViewTabCamera.Name = "ViewTabCamera";
+          this.ViewTabCamera.Padding = new System.Windows.Forms.Padding(3);
+          this.ViewTabCamera.Size = new System.Drawing.Size(636, 535);
+          this.ViewTabCamera.TabIndex = 5;
+          this.ViewTabCamera.Text = "Camera";
+          this.ViewTabCamera.UseVisualStyleBackColor = true;
+          // 
+          // SliderElevation
+          // 
+          this.SliderElevation.Location = new System.Drawing.Point(68, 127);
+          this.SliderElevation.Name = "SliderElevation";
+          this.SliderElevation.Size = new System.Drawing.Size(122, 48);
+          this.SliderElevation.TabIndex = 11;
+          this.ToolTip.SetToolTip(this.SliderElevation, "Set the transparency level for overlaid textures (bump, odd)");
+          this.SliderElevation.Value = 5;
+          // 
+          // TextElevation
+          // 
+          this.TextElevation.Location = new System.Drawing.Point(6, 127);
+          this.TextElevation.Name = "TextElevation";
+          this.TextElevation.Size = new System.Drawing.Size(56, 20);
+          this.TextElevation.TabIndex = 10;
+          // 
+          // label14
+          // 
+          this.label14.AutoSize = true;
+          this.label14.Location = new System.Drawing.Point(3, 111);
+          this.label14.Name = "label14";
+          this.label14.Size = new System.Drawing.Size(51, 13);
+          this.label14.TabIndex = 9;
+          this.label14.Text = "Elevation";
+          // 
+          // SliderDistance
+          // 
+          this.SliderDistance.Location = new System.Drawing.Point(68, 73);
+          this.SliderDistance.Name = "SliderDistance";
+          this.SliderDistance.Size = new System.Drawing.Size(122, 48);
+          this.SliderDistance.TabIndex = 8;
+          this.ToolTip.SetToolTip(this.SliderDistance, "Set the transparency level for overlaid textures (bump, odd)");
+          this.SliderDistance.Value = 5;
+          // 
+          // TextDistance
+          // 
+          this.TextDistance.Location = new System.Drawing.Point(6, 73);
+          this.TextDistance.Name = "TextDistance";
+          this.TextDistance.Size = new System.Drawing.Size(56, 20);
+          this.TextDistance.TabIndex = 7;
+          // 
+          // label13
+          // 
+          this.label13.AutoSize = true;
+          this.label13.Location = new System.Drawing.Point(3, 57);
+          this.label13.Name = "label13";
+          this.label13.Size = new System.Drawing.Size(49, 13);
+          this.label13.TabIndex = 6;
+          this.label13.Text = "Distance";
+          // 
+          // SliderDirection
+          // 
+          this.SliderDirection.Location = new System.Drawing.Point(68, 19);
+          this.SliderDirection.Name = "SliderDirection";
+          this.SliderDirection.Size = new System.Drawing.Size(122, 48);
+          this.SliderDirection.TabIndex = 5;
+          this.ToolTip.SetToolTip(this.SliderDirection, "Set the transparency level for overlaid textures (bump, odd)");
+          this.SliderDirection.Value = 5;
+          // 
+          // TextDirection
+          // 
+          this.TextDirection.Location = new System.Drawing.Point(6, 19);
+          this.TextDirection.Name = "TextDirection";
+          this.TextDirection.Size = new System.Drawing.Size(56, 20);
+          this.TextDirection.TabIndex = 1;
+          // 
+          // label12
+          // 
+          this.label12.AutoSize = true;
+          this.label12.Location = new System.Drawing.Point(3, 3);
+          this.label12.Name = "label12";
+          this.label12.Size = new System.Drawing.Size(49, 13);
+          this.label12.TabIndex = 0;
+          this.label12.Text = "Direction";
           // 
           // ViewTabVRAM
           // 
@@ -1109,6 +1221,44 @@ namespace MMEd
           this.Viewer3DRenderingSurfaceBottomRight.TabIndex = 0;
           this.Viewer3DRenderingSurfaceBottomRight.Text = "renderingSurface4";
           // 
+          // label15
+          // 
+          this.label15.AutoSize = true;
+          this.label15.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+          this.label15.Location = new System.Drawing.Point(3, 15);
+          this.label15.Name = "label15";
+          this.label15.Size = new System.Drawing.Size(41, 20);
+          this.label15.TabIndex = 9;
+          this.label15.Text = "Edit";
+          // 
+          // label16
+          // 
+          this.label16.AutoSize = true;
+          this.label16.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+          this.label16.Location = new System.Drawing.Point(3, 237);
+          this.label16.Name = "label16";
+          this.label16.Size = new System.Drawing.Size(47, 20);
+          this.label16.TabIndex = 10;
+          this.label16.Text = "View";
+          // 
+          // label17
+          // 
+          this.label17.AutoSize = true;
+          this.label17.Location = new System.Drawing.Point(131, 80);
+          this.label17.Name = "label17";
+          this.label17.Size = new System.Drawing.Size(325, 13);
+          this.label17.TabIndex = 11;
+          this.label17.Text = "Select a bump type then click the pixels you want to set to that type";
+          // 
+          // label18
+          // 
+          this.label18.AutoSize = true;
+          this.label18.Location = new System.Drawing.Point(134, 284);
+          this.label18.Name = "label18";
+          this.label18.Size = new System.Drawing.Size(165, 13);
+          this.label18.TabIndex = 12;
+          this.label18.Text = "Click a pixel to view its bump type";
+          // 
           // MainForm
           // 
           this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1155,10 +1305,17 @@ namespace MMEd
           this.ViewTab3D.ResumeLayout(false);
           this.ViewTabBump.ResumeLayout(false);
           this.ViewTabBump.PerformLayout();
+          ((System.ComponentModel.ISupportInitialize)(this.BumpViewPictureBox)).EndInit();
+          ((System.ComponentModel.ISupportInitialize)(this.OddViewPictureBox)).EndInit();
+          ((System.ComponentModel.ISupportInitialize)(this.BumpEditPictureBox)).EndInit();
           this.ViewTabOdd.ResumeLayout(false);
           this.ViewTabOdd.PerformLayout();
-          ((System.ComponentModel.ISupportInitialize)(this.BumpViewPictureBox)).EndInit();
-          ((System.ComponentModel.ISupportInitialize)(this.BumpEditPictureBox)).EndInit();
+          ((System.ComponentModel.ISupportInitialize)(this.OddEditPictureBox)).EndInit();
+          this.ViewTabCamera.ResumeLayout(false);
+          this.ViewTabCamera.PerformLayout();
+          ((System.ComponentModel.ISupportInitialize)(this.SliderElevation)).EndInit();
+          ((System.ComponentModel.ISupportInitialize)(this.SliderDistance)).EndInit();
+          ((System.ComponentModel.ISupportInitialize)(this.SliderDirection)).EndInit();
           this.ViewTabVRAM.ResumeLayout(false);
           this.ViewTabVRAM.PerformLayout();
           this.panel1.ResumeLayout(false);
@@ -1212,6 +1369,7 @@ namespace MMEd
         public GLTK.RenderingSurface Viewer3DRenderingSurface;
         public System.Windows.Forms.TabPage ViewTabBump;
         public System.Windows.Forms.TabPage ViewTabOdd;
+        public System.Windows.Forms.TabPage ViewTabCamera;
         public System.Windows.Forms.PictureBox BumpEditPictureBox;
         public System.Windows.Forms.PictureBox OddEditPictureBox;
         public System.Windows.Forms.TabPage ViewTabVRAM;
@@ -1270,6 +1428,19 @@ namespace MMEd
       private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
       private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem3;
       private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
+      public System.Windows.Forms.TrackBar SliderDistance;
+      private System.Windows.Forms.TextBox TextDistance;
+      private System.Windows.Forms.Label label13;
+      public System.Windows.Forms.TrackBar SliderDirection;
+      private System.Windows.Forms.TextBox TextDirection;
+      private System.Windows.Forms.Label label12;
+      public System.Windows.Forms.TrackBar SliderElevation;
+      private System.Windows.Forms.TextBox TextElevation;
+      private System.Windows.Forms.Label label14;
+      private System.Windows.Forms.Label label18;
+      private System.Windows.Forms.Label label17;
+      private System.Windows.Forms.Label label16;
+      private System.Windows.Forms.Label label15;
     }
 }
 

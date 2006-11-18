@@ -45,6 +45,7 @@ namespace MMEd
       ViewTabImg.Tag = ImageViewer.InitialiseViewer(this);
       ViewTabBump.Tag = BumpViewer.InitialiseViewer(this);
       ViewTabOdd.Tag = OddViewer.InitialiseViewer(this);
+      ViewTabCamera.Tag = CameraViewer.InitialiseViewer(this);
       ViewTabGrid.Tag = GridViewer.InitialiseViewer(this);
       ViewTab3D.Tag = ThreeDeeViewer.InitialiseViewer(this);
       ViewTabVRAM.Tag = VRAMViewer.InitialiseViewer(this);
@@ -317,6 +318,5 @@ namespace MMEd
     }
 
     public event KeyEventHandler DialogKey;
-
   }
 }

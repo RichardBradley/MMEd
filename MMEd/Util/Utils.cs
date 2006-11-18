@@ -299,5 +299,67 @@ namespace MMEd.Util
       }
       return lAcc.ToString();
     }
+
+    public static void DrawArrow(
+      Graphics xiGraphics,
+      Pen xiPen,
+      Point xiTip,
+      int xiDirection,
+      int xiLength)
+    {
+      int lArrowHeadLength = 8;
+      double lAngle = Math.PI * ((double)xiDirection / 2048);
+      Point lLineEnd = new Point(
+        xiTip.X - (int)(xiLength * Math.Sin(lAngle)),
+        xiTip.Y + (int)(xiLength * Math.Cos(lAngle)));
+
+      double lArrowAngle1 = lAngle + (Math.PI / 6);
+      double lArrowAngle2 = lAngle - (Math.PI / 6);
+      Point lArrowHead1 = new Point(
+        xiTip.X - (int)(lArrowHeadLength * Math.Sin(lArrowAngle1)),
+        xiTip.Y + (int)(lArrowHeadLength * Math.Cos(lArrowAngle1)));
+      Point lArrowHead2 = new Point(
+        xiTip.X - (int)(lArrowHeadLength * Math.Sin(lArrowAngle2)),
+        xiTip.Y + (int)(lArrowHeadLength * Math.Cos(lArrowAngle2)));
+
+      xiGraphics.DrawLine(xiPen, xiTip, lLineEnd);
+      xiGraphics.DrawLine(xiPen, xiTip, lArrowHead1);
+      xiGraphics.DrawLine(xiPen, xiTip, lArrowHead2);
+    }
+
+    public static void DrawCircle(
+      Graphics xiGraphics,
+      Pen xiPen,
+      Point xiCentre,
+      int xiRadius)
+    {
+      xiGraphics.DrawEllipse(
+        xiPen,
+        xiCentre.X - xiRadius,
+        xiCentre.Y - xiRadius,
+        xiRadius * 2,
+        xiRadius * 2);
+    }
+
+    public static void DrawCross(
+      Graphics xiGraphics,
+      Pen xiPen,
+      Point xiCentre,
+      int xiLength)
+    {
+      xiGraphics.DrawLine(
+        xiPen,
+        xiCentre.X - xiLength,
+        xiCentre.Y - xiLength,
+        xiCentre.X + xiLength,
+        xiCentre.Y + xiLength);
+      xiGraphics.DrawLine(
+        xiPen,
+        xiCentre.X - xiLength,
+        xiCentre.Y + xiLength,
+        xiCentre.X + xiLength,
+        xiCentre.Y - xiLength);
+    }
+
   }
 }
