@@ -85,7 +85,7 @@ namespace MMEd.Viewers
       lRenderer.FixedRenderMode = xiFixedRenderMode;
       lRenderer.Attach(xiSurface);
 
-      MMEdView lView = new MMEdView(this, xiScene, xiCamera, lRenderer);
+      MMEdEditorView lView = new MMEdEditorView(this, xiScene, xiCamera, lRenderer);
 
       mViews.Add(xiSurface, lView);
     }
@@ -370,7 +370,7 @@ namespace MMEd.Viewers
     private Level mSubject = null;
 
     MMEdScene mScene;
-    Dictionary<RenderingSurface, MMEdView> mViews = new Dictionary<RenderingSurface, MMEdView>();
+    Dictionary<RenderingSurface, MMEdEditorView> mViews = new Dictionary<RenderingSurface, MMEdEditorView>();
 
     ToolStripMenuItem mOptionsMenu;
 
@@ -403,19 +403,19 @@ namespace MMEd.Viewers
 
     private void ResetCamera()
     {
-      MMEdView lTR = mViews[mMainForm.Viewer3DRenderingSurfaceTopRight];
+      MMEdEditorView lTR = mViews[mMainForm.Viewer3DRenderingSurfaceTopRight];
       lTR.Camera.Position = new GLTK.Point(-3 * MoveScale, -3 * MoveScale, 3 * MoveScale);
       lTR.Camera.LookAt(new GLTK.Point(3 * MoveScale, 3 * MoveScale, 0), new GLTK.Vector(0, 0, 1));
 
-      MMEdView lTL = mViews[mMainForm.Viewer3DRenderingSurfaceTopLeft];
+      MMEdEditorView lTL = mViews[mMainForm.Viewer3DRenderingSurfaceTopLeft];
       lTL.Camera.Position = new GLTK.Point(0, 0, -5000);
       lTL.Camera.LookAt(new GLTK.Point(0, 0, 0), GLTK.Vector.XAxis);
 
-      MMEdView lBL = mViews[mMainForm.Viewer3DRenderingSurfaceBottomLeft];
+      MMEdEditorView lBL = mViews[mMainForm.Viewer3DRenderingSurfaceBottomLeft];
       lBL.Camera.Position = new GLTK.Point(-5000, 0, 0);
       lBL.Camera.LookAt(new GLTK.Point(0, 0, 0), GLTK.Vector.ZAxis);
 
-      MMEdView lBR = mViews[mMainForm.Viewer3DRenderingSurfaceBottomRight];
+      MMEdEditorView lBR = mViews[mMainForm.Viewer3DRenderingSurfaceBottomRight];
       lBR.Camera.Position = new GLTK.Point(0, -5000, 0);
       lBR.Camera.LookAt(new GLTK.Point(0, 0, 0), GLTK.Vector.ZAxis);
     }
@@ -541,7 +541,7 @@ namespace MMEd.Viewers
 
     private void InvalidateAllViewers()
     {
-      foreach (MMEdView lView in mViews.Values)
+      foreach (MMEdEditorView lView in mViews.Values)
       {
         lView.Renderer.RendereringSurface.Invalidate();
       }

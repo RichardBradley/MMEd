@@ -8,9 +8,9 @@ using MMEd.Viewers.ThreeDee;
 
 namespace MMEd.Viewers
 {
-  class MMEdView : GLTK.View
+  class MMEdEditorView : GLTK.View
   {
-    public MMEdView(ThreeDeeEditor xiViewer, Scene xiScene, Camera xiCamera, AbstractRenderer xiRenderer) 
+    public MMEdEditorView(ThreeDeeEditor xiViewer, Scene xiScene, Camera xiCamera, AbstractRenderer xiRenderer) 
       : base(xiScene, xiCamera, xiRenderer)
     {
       mViewer = xiViewer;

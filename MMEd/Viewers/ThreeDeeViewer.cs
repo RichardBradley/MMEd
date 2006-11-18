@@ -32,7 +32,7 @@ namespace MMEd.Viewers
 
       mScene = new Scene();
       mCamera = new Camera(80, 0.1, 1e10);
-      mView = new GLTK.View(mScene, mCamera, mRenderer);
+      mView = new MMEdViewerView(this, mScene, mCamera, mRenderer);
       mLight = new Light();
       mLight.DiffuseIntensity = 0.1;
       mLight.SpecularIntensity = 0.02;

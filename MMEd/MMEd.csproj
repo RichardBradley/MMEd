@@ -130,9 +130,10 @@
     <Compile Include="Viewers\FlatViewer.cs" />
     <Compile Include="Viewers\MMEdEntity.cs" />
     <Compile Include="Viewers\MMEdScene.cs" />
-    <Compile Include="Viewers\MMEdView.cs">
+    <Compile Include="Viewers\MMEdEditorView.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Viewers\MMEdViewerView.cs" />
     <Compile Include="Viewers\OddViewer.cs" />
     <Compile Include="Viewers\ThreeDeeEditor.cs">
       <SubType>Code</SubType>
