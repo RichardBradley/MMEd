@@ -27,6 +27,10 @@ namespace MMEd.Viewers
       new PropertyController(this, "ViewMode").BindTo(mMainForm.GridViewViewModeCombo);
       new PropertyController(this, "ShowObjects").BindTo(mMainForm.GridViewShowObjectsCheck);
 
+      new PropertyController(this, "OverlayGridColor").BindTo(mMainForm.OverlaySelectorGrid);
+      new PropertyController(this, "OverlayCameraColor").BindTo(mMainForm.OverlaySelectorCamera);
+      new PropertyController(this, "OverlayRespawnColor").BindTo(mMainForm.OverlaySelectorRespawn);
+
       mMainForm.ViewerTabControl.KeyPress += new KeyPressEventHandler(this.ViewerTabControl_KeyPress);
 
       //set the transparency
@@ -43,7 +47,8 @@ namespace MMEd.Viewers
       int lNumberOffX = 0, lNumberOffY = 0;
       Font lNumberFont = null;
       Brush lNumberFGBrush = null, lNumberBGBrush = null;
-      if (ViewMode == eViewMode.EditMetadata)
+      if (ViewMode == eViewMode.EditMetadata ||
+        ViewMode == eViewMode.FillMetadata)
       {
         lNumberFont = new Font(FontFamily.GenericMonospace, 10);
         lNumberFGBrush = new SolidBrush(Color.Black);
@@ -104,28 +109,8 @@ namespace MMEd.Viewers
                 }
                 break;
 
-              case eViewMode.ViewCameras:
-                Rectangle lCameraDest = new Rectangle(
-                    x * mSubjectTileWidth,
-                    y * mSubjectTileHeight,
-                    mSubjectTileWidth,
-                    mSubjectTileHeight);
-                CameraPosChunk cpc = ((Level)mMainForm.RootChunk).GetCameraById(mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.CameraPos]);
-
-                if (cpc != null)
-                {
-                  if (cpc.Id < 51)
-                  {
-                    // If the camera pos ID is less than 51 it won't be used 
-                    // for multiplayer games, and pos ID 0 will be used instead.
-                    cpc = ((Level)mMainForm.RootChunk).GetCameraById(0);
-                  }
-
-                  DrawTransparentImage(e, cpc.ToImage(), lCameraDest);
-                }
-                break;
-
               case eViewMode.EditMetadata:
+              case eViewMode.FillMetadata:
                 //draw the selected metadata on as text
                 string text = string.Format("{0}", mSubject.TexMetaData[x][y][(int)SelectedMeta]);
 
@@ -152,7 +137,6 @@ namespace MMEd.Viewers
         }
       }
 
-      //draw objects?
       if (ShowObjects)
       {
         if (mWireFrameCache == null)
@@ -252,13 +236,47 @@ namespace MMEd.Viewers
         }
       }
 
+      // Draw overlays
+      for (int x = (e.ClipRectangle.Left / mSubjectTileWidth);
+          x < (e.ClipRectangle.Right / mSubjectTileWidth) + 1
+          && x < mSubject.Width; x++)
+      {
+        for (int y = (e.ClipRectangle.Top / mSubjectTileHeight);
+            y < (e.ClipRectangle.Bottom / mSubjectTileHeight) + 1
+            && y < mSubject.Height; y++)
+        {
+          try
+          {
+            if (OverlayGridColor != Color.Transparent)
+            {
+              DrawGridOverlay(e.Graphics, new Pen(OverlayGridColor), x, y);
+            }
+
+            if (OverlayCameraColor != Color.Transparent)
+            {
+              DrawCameraOverlay(e.Graphics, new Pen(OverlayCameraColor), x, y);
+            }
+
+            if (OverlayRespawnColor != Color.Transparent)
+            {
+              DrawRespawnOverlay(e.Graphics, new Pen(OverlayRespawnColor), x, y);
+            }
+          }
+          catch (NullReferenceException err)
+          {
+            Console.Error.WriteLine(err);
+          }
+        }
+      }
+
       //highlight editable square
       Rectangle lHighlightRect = new Rectangle();
       Point lMousePos = mMainForm.GridDisplayPanel.PointToClient(Cursor.Position);
-      switch(ViewMode)
+      switch (ViewMode)
       {
         case eViewMode.EditBumpSquares:
         case eViewMode.EditMetadata:
+        case eViewMode.FillMetadata:
         case eViewMode.EditTextures:
           lHighlightRect = new Rectangle(
             lMousePos.X / mSubjectTileWidth * mSubjectTileWidth,
@@ -283,6 +301,101 @@ namespace MMEd.Viewers
         e.Graphics.DrawRectangle(
             new Pen(Color.Red, 2.0f),
             lHighlightRect);
+      }
+    }
+
+    private Point GetMidpoint(int x, int y)
+    {
+      return new Point((x * mSubjectTileWidth + (mSubjectTileWidth / 2)),
+        (y * mSubjectTileHeight + (mSubjectTileHeight / 2)));
+    }
+
+    private Point GetCornerPoint(int x, int y)
+    {
+      return new Point((x * mSubjectTileWidth),
+        (y * mSubjectTileHeight));
+    }
+
+    private Point GetPointInTile(int x, int y, int xiXOffset, int xiYOffset)
+    {
+      // Offset to the correct place in the tile, splitting it into an 8x8 grid.
+      int xOffset = xiXOffset * (mSubjectTileWidth / 8);
+      int yOffset = xiYOffset * (mSubjectTileHeight / 8);
+
+      // Since each of the points in the 8x8 grid may be larger than one pixel,
+      // also adjust it to the centre of that point.
+      int xAdjust = (mSubjectTileWidth / 16);
+      int yAdjust = (mSubjectTileHeight / 16);
+      return new Point((x * mSubjectTileWidth + xOffset + xAdjust),
+        (y * mSubjectTileHeight + yOffset + yAdjust));
+    }
+
+    private void DrawGridOverlay(Graphics g, Pen p, int x, int y)
+    {
+      Point lTopLeft = GetCornerPoint(x, y);
+      g.DrawRectangle(
+        p,
+        lTopLeft.X,
+        lTopLeft.Y,
+        mSubjectTileWidth - 1,
+        mSubjectTileHeight - 1);
+    }
+
+    private void DrawCameraOverlay(Graphics g, Pen p, int x, int y)
+    {
+      CameraPosChunk lCamera =
+       ((Level)mMainForm.RootChunk).GetCameraById(mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.CameraPos]);
+      lCamera.Draw(g, p, GetMidpoint(x, y), mSubjectTileWidth);
+    }
+
+    private void DrawRespawnOverlay(Graphics g, Pen p, int x, int y)
+    {
+      byte lWaypointValue = mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Waypoint];
+
+      // If the waypoint value is 0 then the respawn value doesn't matter - 
+      // don't show it.
+      if (lWaypointValue == 0)
+      {
+        return;
+      }
+
+      byte lZeroValue = mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Zero];
+      byte lTwoValue = mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Two];
+      byte lFourValue = mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Four];
+      byte lSevenValue = mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Seven];
+      Point lMidpoint = GetMidpoint(x, y);
+      int lLineLength = (int)(mSubjectTileWidth * 0.4);
+
+      if (Array.IndexOf(sNoRespawnValues, lTwoValue) >= 0)
+      {
+        Utils.DrawCross(g, p, lMidpoint, (int)(mSubjectTileWidth * 0.4));
+      }
+      else
+      {
+        // Get the odds image and find the point within it indicated by the
+        // Seven value.
+        int lRespawnX = (int)(lSevenValue / 16);
+        int lRespawnY = (int)(lSevenValue % 16);
+        OddImageChunk lOdd = ((Level)mMainForm.RootChunk).GetOddById(mSubject.TexMetaData[x][y][0]);
+        byte lOddValue = lOdd.Data[8 * lRespawnX + lRespawnY];
+
+        // Calculate the direction from the combination of the Four value and
+        // the value taken from the odds image.
+        int lDirection = 2048 + lFourValue == 0 ?
+          lOddValue * 256 :
+          (lFourValue * 1024) + (lOddValue * -256);
+
+        if (lFourValue == 0)
+        {
+          lDirection = lOddValue * 256;
+        }
+        else
+        {
+          lDirection = (lFourValue * 1024) + (lOddValue * -256);
+        }
+
+        Point lRespawnPoint = GetPointInTile(x, y, lRespawnX, lRespawnY);
+        Utils.DrawArrow(g, p, lRespawnPoint, lDirection, lLineLength);
       }
     }
 
@@ -443,7 +556,7 @@ namespace MMEd.Viewers
 
         mMainForm.GridViewerStatusLabel.Text = string.Format(
           "Tex Coord: ({0:0}, {1:0}) Flat Coord: ({2:0}, {3:0}) {4}",
-          x, y, x * mSubject.ScaleX, y * mSubject.ScaleY,
+          Math.Floor(x), Math.Floor(y), x * mSubject.ScaleX, y * mSubject.ScaleY,
           lWorldCoord);
 
         //this seems a bit ott, but is needed for the red square highlight
@@ -466,6 +579,7 @@ namespace MMEd.Viewers
         switch (ViewMode)
         {
           case eViewMode.EditMetadata:
+          case eViewMode.FillMetadata:
             //edit meta data mode
             if (mSubject.TexMetaData != null
                && x < mSubject.TexMetaData.Length
@@ -486,7 +600,20 @@ namespace MMEd.Viewers
               {
                 val = short.Parse(lReply);
 
-                mSubject.TexMetaData[x][y][(int)SelectedMeta] = (byte)val;
+                if (ViewMode == eViewMode.FillMetadata)
+                {
+                  for (int lX = 0; lX < mSubject.TexMetaData.Length; lX++)
+                  {
+                    for (int lY = 0; lY < mSubject.TexMetaData[x].Length; lY++)
+                    {
+                      mSubject.TexMetaData[lX][lY][(int)SelectedMeta] = (byte)val;
+                    }
+                  }
+                }
+                else
+                {
+                  mSubject.TexMetaData[x][y][(int)SelectedMeta] = (byte)val;
+                }
 
                 InvalidateGridDisplay();
               }
@@ -599,7 +726,7 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
     private void ViewerTabControl_KeyPress(object sender, KeyPressEventArgs e)
     {
       if (mMainForm.ViewerTabControl.SelectedTab == this.Tab
-         && (ViewMode == eViewMode.EditTextures 
+         && (ViewMode == eViewMode.EditTextures
            || ViewMode == eViewMode.EditBumpSquares
            || ViewMode == eViewMode.EditBumpPixels)
          && mKeyOrMouseToSelPicBoxDict.ContainsKey(e.KeyChar))
@@ -640,7 +767,7 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
             }
             else if (ViewMode == eViewMode.EditBumpPixels)
             {
-             byte lNewVal = (byte)lSel.Tag;
+              byte lNewVal = (byte)lSel.Tag;
               int lBumpPxX = (p.X % mSubjectTileWidth) / (mSubjectTileWidth / 8);
               int lBumpPxY = (p.Y % mSubjectTileHeight) / (mSubjectTileHeight / 8);
 
@@ -663,11 +790,11 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
       ViewOnly,
       ViewBump,
       ViewOdds,
-      ViewCameras,
       EditTextures,
       EditBumpSquares,
       EditBumpPixels,
-      EditMetadata
+      EditMetadata,
+      FillMetadata
     }
 
     private eViewMode mViewMode = eViewMode.ViewOnly;
@@ -682,6 +809,7 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
          && (value == eViewMode.EditBumpPixels
           || value == eViewMode.EditBumpSquares
           || value == eViewMode.EditMetadata
+          || value == eViewMode.FillMetadata
           || value == eViewMode.ViewBump))
         {
           value = eViewMode.ViewOnly; //reject change!
@@ -693,7 +821,7 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
         //
         mMainForm.GridViewPalettePanel.SuspendLayout();
         mMainForm.GridViewPalettePanel.Controls.Clear();
-        if (ViewMode == eViewMode.EditTextures 
+        if (ViewMode == eViewMode.EditTextures
           || ViewMode == eViewMode.EditBumpSquares
           || ViewMode == eViewMode.EditBumpPixels)
         {
@@ -855,7 +983,7 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
     {
       get { return mSelectedMeta; }
       set
-      {        
+      {
         mSelectedMeta = value;
         if (OnSelectedMetaChanged != null) OnSelectedMetaChanged(this, null);
         InvalidateGridDisplay();
@@ -882,7 +1010,60 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
 
     #endregion
 
+    #region OverlayGridColor property
+
+    private Color mOverlayGridColor = Color.Transparent;
+    public Color OverlayGridColor
+    {
+      get { return mOverlayGridColor; }
+      set
+      {
+        mOverlayGridColor = value;
+        if (OnOverlayGridColorChanged != null) OnOverlayGridColorChanged(this, null);
+        InvalidateGridDisplay();
+      }
+    }
+    public event EventHandler OnOverlayGridColorChanged;
+
+    #endregion
+
+    #region OverlayCameraColor property
+
+    private Color mOverlayCameraColor = Color.Transparent;
+    public Color OverlayCameraColor
+    {
+      get { return mOverlayCameraColor; }
+      set
+      {
+        mOverlayCameraColor = value;
+        if (OnOverlayCameraColorChanged != null) OnOverlayCameraColorChanged(this, null);
+        InvalidateGridDisplay();
+      }
+    }
+    public event EventHandler OnOverlayCameraColorChanged;
+
+    #endregion
+
+    #region OverlayRespawnColor property
+
+    private Color mOverlayRespawnColor = Color.Transparent;
+    public Color OverlayRespawnColor
+    {
+      get { return mOverlayRespawnColor; }
+      set
+      {
+        mOverlayRespawnColor = value;
+        if (OnOverlayRespawnColorChanged != null) OnOverlayRespawnColorChanged(this, null);
+        InvalidateGridDisplay();
+      }
+    }
+    public event EventHandler OnOverlayRespawnColorChanged;
+
+    #endregion
+
     private ImageAttributes mTransparencyAttributes = new ImageAttributes();
+    private static byte[] sNoRespawnValues = new byte[] { 2, 5, 8, 12 };
+    private const int SCALE = 16;
   }
 }
 

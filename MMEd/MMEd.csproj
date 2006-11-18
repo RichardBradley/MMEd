@@ -76,11 +76,21 @@
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Util\OverlaySelector.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Util\OverlaySelector.Designer.cs">
+      <DependentUpon>OverlaySelector.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="MainForm.resx">
       <SubType>Designer</SubType>
       <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Util\OverlaySelector.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>OverlaySelector.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

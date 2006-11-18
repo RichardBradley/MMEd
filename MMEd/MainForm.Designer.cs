@@ -76,30 +76,35 @@ namespace MMEd
           this.TexSquareLabel = new System.Windows.Forms.Label();
           this.label3 = new System.Windows.Forms.Label();
           this.label2 = new System.Windows.Forms.Label();
-          this.GridDisplayPanelHolder = new MMEd.Util.SmoothScrollingPanel();
-          this.GridDisplayPanel = new MMEd.Util.UserPaintDoubleBufferedPanel();
           this.groupBox1 = new System.Windows.Forms.GroupBox();
+          this.OverlaySelectorGrid = new MMEd.Util.OverlaySelector();
           this.GridViewShowObjectsCheck = new System.Windows.Forms.CheckBox();
           this.GridViewZoomSlider = new System.Windows.Forms.TrackBar();
           this.GridViewTransparencySlider = new System.Windows.Forms.TrackBar();
           this.GridViewViewModeCombo = new System.Windows.Forms.ComboBox();
           this.GridViewMetaTypeCombo = new System.Windows.Forms.ComboBox();
+          this.GridDisplayPanelHolder = new MMEd.Util.SmoothScrollingPanel();
+          this.GridDisplayPanel = new MMEd.Util.UserPaintDoubleBufferedPanel();
           this.ViewTab3D = new System.Windows.Forms.TabPage();
           this.Viewer3DRenderingSurface = new GLTK.RenderingSurface();
           this.ViewTabBump = new System.Windows.Forms.TabPage();
+          this.label18 = new System.Windows.Forms.Label();
+          this.label17 = new System.Windows.Forms.Label();
+          this.label16 = new System.Windows.Forms.Label();
+          this.label15 = new System.Windows.Forms.Label();
           this.BumpEditFillButton = new System.Windows.Forms.Button();
-          this.label8 = new System.Windows.Forms.Label();
-          this.label7 = new System.Windows.Forms.Label();
-          this.label6 = new System.Windows.Forms.Label();
-          this.label5 = new System.Windows.Forms.Label();
           this.BumpTypeLabel = new System.Windows.Forms.Label();
           this.BumpViewPictureBox = new System.Windows.Forms.PictureBox();
-          this.OddViewPictureBox = new System.Windows.Forms.PictureBox();
           this.BumpCombo = new System.Windows.Forms.ComboBox();
           this.BumpEditPictureBox = new System.Windows.Forms.PictureBox();
           this.ViewTabOdd = new System.Windows.Forms.TabPage();
           this.OddEditFillButton = new System.Windows.Forms.Button();
+          this.label8 = new System.Windows.Forms.Label();
+          this.label7 = new System.Windows.Forms.Label();
+          this.label6 = new System.Windows.Forms.Label();
+          this.label5 = new System.Windows.Forms.Label();
           this.OddTypeLabel = new System.Windows.Forms.Label();
+          this.OddViewPictureBox = new System.Windows.Forms.PictureBox();
           this.OddCombo = new System.Windows.Forms.ComboBox();
           this.OddEditPictureBox = new System.Windows.Forms.PictureBox();
           this.ViewTabCamera = new System.Windows.Forms.TabPage();
@@ -127,10 +132,8 @@ namespace MMEd
           this.Viewer3DRenderingSurfaceTopRight = new GLTK.RenderingSurface();
           this.Viewer3DRenderingSurfaceBottomRight = new GLTK.RenderingSurface();
           this.ToolTip = new System.Windows.Forms.ToolTip(this.components);
-          this.label15 = new System.Windows.Forms.Label();
-          this.label16 = new System.Windows.Forms.Label();
-          this.label17 = new System.Windows.Forms.Label();
-          this.label18 = new System.Windows.Forms.Label();
+          this.OverlaySelectorCamera = new MMEd.Util.OverlaySelector();
+          this.OverlaySelectorRespawn = new MMEd.Util.OverlaySelector();
           this.mMenuStrip.SuspendLayout();
           this.MainSplitter.Panel1.SuspendLayout();
           this.MainSplitter.Panel2.SuspendLayout();
@@ -150,16 +153,16 @@ namespace MMEd
           this.statusStrip1.SuspendLayout();
           this.groupBox2.SuspendLayout();
           this.smoothScrollingPanel1.SuspendLayout();
-          this.GridDisplayPanelHolder.SuspendLayout();
           this.groupBox1.SuspendLayout();
           ((System.ComponentModel.ISupportInitialize)(this.GridViewZoomSlider)).BeginInit();
           ((System.ComponentModel.ISupportInitialize)(this.GridViewTransparencySlider)).BeginInit();
+          this.GridDisplayPanelHolder.SuspendLayout();
           this.ViewTab3D.SuspendLayout();
           this.ViewTabBump.SuspendLayout();
           ((System.ComponentModel.ISupportInitialize)(this.BumpViewPictureBox)).BeginInit();
-          ((System.ComponentModel.ISupportInitialize)(this.OddViewPictureBox)).BeginInit();
           ((System.ComponentModel.ISupportInitialize)(this.BumpEditPictureBox)).BeginInit();
           this.ViewTabOdd.SuspendLayout();
+          ((System.ComponentModel.ISupportInitialize)(this.OddViewPictureBox)).BeginInit();
           ((System.ComponentModel.ISupportInitialize)(this.OddEditPictureBox)).BeginInit();
           this.ViewTabCamera.SuspendLayout();
           ((System.ComponentModel.ISupportInitialize)(this.SliderElevation)).BeginInit();
@@ -534,8 +537,8 @@ namespace MMEd
           this.ViewTabGrid.Controls.Add(this.GridViewSelImageGroupBox);
           this.ViewTabGrid.Controls.Add(this.statusStrip1);
           this.ViewTabGrid.Controls.Add(this.groupBox2);
-          this.ViewTabGrid.Controls.Add(this.GridDisplayPanelHolder);
           this.ViewTabGrid.Controls.Add(this.groupBox1);
+          this.ViewTabGrid.Controls.Add(this.GridDisplayPanelHolder);
           this.ViewTabGrid.Location = new System.Drawing.Point(4, 22);
           this.ViewTabGrid.Name = "ViewTabGrid";
           this.ViewTabGrid.Padding = new System.Windows.Forms.Padding(3);
@@ -549,9 +552,9 @@ namespace MMEd
           this.GridViewSelImageGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                       | System.Windows.Forms.AnchorStyles.Right)));
           this.GridViewSelImageGroupBox.Controls.Add(this.GridViewSelPanelHolder);
-          this.GridViewSelImageGroupBox.Location = new System.Drawing.Point(504, 178);
+          this.GridViewSelImageGroupBox.Location = new System.Drawing.Point(504, 258);
           this.GridViewSelImageGroupBox.Name = "GridViewSelImageGroupBox";
-          this.GridViewSelImageGroupBox.Size = new System.Drawing.Size(133, 192);
+          this.GridViewSelImageGroupBox.Size = new System.Drawing.Size(133, 112);
           this.GridViewSelImageGroupBox.TabIndex = 4;
           this.GridViewSelImageGroupBox.TabStop = false;
           this.GridViewSelImageGroupBox.Text = "Selected Images";
@@ -565,7 +568,7 @@ namespace MMEd
           this.GridViewSelPanelHolder.Controls.Add(this.GridViewSelPanel);
           this.GridViewSelPanelHolder.Location = new System.Drawing.Point(6, 19);
           this.GridViewSelPanelHolder.Name = "GridViewSelPanelHolder";
-          this.GridViewSelPanelHolder.Size = new System.Drawing.Size(121, 167);
+          this.GridViewSelPanelHolder.Size = new System.Drawing.Size(121, 87);
           this.GridViewSelPanelHolder.TabIndex = 0;
           // 
           // GridViewSelPanel
@@ -682,28 +685,12 @@ namespace MMEd
           this.label2.TabIndex = 0;
           this.label2.Text = "Tex square:";
           // 
-          // GridDisplayPanelHolder
-          // 
-          this.GridDisplayPanelHolder.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                      | System.Windows.Forms.AnchorStyles.Left)
-                      | System.Windows.Forms.AnchorStyles.Right)));
-          this.GridDisplayPanelHolder.AutoScroll = true;
-          this.GridDisplayPanelHolder.Controls.Add(this.GridDisplayPanel);
-          this.GridDisplayPanelHolder.Location = new System.Drawing.Point(6, 6);
-          this.GridDisplayPanelHolder.Name = "GridDisplayPanelHolder";
-          this.GridDisplayPanelHolder.Size = new System.Drawing.Size(492, 364);
-          this.GridDisplayPanelHolder.TabIndex = 1;
-          // 
-          // GridDisplayPanel
-          // 
-          this.GridDisplayPanel.Location = new System.Drawing.Point(0, 0);
-          this.GridDisplayPanel.Name = "GridDisplayPanel";
-          this.GridDisplayPanel.Size = new System.Drawing.Size(200, 192);
-          this.GridDisplayPanel.TabIndex = 1;
-          // 
           // groupBox1
           // 
           this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+          this.groupBox1.Controls.Add(this.OverlaySelectorRespawn);
+          this.groupBox1.Controls.Add(this.OverlaySelectorCamera);
+          this.groupBox1.Controls.Add(this.OverlaySelectorGrid);
           this.groupBox1.Controls.Add(this.GridViewShowObjectsCheck);
           this.groupBox1.Controls.Add(this.GridViewZoomSlider);
           this.groupBox1.Controls.Add(this.GridViewTransparencySlider);
@@ -711,10 +698,20 @@ namespace MMEd
           this.groupBox1.Controls.Add(this.GridViewMetaTypeCombo);
           this.groupBox1.Location = new System.Drawing.Point(504, 0);
           this.groupBox1.Name = "groupBox1";
-          this.groupBox1.Size = new System.Drawing.Size(133, 172);
+          this.groupBox1.Size = new System.Drawing.Size(133, 252);
           this.groupBox1.TabIndex = 0;
           this.groupBox1.TabStop = false;
           this.groupBox1.Text = "View Options";
+          // 
+          // OverlaySelectorGrid
+          // 
+          this.OverlaySelectorGrid.Checked = false;
+          this.OverlaySelectorGrid.Location = new System.Drawing.Point(6, 164);
+          this.OverlaySelectorGrid.Name = "OverlaySelectorGrid";
+          this.OverlaySelectorGrid.Size = new System.Drawing.Size(121, 20);
+          this.OverlaySelectorGrid.TabIndex = 10;
+          this.OverlaySelectorGrid.Text = "Grid";
+          this.OverlaySelectorGrid.DefaultColor = System.Drawing.Color.Gray;
           // 
           // GridViewShowObjectsCheck
           // 
@@ -765,6 +762,25 @@ namespace MMEd
           this.ToolTip.SetToolTip(this.GridViewMetaTypeCombo, "Change the selected meta type, for use when viewing \"odd\" images or changing nume" +
                   "ric meta data");
           // 
+          // GridDisplayPanelHolder
+          // 
+          this.GridDisplayPanelHolder.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                      | System.Windows.Forms.AnchorStyles.Left)
+                      | System.Windows.Forms.AnchorStyles.Right)));
+          this.GridDisplayPanelHolder.AutoScroll = true;
+          this.GridDisplayPanelHolder.Controls.Add(this.GridDisplayPanel);
+          this.GridDisplayPanelHolder.Location = new System.Drawing.Point(6, 6);
+          this.GridDisplayPanelHolder.Name = "GridDisplayPanelHolder";
+          this.GridDisplayPanelHolder.Size = new System.Drawing.Size(492, 364);
+          this.GridDisplayPanelHolder.TabIndex = 1;
+          // 
+          // GridDisplayPanel
+          // 
+          this.GridDisplayPanel.Location = new System.Drawing.Point(0, 0);
+          this.GridDisplayPanel.Name = "GridDisplayPanel";
+          this.GridDisplayPanel.Size = new System.Drawing.Size(200, 192);
+          this.GridDisplayPanel.TabIndex = 1;
+          // 
           // ViewTab3D
           // 
           this.ViewTab3D.Controls.Add(this.Viewer3DRenderingSurface);
@@ -806,6 +822,44 @@ namespace MMEd
           this.ViewTabBump.Text = "Bump";
           this.ViewTabBump.UseVisualStyleBackColor = true;
           // 
+          // label18
+          // 
+          this.label18.AutoSize = true;
+          this.label18.Location = new System.Drawing.Point(134, 284);
+          this.label18.Name = "label18";
+          this.label18.Size = new System.Drawing.Size(165, 13);
+          this.label18.TabIndex = 12;
+          this.label18.Text = "Click a pixel to view its bump type";
+          // 
+          // label17
+          // 
+          this.label17.AutoSize = true;
+          this.label17.Location = new System.Drawing.Point(131, 80);
+          this.label17.Name = "label17";
+          this.label17.Size = new System.Drawing.Size(325, 13);
+          this.label17.TabIndex = 11;
+          this.label17.Text = "Select a bump type then click the pixels you want to set to that type";
+          // 
+          // label16
+          // 
+          this.label16.AutoSize = true;
+          this.label16.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+          this.label16.Location = new System.Drawing.Point(3, 237);
+          this.label16.Name = "label16";
+          this.label16.Size = new System.Drawing.Size(47, 20);
+          this.label16.TabIndex = 10;
+          this.label16.Text = "View";
+          // 
+          // label15
+          // 
+          this.label15.AutoSize = true;
+          this.label15.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+          this.label15.Location = new System.Drawing.Point(3, 15);
+          this.label15.Name = "label15";
+          this.label15.Size = new System.Drawing.Size(41, 20);
+          this.label15.TabIndex = 9;
+          this.label15.Text = "Edit";
+          // 
           // BumpEditFillButton
           // 
           this.BumpEditFillButton.Location = new System.Drawing.Point(261, 44);
@@ -814,44 +868,6 @@ namespace MMEd
           this.BumpEditFillButton.TabIndex = 8;
           this.BumpEditFillButton.Text = "Fill";
           this.BumpEditFillButton.UseVisualStyleBackColor = true;
-          // 
-          // label8
-          // 
-          this.label8.AutoSize = true;
-          this.label8.Location = new System.Drawing.Point(134, 284);
-          this.label8.Name = "label8";
-          this.label8.Size = new System.Drawing.Size(165, 13);
-          this.label8.TabIndex = 7;
-          this.label8.Text = "Click a pixel to view its bump type";
-          // 
-          // label7
-          // 
-          this.label7.AutoSize = true;
-          this.label7.Location = new System.Drawing.Point(131, 80);
-          this.label7.Name = "label7";
-          this.label7.Size = new System.Drawing.Size(325, 13);
-          this.label7.TabIndex = 6;
-          this.label7.Text = "Select a bump type then click the pixels you want to set to that type";
-          // 
-          // label6
-          // 
-          this.label6.AutoSize = true;
-          this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-          this.label6.Location = new System.Drawing.Point(3, 237);
-          this.label6.Name = "label6";
-          this.label6.Size = new System.Drawing.Size(47, 20);
-          this.label6.TabIndex = 5;
-          this.label6.Text = "View";
-          // 
-          // label5
-          // 
-          this.label5.AutoSize = true;
-          this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-          this.label5.Location = new System.Drawing.Point(3, 15);
-          this.label5.Name = "label5";
-          this.label5.Size = new System.Drawing.Size(41, 20);
-          this.label5.TabIndex = 4;
-          this.label5.Text = "Edit";
           // 
           // BumpTypeLabel
           // 
@@ -873,18 +889,6 @@ namespace MMEd
           this.BumpViewPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
           this.BumpViewPictureBox.TabIndex = 2;
           this.BumpViewPictureBox.TabStop = false;
-          // 
-          // OddViewPictureBox
-          // 
-          this.OddViewPictureBox.BackColor = System.Drawing.Color.White;
-          this.OddViewPictureBox.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-          this.OddViewPictureBox.InitialImage = null;
-          this.OddViewPictureBox.Location = new System.Drawing.Point(0, 260);
-          this.OddViewPictureBox.Name = "OddViewPictureBox";
-          this.OddViewPictureBox.Size = new System.Drawing.Size(128, 128);
-          this.OddViewPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-          this.OddViewPictureBox.TabIndex = 2;
-          this.OddViewPictureBox.TabStop = false;
           // 
           // BumpCombo
           // 
@@ -935,6 +939,44 @@ namespace MMEd
           this.OddEditFillButton.Text = "Fill";
           this.OddEditFillButton.UseVisualStyleBackColor = true;
           // 
+          // label8
+          // 
+          this.label8.AutoSize = true;
+          this.label8.Location = new System.Drawing.Point(134, 284);
+          this.label8.Name = "label8";
+          this.label8.Size = new System.Drawing.Size(165, 13);
+          this.label8.TabIndex = 7;
+          this.label8.Text = "Click a pixel to view its bump type";
+          // 
+          // label7
+          // 
+          this.label7.AutoSize = true;
+          this.label7.Location = new System.Drawing.Point(131, 80);
+          this.label7.Name = "label7";
+          this.label7.Size = new System.Drawing.Size(325, 13);
+          this.label7.TabIndex = 6;
+          this.label7.Text = "Select a bump type then click the pixels you want to set to that type";
+          // 
+          // label6
+          // 
+          this.label6.AutoSize = true;
+          this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+          this.label6.Location = new System.Drawing.Point(3, 237);
+          this.label6.Name = "label6";
+          this.label6.Size = new System.Drawing.Size(47, 20);
+          this.label6.TabIndex = 5;
+          this.label6.Text = "View";
+          // 
+          // label5
+          // 
+          this.label5.AutoSize = true;
+          this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+          this.label5.Location = new System.Drawing.Point(3, 15);
+          this.label5.Name = "label5";
+          this.label5.Size = new System.Drawing.Size(41, 20);
+          this.label5.TabIndex = 4;
+          this.label5.Text = "Edit";
+          // 
           // OddTypeLabel
           // 
           this.OddTypeLabel.AutoSize = true;
@@ -943,6 +985,18 @@ namespace MMEd
           this.OddTypeLabel.Size = new System.Drawing.Size(77, 13);
           this.OddTypeLabel.TabIndex = 3;
           this.OddTypeLabel.Text = "OddTypeLabel";
+          // 
+          // OddViewPictureBox
+          // 
+          this.OddViewPictureBox.BackColor = System.Drawing.Color.White;
+          this.OddViewPictureBox.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+          this.OddViewPictureBox.InitialImage = null;
+          this.OddViewPictureBox.Location = new System.Drawing.Point(0, 260);
+          this.OddViewPictureBox.Name = "OddViewPictureBox";
+          this.OddViewPictureBox.Size = new System.Drawing.Size(128, 128);
+          this.OddViewPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+          this.OddViewPictureBox.TabIndex = 2;
+          this.OddViewPictureBox.TabStop = false;
           // 
           // OddCombo
           // 
@@ -1221,43 +1275,25 @@ namespace MMEd
           this.Viewer3DRenderingSurfaceBottomRight.TabIndex = 0;
           this.Viewer3DRenderingSurfaceBottomRight.Text = "renderingSurface4";
           // 
-          // label15
+          // OverlaySelectorCamera
           // 
-          this.label15.AutoSize = true;
-          this.label15.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-          this.label15.Location = new System.Drawing.Point(3, 15);
-          this.label15.Name = "label15";
-          this.label15.Size = new System.Drawing.Size(41, 20);
-          this.label15.TabIndex = 9;
-          this.label15.Text = "Edit";
+          this.OverlaySelectorCamera.Checked = false;
+          this.OverlaySelectorCamera.Location = new System.Drawing.Point(6, 184);
+          this.OverlaySelectorCamera.Name = "OverlaySelectorCamera";
+          this.OverlaySelectorCamera.Size = new System.Drawing.Size(121, 20);
+          this.OverlaySelectorCamera.TabIndex = 11;
+          this.OverlaySelectorCamera.Text = "Camera";
+          this.OverlaySelectorCamera.DefaultColor = System.Drawing.Color.White;
           // 
-          // label16
+          // OverlaySelectorRespawn
           // 
-          this.label16.AutoSize = true;
-          this.label16.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-          this.label16.Location = new System.Drawing.Point(3, 237);
-          this.label16.Name = "label16";
-          this.label16.Size = new System.Drawing.Size(47, 20);
-          this.label16.TabIndex = 10;
-          this.label16.Text = "View";
-          // 
-          // label17
-          // 
-          this.label17.AutoSize = true;
-          this.label17.Location = new System.Drawing.Point(131, 80);
-          this.label17.Name = "label17";
-          this.label17.Size = new System.Drawing.Size(325, 13);
-          this.label17.TabIndex = 11;
-          this.label17.Text = "Select a bump type then click the pixels you want to set to that type";
-          // 
-          // label18
-          // 
-          this.label18.AutoSize = true;
-          this.label18.Location = new System.Drawing.Point(134, 284);
-          this.label18.Name = "label18";
-          this.label18.Size = new System.Drawing.Size(165, 13);
-          this.label18.TabIndex = 12;
-          this.label18.Text = "Click a pixel to view its bump type";
+          this.OverlaySelectorRespawn.Checked = false;
+          this.OverlaySelectorRespawn.Location = new System.Drawing.Point(6, 203);
+          this.OverlaySelectorRespawn.Name = "OverlaySelectorRespawn";
+          this.OverlaySelectorRespawn.Size = new System.Drawing.Size(121, 20);
+          this.OverlaySelectorRespawn.TabIndex = 12;
+          this.OverlaySelectorRespawn.Text = "Respawn";
+          this.OverlaySelectorRespawn.DefaultColor = System.Drawing.Color.Red;
           // 
           // MainForm
           // 
@@ -1297,19 +1333,19 @@ namespace MMEd
           this.groupBox2.ResumeLayout(false);
           this.groupBox2.PerformLayout();
           this.smoothScrollingPanel1.ResumeLayout(false);
-          this.GridDisplayPanelHolder.ResumeLayout(false);
           this.groupBox1.ResumeLayout(false);
           this.groupBox1.PerformLayout();
           ((System.ComponentModel.ISupportInitialize)(this.GridViewZoomSlider)).EndInit();
           ((System.ComponentModel.ISupportInitialize)(this.GridViewTransparencySlider)).EndInit();
+          this.GridDisplayPanelHolder.ResumeLayout(false);
           this.ViewTab3D.ResumeLayout(false);
           this.ViewTabBump.ResumeLayout(false);
           this.ViewTabBump.PerformLayout();
           ((System.ComponentModel.ISupportInitialize)(this.BumpViewPictureBox)).EndInit();
-          ((System.ComponentModel.ISupportInitialize)(this.OddViewPictureBox)).EndInit();
           ((System.ComponentModel.ISupportInitialize)(this.BumpEditPictureBox)).EndInit();
           this.ViewTabOdd.ResumeLayout(false);
           this.ViewTabOdd.PerformLayout();
+          ((System.ComponentModel.ISupportInitialize)(this.OddViewPictureBox)).EndInit();
           ((System.ComponentModel.ISupportInitialize)(this.OddEditPictureBox)).EndInit();
           this.ViewTabCamera.ResumeLayout(false);
           this.ViewTabCamera.PerformLayout();
@@ -1441,6 +1477,9 @@ namespace MMEd
       private System.Windows.Forms.Label label17;
       private System.Windows.Forms.Label label16;
       private System.Windows.Forms.Label label15;
+      public MMEd.Util.OverlaySelector OverlaySelectorGrid;
+      public MMEd.Util.OverlaySelector OverlaySelectorRespawn;
+      public MMEd.Util.OverlaySelector OverlaySelectorCamera;
     }
 }
 

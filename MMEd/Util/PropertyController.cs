@@ -45,6 +45,7 @@ namespace MMEd.Util
 
       if (!lPropType.IsEnum
         && lPropType != typeof(bool)
+        && lPropType != typeof(System.Drawing.Color)
         && xiAllowedValues == null) throw new ArgumentException("If property is not enumerated or boolean, then you must provide an array of allowed values");
 
       // have a guess at an update event name. Don't throw an exception
@@ -276,6 +277,28 @@ namespace MMEd.Util
 
     #endregion
 
+    #region OverlaySelector
+
+    private OverlaySelector mOverlaySelector;
+    public void BindTo(OverlaySelector xiOverlaySelector)
+    {
+      if (mOverlaySelector != null) throw new Exception("Can't bind to more than one OverlaySelector");
+      if (mProperty.PropertyType != typeof(System.Drawing.Color)) throw new Exception("Only Color properties can use OverlaySelector");
+      mOverlaySelector = xiOverlaySelector;
+
+      mOverlaySelector.Changed += new EventHandler(this.OverlaySelectorChangedHandler);
+      ValueChangeHandler(null, null);
+    }
+
+    public void OverlaySelectorChangedHandler(object xiSender, EventArgs xiArgs)
+    {
+      System.Drawing.Color lNewValue = mOverlaySelector.CurrentColor;
+      mProperty.SetValue(mTarget, lNewValue, null);
+      ValueChangeHandler(null, null);
+    }
+
+    #endregion
+
     public void ValueChangeHandler(object xiSender, EventArgs xiArgs)
     {
       if (mAllowedValues != null)
@@ -322,6 +345,13 @@ namespace MMEd.Util
         if (mCheckBox != null)
         {
           mCheckBox.Checked = (bool)mProperty.GetValue(mTarget, null);
+        }
+      }
+      else if (mProperty.PropertyType == typeof(System.Drawing.Color))
+      {
+        if (mOverlaySelector != null)
+        {
+          mOverlaySelector.CurrentColor = (System.Drawing.Color)mProperty.GetValue(mTarget, null);
         }
       }
       else
