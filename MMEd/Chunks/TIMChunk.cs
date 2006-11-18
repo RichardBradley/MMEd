@@ -261,9 +261,11 @@ namespace MMEd.Chunks
     {
       get
       {
-        if (BPP != TimBPP._4BPP)
+        if (BPP != TimBPP._4BPP
+          && BPP != TimBPP._8BPP
+          && BPP != TimBPP._16BPP)
         {
-          throw new Exception(string.Format("Only 4BPP TIMs are supported. Found 0x{0:x8} BPP type", BPP));
+          throw new Exception(string.Format("Only 4BPP TIMs are supported. Found 0x{0:x} BPP type", BPP));
         }
 
         // (use ImageData.Length + 12, not ImageDataSize, because of occasionally failed consistency checks)
