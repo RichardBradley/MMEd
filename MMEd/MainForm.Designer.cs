@@ -77,6 +77,8 @@ namespace MMEd
           this.label3 = new System.Windows.Forms.Label();
           this.label2 = new System.Windows.Forms.Label();
           this.groupBox1 = new System.Windows.Forms.GroupBox();
+          this.OverlaySelectorRespawn = new MMEd.Util.OverlaySelector();
+          this.OverlaySelectorCamera = new MMEd.Util.OverlaySelector();
           this.OverlaySelectorGrid = new MMEd.Util.OverlaySelector();
           this.GridViewShowObjectsCheck = new System.Windows.Forms.CheckBox();
           this.GridViewZoomSlider = new System.Windows.Forms.TrackBar();
@@ -132,8 +134,6 @@ namespace MMEd
           this.Viewer3DRenderingSurfaceTopRight = new GLTK.RenderingSurface();
           this.Viewer3DRenderingSurfaceBottomRight = new GLTK.RenderingSurface();
           this.ToolTip = new System.Windows.Forms.ToolTip(this.components);
-          this.OverlaySelectorCamera = new MMEd.Util.OverlaySelector();
-          this.OverlaySelectorRespawn = new MMEd.Util.OverlaySelector();
           this.mMenuStrip.SuspendLayout();
           this.MainSplitter.Panel1.SuspendLayout();
           this.MainSplitter.Panel2.SuspendLayout();
@@ -703,15 +703,35 @@ namespace MMEd
           this.groupBox1.TabStop = false;
           this.groupBox1.Text = "View Options";
           // 
+          // OverlaySelectorRespawn
+          // 
+          this.OverlaySelectorRespawn.Checked = false;
+          this.OverlaySelectorRespawn.CurrentColor = System.Drawing.Color.Transparent;
+          this.OverlaySelectorRespawn.DefaultColor = System.Drawing.Color.Red;
+          this.OverlaySelectorRespawn.Location = new System.Drawing.Point(6, 203);
+          this.OverlaySelectorRespawn.Name = "OverlaySelectorRespawn";
+          this.OverlaySelectorRespawn.Size = new System.Drawing.Size(121, 20);
+          this.OverlaySelectorRespawn.TabIndex = 12;
+          // 
+          // OverlaySelectorCamera
+          // 
+          this.OverlaySelectorCamera.Checked = false;
+          this.OverlaySelectorCamera.CurrentColor = System.Drawing.Color.Transparent;
+          this.OverlaySelectorCamera.DefaultColor = System.Drawing.Color.White;
+          this.OverlaySelectorCamera.Location = new System.Drawing.Point(6, 184);
+          this.OverlaySelectorCamera.Name = "OverlaySelectorCamera";
+          this.OverlaySelectorCamera.Size = new System.Drawing.Size(121, 20);
+          this.OverlaySelectorCamera.TabIndex = 11;
+          // 
           // OverlaySelectorGrid
           // 
           this.OverlaySelectorGrid.Checked = false;
+          this.OverlaySelectorGrid.CurrentColor = System.Drawing.Color.Transparent;
+          this.OverlaySelectorGrid.DefaultColor = System.Drawing.Color.Gray;
           this.OverlaySelectorGrid.Location = new System.Drawing.Point(6, 164);
           this.OverlaySelectorGrid.Name = "OverlaySelectorGrid";
           this.OverlaySelectorGrid.Size = new System.Drawing.Size(121, 20);
           this.OverlaySelectorGrid.TabIndex = 10;
-          this.OverlaySelectorGrid.Text = "Grid";
-          this.OverlaySelectorGrid.DefaultColor = System.Drawing.Color.Gray;
           // 
           // GridViewShowObjectsCheck
           // 
@@ -1042,10 +1062,9 @@ namespace MMEd
           // 
           this.SliderElevation.Location = new System.Drawing.Point(68, 127);
           this.SliderElevation.Name = "SliderElevation";
-          this.SliderElevation.Size = new System.Drawing.Size(122, 48);
+          this.SliderElevation.Size = new System.Drawing.Size(250, 48);
           this.SliderElevation.TabIndex = 11;
-          this.ToolTip.SetToolTip(this.SliderElevation, "Set the transparency level for overlaid textures (bump, odd)");
-          this.SliderElevation.Value = 5;
+          this.ToolTip.SetToolTip(this.SliderElevation, "Height of the camera from the vehicles");
           // 
           // TextElevation
           // 
@@ -1067,10 +1086,9 @@ namespace MMEd
           // 
           this.SliderDistance.Location = new System.Drawing.Point(68, 73);
           this.SliderDistance.Name = "SliderDistance";
-          this.SliderDistance.Size = new System.Drawing.Size(122, 48);
+          this.SliderDistance.Size = new System.Drawing.Size(250, 48);
           this.SliderDistance.TabIndex = 8;
-          this.ToolTip.SetToolTip(this.SliderDistance, "Set the transparency level for overlaid textures (bump, odd)");
-          this.SliderDistance.Value = 5;
+          this.ToolTip.SetToolTip(this.SliderDistance, "Horizontal distance of the camera from the vehicles");
           // 
           // TextDistance
           // 
@@ -1090,12 +1108,15 @@ namespace MMEd
           // 
           // SliderDirection
           // 
+          this.SliderDirection.LargeChange = 4;
           this.SliderDirection.Location = new System.Drawing.Point(68, 19);
+          this.SliderDirection.Maximum = 8;
+          this.SliderDirection.Minimum = -8;
           this.SliderDirection.Name = "SliderDirection";
-          this.SliderDirection.Size = new System.Drawing.Size(122, 48);
+          this.SliderDirection.Size = new System.Drawing.Size(250, 48);
           this.SliderDirection.TabIndex = 5;
-          this.ToolTip.SetToolTip(this.SliderDirection, "Set the transparency level for overlaid textures (bump, odd)");
-          this.SliderDirection.Value = 5;
+          this.SliderDirection.TickFrequency = 2;
+          this.ToolTip.SetToolTip(this.SliderDirection, "Angle of the camera to the vehicles");
           // 
           // TextDirection
           // 
@@ -1275,26 +1296,6 @@ namespace MMEd
           this.Viewer3DRenderingSurfaceBottomRight.TabIndex = 0;
           this.Viewer3DRenderingSurfaceBottomRight.Text = "renderingSurface4";
           // 
-          // OverlaySelectorCamera
-          // 
-          this.OverlaySelectorCamera.Checked = false;
-          this.OverlaySelectorCamera.Location = new System.Drawing.Point(6, 184);
-          this.OverlaySelectorCamera.Name = "OverlaySelectorCamera";
-          this.OverlaySelectorCamera.Size = new System.Drawing.Size(121, 20);
-          this.OverlaySelectorCamera.TabIndex = 11;
-          this.OverlaySelectorCamera.Text = "Camera";
-          this.OverlaySelectorCamera.DefaultColor = System.Drawing.Color.White;
-          // 
-          // OverlaySelectorRespawn
-          // 
-          this.OverlaySelectorRespawn.Checked = false;
-          this.OverlaySelectorRespawn.Location = new System.Drawing.Point(6, 203);
-          this.OverlaySelectorRespawn.Name = "OverlaySelectorRespawn";
-          this.OverlaySelectorRespawn.Size = new System.Drawing.Size(121, 20);
-          this.OverlaySelectorRespawn.TabIndex = 12;
-          this.OverlaySelectorRespawn.Text = "Respawn";
-          this.OverlaySelectorRespawn.DefaultColor = System.Drawing.Color.Red;
-          // 
           // MainForm
           // 
           this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1465,13 +1466,13 @@ namespace MMEd
       private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem3;
       private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
       public System.Windows.Forms.TrackBar SliderDistance;
-      private System.Windows.Forms.TextBox TextDistance;
+      public System.Windows.Forms.TextBox TextDistance;
       private System.Windows.Forms.Label label13;
       public System.Windows.Forms.TrackBar SliderDirection;
-      private System.Windows.Forms.TextBox TextDirection;
+      public System.Windows.Forms.TextBox TextDirection;
       private System.Windows.Forms.Label label12;
       public System.Windows.Forms.TrackBar SliderElevation;
-      private System.Windows.Forms.TextBox TextElevation;
+      public System.Windows.Forms.TextBox TextElevation;
       private System.Windows.Forms.Label label14;
       private System.Windows.Forms.Label label18;
       private System.Windows.Forms.Label label17;
