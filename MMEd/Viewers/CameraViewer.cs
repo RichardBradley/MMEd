@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
 using MMEd;
 using MMEd.Chunks;
@@ -73,6 +74,8 @@ namespace MMEd.Viewers
 
       mMainForm.SliderDirection.Value = lSliderValue;
       mMainForm.TextDirection.Text = xiValue.ToString();
+      mSubject.Direction = (short)xiValue;
+      UpdateCameraImage();
       mUpdating = false;
     }
 
@@ -86,6 +89,8 @@ namespace MMEd.Viewers
       lSliderValue = Math.Max(mMainForm.SliderDistance.Minimum, lSliderValue);
       mMainForm.SliderDistance.Value = lSliderValue;
       mMainForm.TextDistance.Text = xiValue.ToString();
+      mSubject.Distance = (short)xiValue;
+      UpdateCameraImage();
       mUpdating = false;
     }
 
@@ -99,7 +104,28 @@ namespace MMEd.Viewers
       lSliderValue = Math.Max(mMainForm.SliderElevation.Minimum, lSliderValue);
       mMainForm.SliderElevation.Value = lSliderValue;
       mMainForm.TextElevation.Text = xiValue.ToString();
+      mSubject.Elevation = (short)xiValue;
+      UpdateCameraImage();
       mUpdating = false;
+    }
+
+    private void UpdateCameraImage()
+    {
+      Panel lPanel = mMainForm.PanelCameraImage;
+      Bitmap lImage = new Bitmap(lPanel.Width, lPanel.Height);
+      Graphics g = Graphics.FromImage(lImage);
+      g.FillRectangle(
+        new SolidBrush(Color.White), 
+        0, 
+        0, 
+        lPanel.Width, 
+        lPanel.Height);
+      mSubject.Draw(
+        g,
+        new Pen(Color.Black),
+        new Point(lPanel.Width / 2, lPanel.Height / 2),
+        lPanel.Width);
+      lPanel.BackgroundImage = lImage;
     }
 
     private void SetSliderDirection(TrackBar xiSlider, int xiNewValue)

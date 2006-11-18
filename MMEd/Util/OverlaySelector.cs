@@ -17,7 +17,7 @@ namespace MMEd.Util
       Checkbox.CheckedChanged += new EventHandler(Checkbox_CheckedChanged);
     }
 
-    public new string Text
+    public string Label
     {
       get
       {
