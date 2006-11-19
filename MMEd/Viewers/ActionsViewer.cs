@@ -315,6 +315,8 @@ namespace MMEd.Viewers
       mMainForm.ActionsTabCloneFlatButton.Enabled = (mSubject is FlatChunk);
       mMainForm.ActionsTabImportTIMButton.Enabled = (mSubject is TIMChunk);
       mMainForm.ActionsTabExportTIMButton.Enabled = (mSubject is TIMChunk);
+      mMainForm.ActionsTabImportTMDButton.Enabled = false;
+      mMainForm.ActionsTabExportTMDButton.Enabled = false;
     }
 
     public override System.Windows.Forms.TabPage Tab
