@@ -22,6 +22,7 @@ namespace MMEd
     public MainForm.eOpenType LastOpenedType = MainForm.eOpenType.LevelBinary;
     public string LastSavedFile;
     public string LastTIMFile;
+    public string LastTMDFile;
 
     // loads the local settings found on this machine,
     // or creates a new instance

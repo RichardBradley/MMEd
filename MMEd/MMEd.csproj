@@ -50,6 +50,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Ad3ds\Face.cs" />
+    <Compile Include="Ad3ds\FaceListChunk.cs" />
+    <Compile Include="Ad3ds\FileChunk.cs" />
+    <Compile Include="Ad3ds\MeshChunk.cs" />
+    <Compile Include="Ad3ds\MeshDataChunk.cs" />
+    <Compile Include="Ad3ds\ObjectChunk.cs" />
+    <Compile Include="Ad3ds\UnknownChunk.cs" />
+    <Compile Include="Ad3ds\VersionChunk.cs" />
+    <Compile Include="Ad3ds\Vertex.cs" />
+    <Compile Include="Ad3ds\VertexListChunk.cs" />
     <Compile Include="Chunk.cs" />
     <Compile Include="Chunks\BumpImageChunk.cs" />
     <Compile Include="Chunks\CameraPositionChunk.cs" />
@@ -119,6 +129,7 @@
     <Compile Include="Tests\Libraries.cs" />
     <Compile Include="Tests\Serialisation.cs" />
     <Compile Include="Tests\Utils.cs" />
+    <Compile Include="Ad3ds\Ad3dsChunk.cs" />
     <Compile Include="Util\ByteArrayComparer.cs" />
     <Compile Include="Util\FlatEditorPanel.cs">
       <SubType>UserControl</SubType>

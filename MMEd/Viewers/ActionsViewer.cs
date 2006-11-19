@@ -273,6 +273,77 @@ namespace MMEd.Viewers
 
     #endregion
 
+    #region Import TMD Action
+
+    void ActionsTabImportTMDButton_Click(object sender, EventArgs e)
+    {
+      TMDChunk lTmd = mSubject as TMDChunk;
+      if (lTmd == null)
+      {
+        MessageBox.Show("Error: mSubject is null!");
+        return;
+      }
+
+      OpenFileDialog ofd = new OpenFileDialog();
+      ofd.FileName = mMainForm.LocalSettings.LastTMDFile;
+      DialogResult res = ofd.ShowDialog(mMainForm);
+      if (res == DialogResult.OK)
+      {
+        string lExceptionWhen = "opening the file";
+        try
+        {
+          using (FileStream fs = File.OpenRead(ofd.FileName))
+          {
+            lTmd.DeserialiseFrom3dsStream(fs);
+          }
+        }
+        catch (Exception err)
+        {
+          MessageBox.Show(string.Format("Exception occurred while {0}: {1}", lExceptionWhen, err.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+          return;
+        }
+      }
+      mMainForm.LocalSettings.LastTMDFile = ofd.FileName;
+    }
+
+    #endregion
+
+    #region Export TMD Action
+
+    void ActionsTabExportTMDButton_Click(object sender, EventArgs e)
+    {
+      TMDChunk lTmd = mSubject as TMDChunk;
+      if (lTmd == null)
+      {
+        MessageBox.Show("Error: mSubject is null!");
+        return;
+      }
+
+      SaveFileDialog sfd = new SaveFileDialog();
+      sfd.FileName = mMainForm.LocalSettings.LastTMDFile;
+      DialogResult res = sfd.ShowDialog(mMainForm);
+      if (res == DialogResult.OK)
+      {
+        string lExceptionWhen = "opening the file";
+        try
+        {
+          using (FileStream fs = File.Create(sfd.FileName))
+          {
+            lExceptionWhen = "writing the file";
+            lTmd.SerialiseTo3dsStream(fs);
+          }
+        }
+        catch (Exception err)
+        {
+          MessageBox.Show(string.Format("Exception occurred while {0}: {1}", lExceptionWhen, err.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+          return;
+        }
+      }
+      mMainForm.LocalSettings.LastTMDFile = sfd.FileName;
+    }
+
+    #endregion
+
     private ActionsViewer(MainForm xiMainForm)
       : base(xiMainForm) 
     {
@@ -280,6 +351,8 @@ namespace MMEd.Viewers
       mMainForm.ActionsTabCloneFlatButton.Click += new EventHandler(ActionsTabCloneFlatButton_Click);
       mMainForm.ActionsTabExportTIMButton.Click += new EventHandler(ActionsTabExportTIMButton_Click);
       mMainForm.ActionsTabImportTIMButton.Click += new EventHandler(ActionsTabImportTIMButton_Click);
+      mMainForm.ActionsTabExportTMDButton.Click += new EventHandler(ActionsTabExportTMDButton_Click);
+      mMainForm.ActionsTabImportTMDButton.Click += new EventHandler(ActionsTabImportTMDButton_Click);
       SetSubject(null);
     }
 
@@ -315,8 +388,8 @@ namespace MMEd.Viewers
       mMainForm.ActionsTabCloneFlatButton.Enabled = (mSubject is FlatChunk);
       mMainForm.ActionsTabImportTIMButton.Enabled = (mSubject is TIMChunk);
       mMainForm.ActionsTabExportTIMButton.Enabled = (mSubject is TIMChunk);
-      mMainForm.ActionsTabImportTMDButton.Enabled = false;
-      mMainForm.ActionsTabExportTMDButton.Enabled = false;
+      mMainForm.ActionsTabImportTMDButton.Enabled = (mSubject is TMDChunk);
+      mMainForm.ActionsTabExportTMDButton.Enabled = (mSubject is TMDChunk);
     }
 
     public override System.Windows.Forms.TabPage Tab

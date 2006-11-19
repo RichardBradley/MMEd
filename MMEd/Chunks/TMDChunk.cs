@@ -203,6 +203,48 @@ namespace MMEd.Chunks
       }
     }
 
+    public void SerialiseTo3dsStream(Stream outStr)
+    {
+      Ad3ds.FileChunk lFile = new MMEd.Ad3ds.FileChunk();
+      lFile.AddChild(new MMEd.Ad3ds.VersionChunk());
+      Ad3ds.ObjectChunk lObject = new MMEd.Ad3ds.ObjectChunk();
+      lFile.AddChild(lObject);
+      Ad3ds.MeshChunk lMesh = new MMEd.Ad3ds.MeshChunk(Name);
+      lObject.AddChild(lMesh);
+      Ad3ds.MeshDataChunk lMeshData = new MMEd.Ad3ds.MeshDataChunk();
+      lMesh.AddChild(lMeshData);
+      Ad3ds.VertexListChunk lVertexList = new MMEd.Ad3ds.VertexListChunk();
+      Ad3ds.FaceListChunk lFaceList = new MMEd.Ad3ds.FaceListChunk();
+      lMeshData.AddChild(lVertexList);
+      lMeshData.AddChild(lFaceList);
+
+      foreach (Short3Coord lVertex in this.Vertices)
+      {
+        lVertexList.AddVertex(new Ad3ds.Vertex(lVertex.X, lVertex.Y, lVertex.Z));
+      }
+
+      foreach (Face lFace in Faces)
+      {
+        if (lFace.mVertexIds.Length == 3)
+        {
+          lFaceList.AddFace(new Ad3ds.Face((ushort)lFace.mVertexIds[0], (ushort)lFace.mVertexIds[1], (ushort)lFace.mVertexIds[2]));
+        }
+        else //4
+        {
+          lFaceList.AddFace(new Ad3ds.Face((ushort)lFace.mVertexIds[0], (ushort)lFace.mVertexIds[1], (ushort)lFace.mVertexIds[2]));
+          lFaceList.AddFace(new Ad3ds.Face((ushort)lFace.mVertexIds[0], (ushort)lFace.mVertexIds[2], (ushort)lFace.mVertexIds[3]));
+        }
+      }
+
+      lFile.Serialise(outStr);
+    }
+
+    public void DeserialiseFrom3dsStream(Stream inStr)
+    {
+      Ad3ds.Chunk.ReadFile(inStr);
+      //qq
+    }
+
     public IEnumerable<GLTK.Entity> GetEntities(Chunk xiRootChunk, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata)
     {
       return new Entity[] { GetEntity(xiRootChunk, xiTextureMode, xiSelectedMetadata, this) };
