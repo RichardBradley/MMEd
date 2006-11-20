@@ -129,7 +129,7 @@
     <Compile Include="Tests\Libraries.cs" />
     <Compile Include="Tests\Serialisation.cs" />
     <Compile Include="Tests\Utils.cs" />
-    <Compile Include="Ad3ds\Ad3dsChunk.cs" />
+    <Compile Include="Ad3ds\Chunk.cs" />
     <Compile Include="Util\ByteArrayComparer.cs" />
     <Compile Include="Util\FlatEditorPanel.cs">
       <SubType>UserControl</SubType>
