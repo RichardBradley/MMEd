@@ -370,5 +370,30 @@ namespace MMEd.Util
         xiCentre.Y - xiLength);
     }
 
+    public static void DrawString(
+      Graphics xiGraphics,
+      string xiText,
+      Point xiCentre)
+    {
+      Font lFont = new Font(FontFamily.GenericMonospace, 10);
+      SizeF size = xiGraphics.MeasureString(xiText, lFont);
+
+      float xf = xiCentre.X - size.Width / 2;
+      float yf = xiCentre.Y - size.Height / 2;
+
+      xiGraphics.FillRectangle(
+        new SolidBrush(Color.White), 
+        xf, 
+        yf, 
+        size.Width, 
+        size.Height);
+
+      xiGraphics.DrawString(
+          xiText,
+          lFont,
+          new SolidBrush(Color.Black),
+          xf,
+          yf);
+    }
   }
 }

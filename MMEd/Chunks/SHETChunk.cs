@@ -287,5 +287,47 @@ Each entry has three components, which are height, pitch and yaw, in some order"
     private Hashtable mUnusedOdds = null;
 
     #endregion
+
+    #region Key waypoints
+
+    public KeyWaypointsChunk.KeySection GetKeySectionByWaypoint(byte xiWaypoint)
+    {
+      return (KeyWaypointsChunk.KeySection)KeySections[xiWaypoint];
+    }
+
+    private Hashtable KeySections
+    {
+      get
+      {
+        if (mKeySections == null)
+        {
+          FindKeySections();
+        }
+
+        return mKeySections;
+      }
+    }
+
+    private void FindKeySections()
+    {
+      mKeySections = new Hashtable();
+
+      if (KeyWaypoints == null || KeyWaypoints.KeySections == null)
+      {
+        return;
+      }
+
+      foreach (KeyWaypointsChunk.KeySection lKeySection in KeyWaypoints.KeySections)
+      {
+        for (int i = lKeySection.From; i <= lKeySection.To; i++)
+        {
+          mKeySections[(byte)i] = lKeySection;
+        }
+      }
+    }
+
+    private Hashtable mKeySections = null;
+
+    #endregion
   }
 }

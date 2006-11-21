@@ -27,6 +27,7 @@ namespace MMEd.Viewers
       new PropertyController(this, "SelectedMeta").BindTo(mMainForm.GridViewMetaTypeCombo);
       new PropertyController(this, "ViewMode").BindTo(mMainForm.GridViewViewModeCombo);
       new PropertyController(this, "ShowObjects").BindTo(mMainForm.GridViewShowObjectsCheck);
+      new PropertyController(this, "ShowWaypoints").BindTo(mMainForm.GridViewShowWaypointsCheck);
 
       new PropertyController(this, "OverlayGridColor").BindTo(mMainForm.OverlaySelectorGrid);
       new PropertyController(this, "OverlayCameraColor").BindTo(mMainForm.OverlaySelectorCamera);
@@ -114,20 +115,7 @@ namespace MMEd.Viewers
               case eViewMode.FillMetadata:
                 //draw the selected metadata on as text
                 string text = string.Format("{0}", mSubject.TexMetaData[x][y][(int)SelectedMeta]);
-
-                SizeF size = e.Graphics.MeasureString(text, lNumberFont);
-
-                float xf = x * mSubjectTileWidth + lNumberOffX - size.Width / 2;
-                float yf = y * mSubjectTileHeight + lNumberOffY - size.Height / 2;
-
-                e.Graphics.FillRectangle(lNumberBGBrush, xf, yf, size.Width, size.Height);
-
-                e.Graphics.DrawString(
-                    text,
-                    lNumberFont,
-                    lNumberFGBrush,
-                    xf,
-                    yf);
+                Utils.DrawString(e.Graphics, text, GetMidpoint(x, y));
                 break;
             }
           }
@@ -262,6 +250,11 @@ namespace MMEd.Viewers
             {
               DrawRespawnOverlay(e.Graphics, new Pen(OverlayRespawnColor), x, y);
             }
+
+            if (ShowWaypoints)
+            {
+              DrawWaypointsOverlay(e.Graphics, x, y);
+            }
           }
           catch (NullReferenceException err)
           {
@@ -305,6 +298,8 @@ namespace MMEd.Viewers
             new Pen(Color.Red, 2.0f),
             lHighlightRect);
       }
+
+      InvalidateGridDisplay();
     }
 
     private Point GetMidpoint(int x, int y)
@@ -399,6 +394,113 @@ namespace MMEd.Viewers
 
         Point lRespawnPoint = GetPointInTile(x, y, lRespawnX, lRespawnY);
         Utils.DrawArrow(g, p, lRespawnPoint, lDirection, lLineLength, false);
+      }
+    }
+
+    private void DrawWaypointsOverlay(Graphics g, int x, int y)
+    {
+      byte lWaypoint = mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Waypoint];
+
+      if (lWaypoint == 0)
+      {
+        return;
+      }
+
+      KeyWaypointsChunk.KeySection lKeySection =
+        ((Level)mMainForm.RootChunk).SHET.GetKeySectionByWaypoint(lWaypoint);
+      Point lTopLeft = GetCornerPoint(x, y);
+      Point lTopRight = GetCornerPoint(x, y);
+      Point lBottomLeft = GetCornerPoint(x, y);
+      Point lBottomRight = GetCornerPoint(x, y);
+      lTopRight.Offset(new Point(mSubjectTileWidth, 0));
+      lBottomLeft.Offset(new Point(0, mSubjectTileHeight));
+      lBottomRight.Offset(new Point(mSubjectTileWidth, mSubjectTileHeight));
+
+      DrawWaypointOverlayLine(
+        g,
+        lWaypoint,
+        lKeySection,
+        x,
+        y - 1,
+        lTopLeft,
+        lTopRight);
+      DrawWaypointOverlayLine(
+        g,
+        lWaypoint,
+        lKeySection,
+        x - 1,
+        y,
+        lTopLeft, 
+        lBottomLeft);
+      DrawWaypointOverlayLine(
+        g,
+        lWaypoint,
+        lKeySection,
+        x,
+        y + 1,
+        lBottomLeft, 
+        lBottomRight);
+      DrawWaypointOverlayLine(
+        g,
+        lWaypoint,
+        lKeySection,
+        x + 1,
+        y,
+        lTopRight, 
+        lBottomRight);
+      Utils.DrawString(g, string.Format("{0}", lWaypoint), GetMidpoint(x, y));
+    }
+
+    private void DrawWaypointOverlayLine(
+      Graphics g,
+      byte xiCurrentWaypoint,
+      KeyWaypointsChunk.KeySection xiCurrentKeySection,
+      int xNeighbour, 
+      int yNeighbour,
+      Point xiLineStart,
+      Point xiLineEnd)
+    {
+      Color lColor = Color.Transparent;
+
+      // Check for the edge of the flat.
+      if (xNeighbour < 0 ||
+        yNeighbour < 0 ||
+        xNeighbour >= mSubject.Width ||
+        yNeighbour >= mSubject.Height)
+      {
+        lColor = xiCurrentKeySection == null ? Color.White : Color.Red;
+      }
+      else
+      {
+        // Compare to neighbouring square
+        byte lNeighbourWaypoint =
+          mSubject.TexMetaData[xNeighbour][yNeighbour][(byte)eTexMetaDataEntries.Waypoint];
+
+        if (xiCurrentKeySection != null)
+        {
+          // If this is a key section, outline in red unless the neighbour is in 
+          // the same section.
+          KeyWaypointsChunk.KeySection lNeighbourKeySection =
+            ((Level)mMainForm.RootChunk).SHET.GetKeySectionByWaypoint(lNeighbourWaypoint);
+
+          if (xiCurrentKeySection != lNeighbourKeySection)
+          {
+            lColor = Color.Red;
+          }
+        }
+        else if (lNeighbourWaypoint == 0)
+        {
+          // For non-key sections, just draw a white border around the 
+          // waypoint squares. Ideally it should also test whether the neighbour
+          // falls into the same non-key section and draw a white line if not,
+          // but that's a sufficiently borderline case that it's ignored.
+          lColor = Color.White;
+        }
+      }
+
+      if (lColor != Color.Transparent)
+      {
+        g.DrawLine(new Pen(lColor), xiLineStart, xiLineEnd);
       }
     }
 
@@ -1146,6 +1248,23 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
       }
     }
     public event EventHandler OnShowObjectsChanged;
+
+    #endregion
+
+    #region ShowWaypoints property
+
+    private bool mShowWaypoints = false;
+    public bool ShowWaypoints
+    {
+      get { return mShowWaypoints; }
+      set
+      {
+        mShowWaypoints = value;
+        if (OnShowWaypointsChanged != null) OnShowWaypointsChanged(this, null);
+        InvalidateGridDisplay();
+      }
+    }
+    public event EventHandler OnShowWaypointsChanged;
 
     #endregion
 

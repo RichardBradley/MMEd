@@ -42,6 +42,11 @@ namespace MMEd
           this.ChunkTreeView = new System.Windows.Forms.TreeView();
           this.ViewerTabControl = new System.Windows.Forms.TabControl();
           this.ViewTabActions = new System.Windows.Forms.TabPage();
+          this.groupBox6 = new System.Windows.Forms.GroupBox();
+          this.label20 = new System.Windows.Forms.Label();
+          this.label19 = new System.Windows.Forms.Label();
+          this.ActionsTabImportTMDButton = new System.Windows.Forms.Button();
+          this.ActionsTabExportTMDButton = new System.Windows.Forms.Button();
           this.groupBox5 = new System.Windows.Forms.GroupBox();
           this.ActionsTabImportTIMButton = new System.Windows.Forms.Button();
           this.label11 = new System.Windows.Forms.Label();
@@ -135,17 +140,14 @@ namespace MMEd
           this.Viewer3DRenderingSurfaceTopRight = new GLTK.RenderingSurface();
           this.Viewer3DRenderingSurfaceBottomRight = new GLTK.RenderingSurface();
           this.ToolTip = new System.Windows.Forms.ToolTip(this.components);
-          this.groupBox6 = new System.Windows.Forms.GroupBox();
-          this.ActionsTabExportTMDButton = new System.Windows.Forms.Button();
-          this.ActionsTabImportTMDButton = new System.Windows.Forms.Button();
-          this.label19 = new System.Windows.Forms.Label();
-          this.label20 = new System.Windows.Forms.Label();
+          this.GridViewShowWaypointsCheck = new System.Windows.Forms.CheckBox();
           this.mMenuStrip.SuspendLayout();
           this.MainSplitter.Panel1.SuspendLayout();
           this.MainSplitter.Panel2.SuspendLayout();
           this.MainSplitter.SuspendLayout();
           this.ViewerTabControl.SuspendLayout();
           this.ViewTabActions.SuspendLayout();
+          this.groupBox6.SuspendLayout();
           this.groupBox5.SuspendLayout();
           this.groupBox4.SuspendLayout();
           this.groupBox3.SuspendLayout();
@@ -188,7 +190,6 @@ namespace MMEd
           this.RightHandSplit.Panel1.SuspendLayout();
           this.RightHandSplit.Panel2.SuspendLayout();
           this.RightHandSplit.SuspendLayout();
-          this.groupBox6.SuspendLayout();
           this.SuspendLayout();
           // 
           // mMenuStrip
@@ -211,7 +212,7 @@ namespace MMEd
             this.saveToolStripMenuItem,
             this.toolStripMenuItem2});
           this.MnuFile.Name = "MnuFile";
-          this.MnuFile.Size = new System.Drawing.Size(35, 20);
+          this.MnuFile.Size = new System.Drawing.Size(42, 20);
           this.MnuFile.Text = "&File";
           // 
           // toolStripMenuItem1
@@ -220,7 +221,7 @@ namespace MMEd
           this.toolStripMenuItem1.ImageTransparentColor = System.Drawing.Color.Magenta;
           this.toolStripMenuItem1.Name = "toolStripMenuItem1";
           this.toolStripMenuItem1.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-          this.toolStripMenuItem1.Size = new System.Drawing.Size(224, 22);
+          this.toolStripMenuItem1.Size = new System.Drawing.Size(243, 22);
           this.toolStripMenuItem1.Text = "&Open Level Binary...";
           this.toolStripMenuItem1.ToolTipText = "Opens an MMv3 level file, as extracted from the CD";
           this.toolStripMenuItem1.Click += new System.EventHandler(this.OpenLevelBinaryClick);
@@ -229,7 +230,7 @@ namespace MMEd
           // 
           this.MnuiFileOpenLevel.ImageTransparentColor = System.Drawing.Color.Magenta;
           this.MnuiFileOpenLevel.Name = "MnuiFileOpenLevel";
-          this.MnuiFileOpenLevel.Size = new System.Drawing.Size(224, 22);
+          this.MnuiFileOpenLevel.Size = new System.Drawing.Size(243, 22);
           this.MnuiFileOpenLevel.Text = "&Open Unknown Binary...";
           this.MnuiFileOpenLevel.ToolTipText = "Opens any old binary file, and searches through it for recognisable MMv3 datastru" +
               "ctures";
@@ -239,7 +240,7 @@ namespace MMEd
           // 
           this.toolStripMenuItem3.ImageTransparentColor = System.Drawing.Color.Magenta;
           this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-          this.toolStripMenuItem3.Size = new System.Drawing.Size(224, 22);
+          this.toolStripMenuItem3.Size = new System.Drawing.Size(243, 22);
           this.toolStripMenuItem3.Text = "&Open XML...";
           this.toolStripMenuItem3.ToolTipText = "Opens an XML file saved from this program";
           this.toolStripMenuItem3.Click += new System.EventHandler(this.OpenXmlClick);
@@ -247,7 +248,7 @@ namespace MMEd
           // toolStripSeparator1
           // 
           this.toolStripSeparator1.Name = "toolStripSeparator1";
-          this.toolStripSeparator1.Size = new System.Drawing.Size(221, 6);
+          this.toolStripSeparator1.Size = new System.Drawing.Size(240, 6);
           // 
           // saveToolStripMenuItem
           // 
@@ -255,7 +256,7 @@ namespace MMEd
           this.saveToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
           this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
           this.saveToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-          this.saveToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+          this.saveToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
           this.saveToolStripMenuItem.Text = "&Save As Binary...";
           this.saveToolStripMenuItem.ToolTipText = "Saves this file in an MMv3 binary format";
           this.saveToolStripMenuItem.Click += new System.EventHandler(this.SaveAsBinaryClick);
@@ -264,7 +265,7 @@ namespace MMEd
           // 
           this.toolStripMenuItem2.ImageTransparentColor = System.Drawing.Color.Magenta;
           this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-          this.toolStripMenuItem2.Size = new System.Drawing.Size(224, 22);
+          this.toolStripMenuItem2.Size = new System.Drawing.Size(243, 22);
           this.toolStripMenuItem2.Text = "&Save As XML...";
           this.toolStripMenuItem2.ToolTipText = "Saves this file as an XML tree\r\nCAUTION: the resulting file may not be openable\r\n" +
               "by future versions of MMEd!";
@@ -335,6 +336,55 @@ namespace MMEd
           this.ViewTabActions.TabIndex = 0;
           this.ViewTabActions.Text = "Actions";
           this.ViewTabActions.UseVisualStyleBackColor = true;
+          // 
+          // groupBox6
+          // 
+          this.groupBox6.Controls.Add(this.label20);
+          this.groupBox6.Controls.Add(this.label19);
+          this.groupBox6.Controls.Add(this.ActionsTabImportTMDButton);
+          this.groupBox6.Controls.Add(this.ActionsTabExportTMDButton);
+          this.groupBox6.Location = new System.Drawing.Point(1, 267);
+          this.groupBox6.Name = "groupBox6";
+          this.groupBox6.Size = new System.Drawing.Size(626, 83);
+          this.groupBox6.TabIndex = 7;
+          this.groupBox6.TabStop = false;
+          this.groupBox6.Text = "TMD Objects";
+          // 
+          // label20
+          // 
+          this.label20.AutoSize = true;
+          this.label20.Location = new System.Drawing.Point(157, 48);
+          this.label20.Name = "label20";
+          this.label20.Size = new System.Drawing.Size(212, 13);
+          this.label20.TabIndex = 8;
+          this.label20.Text = "Overwrite the selected TMD from a 3DS file";
+          // 
+          // label19
+          // 
+          this.label19.AutoSize = true;
+          this.label19.Location = new System.Drawing.Point(157, 19);
+          this.label19.Name = "label19";
+          this.label19.Size = new System.Drawing.Size(181, 13);
+          this.label19.TabIndex = 6;
+          this.label19.Text = "Save the selected TMD to a 3DS file";
+          // 
+          // ActionsTabImportTMDButton
+          // 
+          this.ActionsTabImportTMDButton.Location = new System.Drawing.Point(9, 48);
+          this.ActionsTabImportTMDButton.Name = "ActionsTabImportTMDButton";
+          this.ActionsTabImportTMDButton.Size = new System.Drawing.Size(142, 23);
+          this.ActionsTabImportTMDButton.TabIndex = 7;
+          this.ActionsTabImportTMDButton.Text = "Import TMD from 3DS";
+          this.ActionsTabImportTMDButton.UseVisualStyleBackColor = true;
+          // 
+          // ActionsTabExportTMDButton
+          // 
+          this.ActionsTabExportTMDButton.Location = new System.Drawing.Point(9, 19);
+          this.ActionsTabExportTMDButton.Name = "ActionsTabExportTMDButton";
+          this.ActionsTabExportTMDButton.Size = new System.Drawing.Size(142, 23);
+          this.ActionsTabExportTMDButton.TabIndex = 6;
+          this.ActionsTabExportTMDButton.Text = "Export TMD to 3DS";
+          this.ActionsTabExportTMDButton.UseVisualStyleBackColor = true;
           // 
           // groupBox5
           // 
@@ -599,7 +649,7 @@ namespace MMEd
           // GridViewerStatusLabel
           // 
           this.GridViewerStatusLabel.Name = "GridViewerStatusLabel";
-          this.GridViewerStatusLabel.Size = new System.Drawing.Size(45, 17);
+          this.GridViewerStatusLabel.Size = new System.Drawing.Size(51, 17);
           this.GridViewerStatusLabel.Text = "(status)";
           // 
           // groupBox2
@@ -696,6 +746,7 @@ namespace MMEd
           // groupBox1
           // 
           this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+          this.groupBox1.Controls.Add(this.GridViewShowWaypointsCheck);
           this.groupBox1.Controls.Add(this.OverlaySelectorRespawn);
           this.groupBox1.Controls.Add(this.OverlaySelectorCamera);
           this.groupBox1.Controls.Add(this.OverlaySelectorGrid);
@@ -717,7 +768,7 @@ namespace MMEd
           this.OverlaySelectorRespawn.CurrentColor = System.Drawing.Color.Transparent;
           this.OverlaySelectorRespawn.DefaultColor = System.Drawing.Color.Red;
           this.OverlaySelectorRespawn.Label = "Respawn";
-          this.OverlaySelectorRespawn.Location = new System.Drawing.Point(6, 203);
+          this.OverlaySelectorRespawn.Location = new System.Drawing.Point(6, 216);
           this.OverlaySelectorRespawn.Name = "OverlaySelectorRespawn";
           this.OverlaySelectorRespawn.Size = new System.Drawing.Size(121, 20);
           this.OverlaySelectorRespawn.TabIndex = 12;
@@ -728,7 +779,7 @@ namespace MMEd
           this.OverlaySelectorCamera.CurrentColor = System.Drawing.Color.Transparent;
           this.OverlaySelectorCamera.DefaultColor = System.Drawing.Color.White;
           this.OverlaySelectorCamera.Label = "Camera";
-          this.OverlaySelectorCamera.Location = new System.Drawing.Point(6, 184);
+          this.OverlaySelectorCamera.Location = new System.Drawing.Point(6, 198);
           this.OverlaySelectorCamera.Name = "OverlaySelectorCamera";
           this.OverlaySelectorCamera.Size = new System.Drawing.Size(121, 20);
           this.OverlaySelectorCamera.TabIndex = 11;
@@ -739,7 +790,7 @@ namespace MMEd
           this.OverlaySelectorGrid.CurrentColor = System.Drawing.Color.Transparent;
           this.OverlaySelectorGrid.DefaultColor = System.Drawing.Color.Gray;
           this.OverlaySelectorGrid.Label = "Grid";
-          this.OverlaySelectorGrid.Location = new System.Drawing.Point(6, 164);
+          this.OverlaySelectorGrid.Location = new System.Drawing.Point(6, 180);
           this.OverlaySelectorGrid.Name = "OverlaySelectorGrid";
           this.OverlaySelectorGrid.Size = new System.Drawing.Size(121, 20);
           this.OverlaySelectorGrid.TabIndex = 10;
@@ -747,7 +798,7 @@ namespace MMEd
           // GridViewShowObjectsCheck
           // 
           this.GridViewShowObjectsCheck.AutoSize = true;
-          this.GridViewShowObjectsCheck.Location = new System.Drawing.Point(6, 149);
+          this.GridViewShowObjectsCheck.Location = new System.Drawing.Point(6, 144);
           this.GridViewShowObjectsCheck.Name = "GridViewShowObjectsCheck";
           this.GridViewShowObjectsCheck.Size = new System.Drawing.Size(90, 17);
           this.GridViewShowObjectsCheck.TabIndex = 5;
@@ -760,7 +811,7 @@ namespace MMEd
           this.GridViewZoomSlider.Maximum = 5;
           this.GridViewZoomSlider.Minimum = -5;
           this.GridViewZoomSlider.Name = "GridViewZoomSlider";
-          this.GridViewZoomSlider.Size = new System.Drawing.Size(122, 42);
+          this.GridViewZoomSlider.Size = new System.Drawing.Size(122, 48);
           this.GridViewZoomSlider.TabIndex = 6;
           this.ToolTip.SetToolTip(this.GridViewZoomSlider, "Set the zoom level");
           // 
@@ -768,7 +819,7 @@ namespace MMEd
           // 
           this.GridViewTransparencySlider.Location = new System.Drawing.Point(5, 73);
           this.GridViewTransparencySlider.Name = "GridViewTransparencySlider";
-          this.GridViewTransparencySlider.Size = new System.Drawing.Size(122, 42);
+          this.GridViewTransparencySlider.Size = new System.Drawing.Size(122, 48);
           this.GridViewTransparencySlider.TabIndex = 4;
           this.ToolTip.SetToolTip(this.GridViewTransparencySlider, "Set the transparency level for overlaid textures (bump, odd)");
           this.GridViewTransparencySlider.Value = 5;
@@ -1081,7 +1132,7 @@ namespace MMEd
           // 
           this.SliderElevation.Location = new System.Drawing.Point(68, 127);
           this.SliderElevation.Name = "SliderElevation";
-          this.SliderElevation.Size = new System.Drawing.Size(250, 42);
+          this.SliderElevation.Size = new System.Drawing.Size(250, 48);
           this.SliderElevation.TabIndex = 11;
           this.ToolTip.SetToolTip(this.SliderElevation, "Height of the camera from the vehicles");
           // 
@@ -1105,7 +1156,7 @@ namespace MMEd
           // 
           this.SliderDistance.Location = new System.Drawing.Point(68, 73);
           this.SliderDistance.Name = "SliderDistance";
-          this.SliderDistance.Size = new System.Drawing.Size(250, 42);
+          this.SliderDistance.Size = new System.Drawing.Size(250, 48);
           this.SliderDistance.TabIndex = 8;
           this.ToolTip.SetToolTip(this.SliderDistance, "Horizontal distance of the camera from the vehicles");
           // 
@@ -1132,7 +1183,7 @@ namespace MMEd
           this.SliderDirection.Maximum = 8;
           this.SliderDirection.Minimum = -8;
           this.SliderDirection.Name = "SliderDirection";
-          this.SliderDirection.Size = new System.Drawing.Size(250, 42);
+          this.SliderDirection.Size = new System.Drawing.Size(250, 48);
           this.SliderDirection.TabIndex = 5;
           this.SliderDirection.TickFrequency = 2;
           this.ToolTip.SetToolTip(this.SliderDirection, "Angle of the camera to the vehicles");
@@ -1315,54 +1366,15 @@ namespace MMEd
           this.Viewer3DRenderingSurfaceBottomRight.TabIndex = 0;
           this.Viewer3DRenderingSurfaceBottomRight.Text = "renderingSurface4";
           // 
-          // groupBox6
+          // GridViewShowWaypointsCheck
           // 
-          this.groupBox6.Controls.Add(this.label20);
-          this.groupBox6.Controls.Add(this.label19);
-          this.groupBox6.Controls.Add(this.ActionsTabImportTMDButton);
-          this.groupBox6.Controls.Add(this.ActionsTabExportTMDButton);
-          this.groupBox6.Location = new System.Drawing.Point(1, 267);
-          this.groupBox6.Name = "groupBox6";
-          this.groupBox6.Size = new System.Drawing.Size(626, 83);
-          this.groupBox6.TabIndex = 7;
-          this.groupBox6.TabStop = false;
-          this.groupBox6.Text = "TMD Objects";
-          // 
-          // ActionsTabExportTMDButton
-          // 
-          this.ActionsTabExportTMDButton.Location = new System.Drawing.Point(9, 19);
-          this.ActionsTabExportTMDButton.Name = "ActionsTabExportTMDButton";
-          this.ActionsTabExportTMDButton.Size = new System.Drawing.Size(142, 23);
-          this.ActionsTabExportTMDButton.TabIndex = 6;
-          this.ActionsTabExportTMDButton.Text = "Export TMD to 3DS";
-          this.ActionsTabExportTMDButton.UseVisualStyleBackColor = true;
-          // 
-          // ActionsTabImportTMDButton
-          // 
-          this.ActionsTabImportTMDButton.Location = new System.Drawing.Point(9, 48);
-          this.ActionsTabImportTMDButton.Name = "ActionsTabImportTMDButton";
-          this.ActionsTabImportTMDButton.Size = new System.Drawing.Size(142, 23);
-          this.ActionsTabImportTMDButton.TabIndex = 7;
-          this.ActionsTabImportTMDButton.Text = "Import TMD from 3DS";
-          this.ActionsTabImportTMDButton.UseVisualStyleBackColor = true;
-          // 
-          // label19
-          // 
-          this.label19.AutoSize = true;
-          this.label19.Location = new System.Drawing.Point(157, 19);
-          this.label19.Name = "label19";
-          this.label19.Size = new System.Drawing.Size(181, 13);
-          this.label19.TabIndex = 6;
-          this.label19.Text = "Save the selected TMD to a 3DS file";
-          // 
-          // label20
-          // 
-          this.label20.AutoSize = true;
-          this.label20.Location = new System.Drawing.Point(157, 48);
-          this.label20.Name = "label20";
-          this.label20.Size = new System.Drawing.Size(212, 13);
-          this.label20.TabIndex = 8;
-          this.label20.Text = "Overwrite the selected TMD from a 3DS file";
+          this.GridViewShowWaypointsCheck.AutoSize = true;
+          this.GridViewShowWaypointsCheck.Location = new System.Drawing.Point(6, 162);
+          this.GridViewShowWaypointsCheck.Name = "GridViewShowWaypointsCheck";
+          this.GridViewShowWaypointsCheck.Size = new System.Drawing.Size(103, 17);
+          this.GridViewShowWaypointsCheck.TabIndex = 13;
+          this.GridViewShowWaypointsCheck.Text = "Show waypoints";
+          this.GridViewShowWaypointsCheck.UseVisualStyleBackColor = true;
           // 
           // MainForm
           // 
@@ -1381,6 +1393,8 @@ namespace MMEd
           this.MainSplitter.ResumeLayout(false);
           this.ViewerTabControl.ResumeLayout(false);
           this.ViewTabActions.ResumeLayout(false);
+          this.groupBox6.ResumeLayout(false);
+          this.groupBox6.PerformLayout();
           this.groupBox5.ResumeLayout(false);
           this.groupBox5.PerformLayout();
           this.groupBox4.ResumeLayout(false);
@@ -1438,8 +1452,6 @@ namespace MMEd
           this.RightHandSplit.Panel1.ResumeLayout(false);
           this.RightHandSplit.Panel2.ResumeLayout(false);
           this.RightHandSplit.ResumeLayout(false);
-          this.groupBox6.ResumeLayout(false);
-          this.groupBox6.PerformLayout();
           this.ResumeLayout(false);
           this.PerformLayout();
 
@@ -1557,6 +1569,7 @@ namespace MMEd
       private System.Windows.Forms.Label label19;
       public System.Windows.Forms.Button ActionsTabImportTMDButton;
       public System.Windows.Forms.Button ActionsTabExportTMDButton;
+      public System.Windows.Forms.CheckBox GridViewShowWaypointsCheck;
     }
 }
 
