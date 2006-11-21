@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using MMEd;
@@ -278,6 +279,7 @@ namespace MMEd.Viewers
         case eViewMode.EditMetadata:
         case eViewMode.FillMetadata:
         case eViewMode.EditTextures:
+        case eViewMode.EditCameras:
           lHighlightRect = new Rectangle(
             lMousePos.X / mSubjectTileWidth * mSubjectTileWidth,
             lMousePos.Y / mSubjectTileHeight * mSubjectTileHeight,
@@ -285,6 +287,7 @@ namespace MMEd.Viewers
             mSubjectTileHeight);
           break;
         case eViewMode.EditBumpPixels:
+        case eViewMode.EditRespawns:
           int lBumpPixWidth = mSubjectTileWidth / 8;
           int lBumpPixHeight = mSubjectTileHeight / 8;
           lHighlightRect = new Rectangle(
@@ -395,19 +398,7 @@ namespace MMEd.Viewers
         }
 
         Point lRespawnPoint = GetPointInTile(x, y, lRespawnX, lRespawnY);
-        Utils.DrawArrow(g, p, lRespawnPoint, lDirection, lLineLength);
-      }
-    }
-
-    private class ColoredPolygon
-    {
-      public Color Color;
-      public Point[] Vertices;
-
-      public ColoredPolygon(Color xiColor, Point[] xiVertices)
-      {
-        Color = xiColor;
-        Vertices = xiVertices;
+        Utils.DrawArrow(g, p, lRespawnPoint, lDirection, lLineLength, false);
       }
     }
 
@@ -575,6 +566,8 @@ namespace MMEd.Viewers
       {
         int x = e.X / mSubjectTileWidth;
         int y = e.Y / mSubjectTileHeight;
+        int lPxX = (e.X % mSubjectTileWidth) / (mSubjectTileWidth / 8);
+        int lPxY = (e.Y % mSubjectTileHeight) / (mSubjectTileHeight / 8);
 
         switch (ViewMode)
         {
@@ -646,11 +639,27 @@ namespace MMEd.Viewers
             {
               PictureBox lSel = mKeyOrMouseToSelPicBoxDict[e.Button];
               byte lNewVal = (byte)lSel.Tag;
-              int lBumpPxX = (e.X % mSubjectTileWidth) / (mSubjectTileWidth / 8);
-              int lBumpPxY = (e.Y % mSubjectTileHeight) / (mSubjectTileHeight / 8);
+              UpdateBumpPixel(x, y, lPxX, lPxY, lNewVal);
+              InvalidateGridDisplay();
+            }
+            break;
 
-              UpdateBumpPixel(x, y, lBumpPxX, lBumpPxY, lNewVal);
+          case eViewMode.EditCameras:
+            //edit camera positions
+            if (mKeyOrMouseToSelPicBoxDict.ContainsKey(e.Button))
+            {
+              PictureBox lSel = mKeyOrMouseToSelPicBoxDict[e.Button];
+              mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.CameraPos] = (byte)lSel.Tag;
+              InvalidateGridDisplay();
+            }
+            break;
 
+          case eViewMode.EditRespawns:
+            //edit respawns
+            if (mKeyOrMouseToSelPicBoxDict.ContainsKey(e.Button))
+            {
+              PictureBox lSel = mKeyOrMouseToSelPicBoxDict[e.Button];
+              SetRespawnPosition(x, y, new RespawnSetting(lPxX, lPxY, (byte)lSel.Tag));
               InvalidateGridDisplay();
             }
             break;
@@ -728,7 +737,9 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
       if (mMainForm.ViewerTabControl.SelectedTab == this.Tab
          && (ViewMode == eViewMode.EditTextures
            || ViewMode == eViewMode.EditBumpSquares
-           || ViewMode == eViewMode.EditBumpPixels)
+           || ViewMode == eViewMode.EditBumpPixels 
+           || ViewMode == eViewMode.EditCameras
+           || ViewMode == eViewMode.EditRespawns)
          && mKeyOrMouseToSelPicBoxDict.ContainsKey(e.KeyChar))
       {
         //drill down the child heirarchy
@@ -756,6 +767,8 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
             Point p = mMainForm.GridDisplayPanel.PointToClient(lMousePt);
             int x = p.X / mSubjectTileWidth;
             int y = p.Y / mSubjectTileHeight;
+            int lPxX = (p.X % mSubjectTileWidth) / (mSubjectTileWidth / 8);
+            int lPxY = (p.Y % mSubjectTileHeight) / (mSubjectTileHeight / 8);
             PictureBox lSel = mKeyOrMouseToSelPicBoxDict[e.KeyChar];
             if (ViewMode == eViewMode.EditTextures)
             {
@@ -768,10 +781,15 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
             else if (ViewMode == eViewMode.EditBumpPixels)
             {
               byte lNewVal = (byte)lSel.Tag;
-              int lBumpPxX = (p.X % mSubjectTileWidth) / (mSubjectTileWidth / 8);
-              int lBumpPxY = (p.Y % mSubjectTileHeight) / (mSubjectTileHeight / 8);
-
-              UpdateBumpPixel(x, y, lBumpPxX, lBumpPxY, lNewVal);
+              UpdateBumpPixel(x, y, lPxX, lPxY, lNewVal);
+            }
+            else if (ViewMode == eViewMode.EditCameras)
+            {
+              mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.CameraPos] = (byte)lSel.Tag;
+            }
+            else if (ViewMode == eViewMode.EditRespawns)
+            {
+              SetRespawnPosition(x, y, new RespawnSetting(lPxX, lPxY, (byte)lSel.Tag));
             }
             InvalidateGridDisplay();
             return;
@@ -783,19 +801,95 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
       }
     }
 
-    #region ViewMode property
-
-    public enum eViewMode
+    private void SetRespawnPosition(
+      int x, 
+      int y, 
+      RespawnSetting xiRespawnSetting)
     {
-      ViewOnly,
-      ViewBump,
-      ViewOdds,
-      EditTextures,
-      EditBumpSquares,
-      EditBumpPixels,
-      EditMetadata,
-      FillMetadata
+      SHETChunk lShet = ((Level)mMainForm.RootChunk).SHET;
+
+      // eDirection.None is used to mean 'no respawn allowed', which is coded 
+      // on a different metadata sheet.
+      if (xiRespawnSetting.Direction == eDirection.None)
+      {
+        mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Two] = FlatChunk.LAYERTWO_NORESPAWN;
+        return;
+      }
+      else if (Array.IndexOf(sNoRespawnValues, mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Two]) >= 0)
+      {
+        mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Two] = FlatChunk.LAYERTWO_DEFAULT;
+      }
+
+      // Find an Odd image which can be used for this direction, at one of the four orientations
+      int lOddId = FindOddMatchingDirection(ref xiRespawnSetting);
+
+      if (lOddId == int.MinValue)
+      {
+        xiRespawnSetting.RotateTo(eOrientation.North);
+
+        if (lShet.UnusedOdds.Count == 0)
+        {
+          lOddId = lShet.OddImages.mChildren.Length;
+          OddImageChunk lNewOdd = new OddImageChunk(
+            lOddId,
+            (byte)xiRespawnSetting.Direction);
+          lShet.AddOdd(lNewOdd);
+        }
+        else
+        {
+          foreach (DictionaryEntry lEntry in lShet.UnusedOdds)
+          {
+            // Just get the first unused.
+            lOddId = (int)lEntry.Key;
+            OddImageChunk lOdd = (OddImageChunk)lEntry.Value;
+            lOdd.FlushToValue((byte)xiRespawnSetting.Direction);
+            break;
+          }
+
+          lShet.UnusedOdds.Remove(lOddId);
+        }
+      }
+
+      // Use 4 instead of 0 for orientation North, because orientation 0 
+      // reverses the directions...
+      mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Four] =
+       xiRespawnSetting.Orientation == eOrientation.North ? (byte)4 : (byte)xiRespawnSetting.Orientation;
+      mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Zero] = (byte)lOddId;
+      
+      // Rotate back to north to set position (layer seven)
+      xiRespawnSetting.RotateTo(eOrientation.North);
+      byte lSevenValue = PointToLayerSevenValue(new Point(xiRespawnSetting.X, xiRespawnSetting.Y));
+      mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Seven] = lSevenValue;
     }
+
+    private byte PointToLayerSevenValue(Point xiPoint)
+    {
+      return (byte)(xiPoint.X * 16 + xiPoint.Y);
+    }
+
+    private int FindOddMatchingDirection(ref RespawnSetting xbRespawnSetting)
+    {
+      SHETChunk lShet = ((Level)mMainForm.RootChunk).SHET;
+
+      for (int i = 0; i < lShet.OddImages.mChildren.Length; i++)
+      {
+        if (!(lShet.OddImages.mChildren[i] is OddImageChunk))
+        {
+          continue;
+        }
+
+        OddImageChunk lOdd = (OddImageChunk)lShet.OddImages.mChildren[i];
+
+        if (xbRespawnSetting.MatchToOdd(lOdd))
+        {
+          return i;
+        }
+      }
+
+      return int.MinValue;
+    }
+
+    #region ViewMode property
 
     private eViewMode mViewMode = eViewMode.ViewOnly;
     public eViewMode ViewMode
@@ -808,6 +902,8 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
         if ((mSubject == null || mSubject.TexMetaData == null)
          && (value == eViewMode.EditBumpPixels
           || value == eViewMode.EditBumpSquares
+          || value == eViewMode.EditCameras
+          || value == eViewMode.EditRespawns
           || value == eViewMode.EditMetadata
           || value == eViewMode.FillMetadata
           || value == eViewMode.ViewBump))
@@ -823,7 +919,9 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
         mMainForm.GridViewPalettePanel.Controls.Clear();
         if (ViewMode == eViewMode.EditTextures
           || ViewMode == eViewMode.EditBumpSquares
-          || ViewMode == eViewMode.EditBumpPixels)
+          || ViewMode == eViewMode.EditBumpPixels
+          || ViewMode == eViewMode.EditCameras
+          || ViewMode == eViewMode.EditRespawns)
         {
           Point lNextPbTL = new Point(0, 0);
           IEnumerator<object> lKeys = mKeyOrMouseToSelPicBoxDict.Keys.GetEnumerator();
@@ -898,6 +996,22 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
                 im = lBmp;
               }
             }
+            else if (ViewMode == eViewMode.EditCameras)
+            {
+              // Skip all camera positions between 1 and 50 - they're not used
+              // for multiplayer mode.
+              if (i == 1)
+              {
+                i = 51;
+              }
+
+              CameraPosChunk cpc = ((Level)mMainForm.RootChunk).GetCameraById(i);
+              if (cpc != null) im = cpc.ToImage();
+            }
+            else if (ViewMode == eViewMode.EditRespawns)
+            {
+              im = GetRespawnBrush(i);
+            }
 
             // have image, add it to editing palette
             if (im != null)
@@ -970,6 +1084,31 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
         InvalidateGridDisplay();
       }
     }
+
+    private Image GetRespawnBrush(int i)
+    {
+      Bitmap lRet = new Bitmap(4 * SCALE, 4 * SCALE);
+      Graphics g = Graphics.FromImage(lRet);
+      Pen p = new Pen(Color.Red, 1);
+      Point lMidpoint = new Point(2 * SCALE, 2 * SCALE);
+
+      if (i == 0)
+      {
+        Utils.DrawCross(g, p, lMidpoint, (int)(mSubjectTileWidth * 0.8));
+        return lRet;
+      }
+      else if (i <= FlatChunk.LAYERZERO_HIGHESTDIRECTION + 1)
+      {
+        g.DrawRectangle(p, 0, 0, 63, 63);
+        Utils.DrawArrow(g, p, lMidpoint, 4096 - ((i - 1) * 256), (int)(mSubjectTileWidth * 0.4), true);
+        return lRet;
+      }
+      else
+      {
+        return null;
+      }
+    }
+
     public event EventHandler OnViewModeChanged;
 
     #endregion
@@ -1058,6 +1197,154 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
       }
     }
     public event EventHandler OnOverlayRespawnColorChanged;
+
+    #endregion
+
+    #region Enums
+
+    public enum eViewMode
+    {
+      ViewOnly,
+      ViewBump,
+      ViewOdds,
+      EditTextures,
+      EditBumpSquares,
+      EditBumpPixels,
+      EditCameras,
+      EditRespawns,
+      EditMetadata,
+      FillMetadata
+    }
+
+    private enum eOrientation
+    {
+      Unknown = -1,
+      North = 0,
+      East = 1,
+      South = 2,
+      West = 3
+    }
+
+    private enum eDirection
+    {
+      None = -1,
+      N = 0,
+      NNW = 1,
+      NW = 2,
+      WNW = 3,
+      W = 4,
+      WSW = 5,
+      SW = 6,
+      SSW = 7,
+      S = 8,
+      SSE = 9,
+      SE = 10,
+      ESE = 11,
+      E = 12,
+      ENE = 13,
+      NE = 14,
+      NNE = 15
+    }
+
+    #endregion
+
+    #region Helper classes
+
+    private class ColoredPolygon
+    {
+      public Color Color;
+      public Point[] Vertices;
+
+      public ColoredPolygon(Color xiColor, Point[] xiVertices)
+      {
+        Color = xiColor;
+        Vertices = xiVertices;
+      }
+    }
+
+    private class RespawnSetting
+    {
+      public RespawnSetting(int x, int y, int xiNewDirectionValue)
+      {
+        X = x;
+        Y = y;
+        Orientation = eOrientation.North;
+
+        if (xiNewDirectionValue > FlatChunk.LAYERZERO_HIGHESTDIRECTION + 1)
+        {
+          throw new Exception("Tried to set respawn direction to a value higher than the maximum");
+        }
+
+        // The direction value passed in is based on the brush numbering and so needs to be reduced by one.
+        Direction = (eDirection)(xiNewDirectionValue - 1);
+      }
+
+      public bool MatchToOdd(OddImageChunk xiOdd)
+      {
+        eOrientation lOriginalOrientation = Orientation;
+
+        for (int lOrientation = (int)eOrientation.North; (int)lOrientation <= (int)eOrientation.West; lOrientation++)
+        {
+          RotateTo((eOrientation)lOrientation);
+
+          // y needs to be flipped.
+          if (xiOdd.GetPixelType(X, (FlatChunk.ODDDIMENSION - 1) - Y) == (byte)Direction)
+          {
+            return true;
+          }
+        }
+
+        RotateTo(lOriginalOrientation);
+        return false;
+      }
+
+      public void RotateTo(eOrientation xiOrientation)
+      {
+        int lDifference = xiOrientation - Orientation;
+
+        if (lDifference <= 0)
+        {
+          lDifference += 4;
+        }
+
+        int lOldX = X;
+        int lOldY = Y;
+        int lMaxValue = FlatChunk.ODDDIMENSION - 1;
+
+        switch (lDifference)
+        {
+          case 0:
+          // No change
+          case 1:
+            X = lMaxValue - lOldY;
+            Y = lOldX;
+            Direction += 4;
+            break;
+          case 2:
+            X = lMaxValue - lOldX;
+            Y = lMaxValue - lOldY;
+            Direction += 8;
+            break;
+          case 3:
+            X = lOldY;
+            Y = lMaxValue - lOldX;
+            Direction += 12;
+            break;
+        }
+
+        if ((int)Direction >= 16)
+        {
+          Direction -= 16;
+        }
+
+        Orientation = xiOrientation;
+      }
+
+      public int X;
+      public int Y;
+      public eOrientation Orientation = eOrientation.North;
+      public eDirection Direction = eDirection.N;
+    }
 
     #endregion
 

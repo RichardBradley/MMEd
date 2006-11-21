@@ -305,10 +305,19 @@ namespace MMEd.Util
       Pen xiPen,
       Point xiTip,
       int xiDirection,
-      int xiLength)
+      int xiLength,
+      bool xiCentre)
     {
       int lArrowHeadLength = 8;
       double lAngle = Math.PI * ((double)xiDirection / 2048);
+
+      if (xiCentre)
+      {
+        int xAdjust = (int)(Math.Sin(lAngle) * xiLength / 2);
+        int yAdjust = -(int)(Math.Cos(lAngle) * xiLength / 2);
+        xiTip.Offset(xAdjust, yAdjust);
+      }
+
       Point lLineEnd = new Point(
         xiTip.X - (int)(xiLength * Math.Sin(lAngle)),
         xiTip.Y + (int)(xiLength * Math.Cos(lAngle)));

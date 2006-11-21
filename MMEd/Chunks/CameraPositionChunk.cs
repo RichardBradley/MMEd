@@ -13,13 +13,46 @@ namespace MMEd.Chunks
     int mIdx;
 
     [Description("Viewing direction: 0 is north, 1024 is east, etc.")]
-    public short Direction;
+    public short Direction
+    {
+      get
+      {
+        return mDirection;
+      }
+      set
+      {
+        mDirection = value;
+        mBitmapCache = null;
+      }
+    }
 
     [Description("Camera distance from the car in a straight line along the xy plane")]
-    public short Distance;
+    public short Distance
+    {
+      get
+      {
+        return mDistance;
+      }
+      set
+      {
+        mDistance = value;
+        mBitmapCache = null;
+      }
+    }
 
     [Description("Camera height, as a straight-line distance above the car")]
-    public short Elevation;
+    public short Elevation
+    {
+      get
+      {
+        return mElevation;
+      }
+      set
+      {
+        mElevation = value;
+        mBitmapCache = null;
+      }
+    }
 
     public CameraPosChunk() { }
     public CameraPosChunk(int idx, BinaryReader bin) 
@@ -88,7 +121,7 @@ namespace MMEd.Chunks
     {
       Bitmap lBmp = new Bitmap(8 * SCALE, 8 * SCALE);
       Graphics g = Graphics.FromImage(lBmp);
-      Draw(g, new Pen(Color.Black), new Point(4 * SCALE, 4 * SCALE), 8 * SCALE);
+      Draw(g, new Pen(Color.Black, 2), new Point(4 * SCALE, 4 * SCALE), 8 * SCALE);
       return lBmp;
     }
 
@@ -109,9 +142,12 @@ namespace MMEd.Chunks
       int lDistance = Math.Min((int)Distance, 1000);
       int lLineLength = (lDistance * xiMaxDistance) / (1000 * 2);
 
-      Utils.DrawArrow(g, p, xiMidpoint, Direction, lLineLength);
+      Utils.DrawArrow(g, p, xiMidpoint, Direction, lLineLength, false);
     }
 
+    short mDirection;
+    short mDistance;
+    short mElevation;
     Bitmap mBitmapCache;
     public const int SCALE = 16;
   }

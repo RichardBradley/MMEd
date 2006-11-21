@@ -214,5 +214,78 @@ Each entry has three components, which are height, pitch and yaw, in some order"
 
       return xiFlat.ByteSize;
     }
+
+    public void AddOdd(OddImageChunk xiOdd)
+    {
+      Chunk[] lNewOddArray = new Chunk[OddImages.mChildren.Length + 1];
+      Array.Copy(OddImages.mChildren, lNewOddArray, OddImages.mChildren.Length);
+      lNewOddArray[OddImages.mChildren.Length] = xiOdd;
+      OddImages.mChildren = lNewOddArray;
+    }
+
+    #region Odds manipulation
+
+    public Hashtable UnusedOdds
+    {
+      get
+      {
+        if (mUnusedOdds == null)
+        {
+          mUnusedOdds = new Hashtable();
+          FindUnusedOdds();
+        }
+
+        return mUnusedOdds;
+      }
+      set
+      {
+        mUnusedOdds = value;
+      }
+    }
+
+    private void FindUnusedOdds()
+    {
+      //=======================================================================
+      // Get a list of all odds to start with.
+      //=======================================================================
+      for (int i = 0; i < OddImages.mChildren.Length; i++)
+      {
+        if (!(OddImages.mChildren[i] is OddImageChunk))
+        {
+          continue;
+        }
+
+        OddImageChunk lOdd = (OddImageChunk)OddImages.mChildren[i];
+        mUnusedOdds[i] = lOdd;
+      }
+
+      //=======================================================================
+      // Now remove all used odds.
+      //=======================================================================
+      foreach (FlatChunk lFlat in Flats)
+      {
+        if (lFlat.TexMetaData == null)
+        {
+          continue;
+        }
+
+        for (int x = 0; x < lFlat.Width; x++)
+        {
+          for (int y = 0; y < lFlat.Height; y++)
+          {
+            int lOddId = lFlat.TexMetaData[x][y][(byte)eTexMetaDataEntries.Zero];
+
+            if (mUnusedOdds.ContainsKey(lOddId))
+            {
+              mUnusedOdds.Remove(lOddId);
+            }
+          }
+        }
+      }
+    }
+
+    private Hashtable mUnusedOdds = null;
+
+    #endregion
   }
 }

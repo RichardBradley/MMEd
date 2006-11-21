@@ -829,5 +829,12 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
 
       return lAcc;
     }
+
+    // Constants relating to the meta data
+    public const int ODDDIMENSION = 8;
+    public const int LAYERTWO_DEFAULT = 0;
+    public const int LAYERTWO_NORESPAWN = 8;
+    public const int LAYERZERO_HIGHESTDIRECTION = 15;
+
   }
 }

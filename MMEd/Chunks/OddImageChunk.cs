@@ -26,6 +26,13 @@ namespace MMEd.Chunks
     public byte[] Data;
 
     public OddImageChunk() { }
+    public OddImageChunk(int idx, byte xiValue)
+    {
+      mIdx = idx;
+      Data = new byte[64];
+      FlushToValue(xiValue);
+    }
+
     public OddImageChunk(int idx, Stream inStr)
     {
       mIdx = idx;
@@ -79,6 +86,14 @@ namespace MMEd.Chunks
           g.FillRectangle(b, x * SCALE, y * SCALE, SCALE, SCALE);
         }
       return lBmp;
+    }
+
+    public void FlushToValue(byte xiNewValue)
+    {
+      for (int i = 0; i < Data.Length; i++)
+      {
+        Data[i] = xiNewValue;
+      }
     }
 
     public static OddTypeInfo GetOddTypeInfo(byte xiVal)
@@ -158,8 +173,6 @@ namespace MMEd.Chunks
       return mOddTypes;
     }
     
-    // this wasn't necessary under the enum scheme, but I think it's
-    // preferable to having the list of types twice...
     public const int HIGHEST_KNOWN_Odd_TYPE = 45;
 
     public class OddTypeInfo
