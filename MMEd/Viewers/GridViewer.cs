@@ -273,6 +273,7 @@ namespace MMEd.Viewers
         case eViewMode.FillMetadata:
         case eViewMode.EditTextures:
         case eViewMode.EditCameras:
+        case eViewMode.EditWaypoints:
           lHighlightRect = new Rectangle(
             lMousePos.X / mSubjectTileWidth * mSubjectTileWidth,
             lMousePos.Y / mSubjectTileHeight * mSubjectTileHeight,
@@ -406,6 +407,11 @@ namespace MMEd.Viewers
         return;
       }
 
+      if (lWaypoint == mCurrentWaypoint)
+      {
+        Utils.DrawCircle(g, new Pen(Color.Green, 3), GetMidpoint(x, y), (int)(mSubjectTileWidth * 0.3));
+      }
+
       KeyWaypointsChunk.KeySection lKeySection =
         ((Level)mMainForm.RootChunk).SHET.GetKeySectionByWaypoint(lWaypoint);
       Point lTopLeft = GetCornerPoint(x, y);
@@ -502,6 +508,107 @@ namespace MMEd.Viewers
       {
         g.DrawLine(new Pen(lColor), xiLineStart, xiLineEnd);
       }
+    }
+
+    private void MakeWaypointChange(int x, int y, eWaypointAction xiAction)
+    {
+      byte lWaypoint = mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Waypoint];
+
+      switch (xiAction)
+      {
+        case eWaypointAction.Insert:
+          if (mCurrentWaypoint == 255 && lWaypoint == 0)
+          {
+            System.Windows.Forms.MessageBox.Show(
+              mMainForm,
+              "You can't add a waypoint higher than 255 - delete some of the existing ones first.",
+              "Error",
+              MessageBoxButtons.OK,
+              MessageBoxIcon.Error);
+          }
+          else if (lWaypoint == 0)
+          {
+            AdjustWaypoints(++mCurrentWaypoint, 1);
+            mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Waypoint] = mCurrentWaypoint;
+          }
+          else
+          {
+            mCurrentWaypoint = (byte)(lWaypoint == 0 ? 0 : lWaypoint - 1);
+            AdjustWaypoints(lWaypoint, -1);
+            mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Waypoint] = 0;
+          }
+          break;
+        case eWaypointAction.Duplicate:
+          mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Waypoint] = mCurrentWaypoint;
+          break;
+        case eWaypointAction.Eyedropper:
+          mCurrentWaypoint = lWaypoint;
+          break;
+        case eWaypointAction.Erase:
+          mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Waypoint] = 0;
+
+          if (lWaypoint == mCurrentWaypoint)
+          {
+            SetCurrentWaypointToDefault();
+          }
+          break;
+        case eWaypointAction.Waypoints:
+          SHETChunk lShet = ((Level)mMainForm.RootChunk).SHET;
+
+          if (lShet.GetKeySectionByWaypoint(lWaypoint) == null)
+          {
+            lShet.AddKeySection(lWaypoint);
+          }
+          else
+          {
+            lShet.RemoveKeySection(lWaypoint);
+          }
+          break;
+      }
+    }
+
+    private void SetCurrentWaypointToDefault()
+    {
+      mCurrentWaypoint = 0;
+
+      for (int x = 0; x < mSubject.Width; x++)
+      {
+        for (int y = 0; y < mSubject.Height; y++)
+        {
+          byte lWaypoint = mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Waypoint];
+
+          mCurrentWaypoint = Math.Max(mCurrentWaypoint, lWaypoint);
+        }
+      }
+    }
+
+    private void AdjustWaypoints(int xiFrom, int xiChangeBy)
+    {
+      SHETChunk lShet = ((Level)mMainForm.RootChunk).SHET;
+
+      foreach (FlatChunk lFlat in lShet.Flats)
+      {
+        if (lFlat.TexMetaData == null)
+        {
+          continue;
+        }
+
+        for (int x = 0; x < lFlat.Width; x++)
+        {
+          for (int y = 0; y < lFlat.Height; y++)
+          {
+            byte lWaypoint = lFlat.TexMetaData[x][y][(byte)eTexMetaDataEntries.Waypoint];
+
+            if (lWaypoint >= xiFrom)
+            {
+              int lNewValue = Math.Max(0, lWaypoint + xiChangeBy);
+              lFlat.TexMetaData[x][y][(byte)eTexMetaDataEntries.Waypoint] = (byte)lNewValue;
+            }
+          }
+        }
+      }
+
+      lShet.AdjustKeySections(xiFrom, xiChangeBy);
     }
 
     // a precomputed cache of the objects in the whole level, as coloured polys
@@ -765,6 +872,16 @@ namespace MMEd.Viewers
               InvalidateGridDisplay();
             }
             break;
+
+          case eViewMode.EditWaypoints:
+            //edit waypoints
+            if (mKeyOrMouseToSelPicBoxDict.ContainsKey(e.Button))
+            {
+              PictureBox lSel = mKeyOrMouseToSelPicBoxDict[e.Button];
+              MakeWaypointChange(x, y, (eWaypointAction)(byte)lSel.Tag);
+              InvalidateGridDisplay();
+            }
+            break;
         }
       }
     }
@@ -841,7 +958,8 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
            || ViewMode == eViewMode.EditBumpSquares
            || ViewMode == eViewMode.EditBumpPixels 
            || ViewMode == eViewMode.EditCameras
-           || ViewMode == eViewMode.EditRespawns)
+           || ViewMode == eViewMode.EditRespawns
+           || ViewMode == eViewMode.EditWaypoints)
          && mKeyOrMouseToSelPicBoxDict.ContainsKey(e.KeyChar))
       {
         //drill down the child heirarchy
@@ -892,6 +1010,10 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
             else if (ViewMode == eViewMode.EditRespawns)
             {
               SetRespawnPosition(x, y, new RespawnSetting(lPxX, lPxY, (byte)lSel.Tag));
+            }
+            else if (ViewMode == eViewMode.EditWaypoints)
+            {
+              MakeWaypointChange(x, y, (eWaypointAction)(byte)lSel.Tag);
             }
             InvalidateGridDisplay();
             return;
@@ -1001,11 +1123,17 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
       {
         const int PADDING = 5;
 
+        if (value == eViewMode.EditWaypoints && mCurrentWaypoint == 0)
+        {
+          SetCurrentWaypointToDefault();
+        }
+
         if ((mSubject == null || mSubject.TexMetaData == null)
          && (value == eViewMode.EditBumpPixels
           || value == eViewMode.EditBumpSquares
           || value == eViewMode.EditCameras
           || value == eViewMode.EditRespawns
+          || value == eViewMode.EditWaypoints
           || value == eViewMode.EditMetadata
           || value == eViewMode.FillMetadata
           || value == eViewMode.ViewBump))
@@ -1023,7 +1151,8 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
           || ViewMode == eViewMode.EditBumpSquares
           || ViewMode == eViewMode.EditBumpPixels
           || ViewMode == eViewMode.EditCameras
-          || ViewMode == eViewMode.EditRespawns)
+          || ViewMode == eViewMode.EditRespawns
+          || ViewMode == eViewMode.EditWaypoints)
         {
           Point lNextPbTL = new Point(0, 0);
           IEnumerator<object> lKeys = mKeyOrMouseToSelPicBoxDict.Keys.GetEnumerator();
@@ -1113,6 +1242,10 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
             else if (ViewMode == eViewMode.EditRespawns)
             {
               im = GetRespawnBrush(i);
+            }
+            else if (ViewMode == eViewMode.EditWaypoints)
+            {
+              im = GetWaypointBrush(i);
             }
 
             // have image, add it to editing palette
@@ -1209,6 +1342,66 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
       {
         return null;
       }
+    }
+
+    private Image GetWaypointBrush(int i)
+    {
+      if (i > (int)eWaypointAction.Waypoints)
+      {
+        return null;
+      }
+
+      string lLabel = "";
+
+      switch (i)
+      {
+        case (int)eWaypointAction.Insert:
+          lLabel = "Add path";
+          break;
+        default:
+          lLabel = ((eWaypointAction)i).ToString();
+          break;
+      }
+
+      int lWidth = 4 * SCALE;
+      int lHeight = 4 * SCALE;
+      Bitmap lRet = new Bitmap(lWidth, lHeight);
+      Graphics g = Graphics.FromImage(lRet);
+      Font lFont = new Font(FontFamily.GenericMonospace, 10);
+      int lTextWidth = (int)(g.MeasureString(lLabel, lFont).Width);
+
+      if (lTextWidth > lWidth)
+      {
+        lWidth = (int)lTextWidth;
+        lRet = new Bitmap(lWidth, lHeight);
+        g = Graphics.FromImage(lRet);
+      }
+
+      Pen p = new Pen(Color.Red, 1);
+      Point lMidpoint = new Point(lWidth / 2, lHeight / 2);
+      g.DrawRectangle(p, 0, 0, lWidth - 1, lHeight - 1);
+      Utils.DrawString(g, lLabel, lMidpoint);
+
+      //switch (i)
+      //{
+      //  case (int)eWaypointAction.Insert:
+      //    Utils.DrawString(g, "Add path", lMidpoint);
+      //    break;
+      //  case (int)eWaypointAction.Paint:
+      //    Utils.DrawString(g, "Duplicate", lMidpoint);
+      //    break;
+      //  case (int)eWaypointAction.SetTo:
+      //    Utils.DrawString(g, "Eyedropper", lMidpoint);
+      //    break;
+      //  case (int)eWaypointAction.ToggleKey:
+      //    Utils.DrawString(g, "Waypoints", lMidpoint);
+      //    break;
+      //  default:
+      //    Utils.DrawString(g, ((eWaypointAction)i).ToString(), lMidpoint);
+      //    break;
+      //}
+      //qqTLP Reset mCurrentWaypoint
+      return lRet;
     }
 
     public event EventHandler OnViewModeChanged;
@@ -1331,6 +1524,7 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
       EditBumpPixels,
       EditCameras,
       EditRespawns,
+      EditWaypoints,
       EditMetadata,
       FillMetadata
     }
@@ -1363,6 +1557,15 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
       ENE = 13,
       NE = 14,
       NNE = 15
+    }
+
+    private enum eWaypointAction
+    {
+      Insert = 0,
+      Duplicate = 1,
+      Eyedropper = 2,
+      Erase = 3,
+      Waypoints = 4
     }
 
     #endregion
@@ -1468,6 +1671,7 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
     #endregion
 
     private ImageAttributes mTransparencyAttributes = new ImageAttributes();
+    private byte mCurrentWaypoint = 0;
     private static byte[] sNoRespawnValues = new byte[] { 2, 5, 8, 12 };
     private const int SCALE = 16;
   }

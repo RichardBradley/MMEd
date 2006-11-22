@@ -4,6 +4,7 @@ using System.Text;
 using System.IO;
 using System.ComponentModel;
 using System.Collections;
+using System.Xml.Serialization;
 using MMEd.Util;
 
 namespace MMEd.Chunks
@@ -225,6 +226,7 @@ Each entry has three components, which are height, pitch and yaw, in some order"
 
     #region Odds manipulation
 
+    [XmlIgnore]
     public Hashtable UnusedOdds
     {
       get
@@ -292,25 +294,137 @@ Each entry has three components, which are height, pitch and yaw, in some order"
 
     public KeyWaypointsChunk.KeySection GetKeySectionByWaypoint(byte xiWaypoint)
     {
-      return (KeyWaypointsChunk.KeySection)KeySections[xiWaypoint];
+      return (KeyWaypointsChunk.KeySection)KeySectionsByWaypoint[xiWaypoint];
     }
 
-    private Hashtable KeySections
+    public void AdjustKeySections(int xiFrom, int xiChangeBy)
+    {
+      foreach (KeyWaypointsChunk.KeySection lKeySection in KeyWaypoints.KeySections)
+      {
+        if (lKeySection.From >= xiFrom)
+        {
+          lKeySection.From = (byte)(lKeySection.From + xiChangeBy);//qqTLP Bounds
+        }
+
+        if (lKeySection.To >= xiFrom)
+        {
+          lKeySection.To = (byte)(lKeySection.To + xiChangeBy);//qqTLP Bounds
+        }
+      }
+
+      mKeySectionsByWaypoint = null;
+    }
+
+    public void AddKeySection(byte xiWaypoint)
+    {
+      if (GetKeySectionByWaypoint(xiWaypoint) != null || 
+        xiWaypoint == 0)
+      {
+        return;
+      }
+
+      KeyWaypointsChunk.KeySection lPreviousSection = 
+        GetKeySectionByWaypoint((byte)(xiWaypoint - 1));
+      KeyWaypointsChunk.KeySection lFollowingSection = 
+        GetKeySectionByWaypoint((byte)(xiWaypoint + 1));//qqTLP What if it hits the limit (not here but when inserting)?
+
+      if (lPreviousSection == null && lFollowingSection == null)
+      {
+        KeyWaypointsChunk.KeySection lNewSection = 
+          new KeyWaypointsChunk.KeySection(xiWaypoint, xiWaypoint);
+        KeyWaypointsChunk.KeySection[] lNewSectionArray = 
+          new KeyWaypointsChunk.KeySection[KeyWaypoints.KeySections.Length + 1];
+        Array.Copy(
+          KeyWaypoints.KeySections, 
+          lNewSectionArray, 
+          KeyWaypoints.KeySections.Length);
+        lNewSectionArray[KeyWaypoints.KeySections.Length] = lNewSection;
+        KeyWaypoints.KeySections = lNewSectionArray;
+      }
+      else if (lPreviousSection == null)
+      {
+        lFollowingSection.From = xiWaypoint;
+      }
+      else if (lFollowingSection == null)
+      {
+        lPreviousSection.To = xiWaypoint;
+      }
+      else
+      {
+        lPreviousSection.To = lFollowingSection.To;
+        ArrayList lSections = new ArrayList(KeyWaypoints.KeySections);
+        lSections.Remove(lFollowingSection);
+        KeyWaypoints.KeySections = (KeyWaypointsChunk.KeySection[])
+          lSections.ToArray(typeof(KeyWaypointsChunk.KeySection));
+      }
+
+      mKeySectionsByWaypoint = null;
+    }
+
+    public void RemoveKeySection(byte xiWaypoint)
+    {
+      KeyWaypointsChunk.KeySection lSection =
+        GetKeySectionByWaypoint(xiWaypoint);
+
+      if (lSection == null || xiWaypoint == 0)
+      {
+        return;
+      }
+
+      KeyWaypointsChunk.KeySection lPreviousSection =
+        GetKeySectionByWaypoint((byte)(xiWaypoint - 1));
+      KeyWaypointsChunk.KeySection lFollowingSection =
+        GetKeySectionByWaypoint((byte)(xiWaypoint + 1));
+
+      if (lPreviousSection == null && lFollowingSection == null)
+      {
+        ArrayList lSections = new ArrayList(KeyWaypoints.KeySections);
+        lSections.Remove(lSection);
+        KeyWaypoints.KeySections = (KeyWaypointsChunk.KeySection[])
+          lSections.ToArray(typeof(KeyWaypointsChunk.KeySection));
+      }
+      else if (lPreviousSection == null)
+      {
+        lFollowingSection.From = (byte)(xiWaypoint + 1);
+      }
+      else if (lFollowingSection == null)
+      {
+        lPreviousSection.To = (byte)(xiWaypoint - 1);
+      }
+      else
+      {
+        KeyWaypointsChunk.KeySection lNewSection =
+        new KeyWaypointsChunk.KeySection((byte)(xiWaypoint + 1), lFollowingSection.To);
+        KeyWaypointsChunk.KeySection[] lNewSectionArray =
+          new KeyWaypointsChunk.KeySection[KeyWaypoints.KeySections.Length + 1];
+        Array.Copy(
+          KeyWaypoints.KeySections,
+          lNewSectionArray,
+          KeyWaypoints.KeySections.Length);
+        lNewSectionArray[KeyWaypoints.KeySections.Length] = lNewSection;
+        KeyWaypoints.KeySections = lNewSectionArray;
+        lPreviousSection.To = (byte)(xiWaypoint - 1);
+      }
+
+      mKeySectionsByWaypoint = null;
+    }
+
+    private Hashtable KeySectionsByWaypoint
     {
       get
       {
-        if (mKeySections == null)
+        if (mKeySectionsByWaypoint == null)
         {
           FindKeySections();
         }
 
-        return mKeySections;
+        return mKeySectionsByWaypoint;
       }
     }
 
     private void FindKeySections()
     {
-      mKeySections = new Hashtable();
+      mKeySectionsByWaypoint = new Hashtable();
 
       if (KeyWaypoints == null || KeyWaypoints.KeySections == null)
       {
@@ -321,12 +435,12 @@ Each entry has three components, which are height, pitch and yaw, in some order"
       {
         for (int i = lKeySection.From; i <= lKeySection.To; i++)
         {
-          mKeySections[(byte)i] = lKeySection;
+          mKeySectionsByWaypoint[(byte)i] = lKeySection;
         }
       }
     }
 
-    private Hashtable mKeySections = null;
+    private Hashtable mKeySectionsByWaypoint = null;
 
     #endregion
   }

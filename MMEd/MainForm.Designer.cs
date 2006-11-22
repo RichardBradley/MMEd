@@ -82,6 +82,7 @@ namespace MMEd
           this.label3 = new System.Windows.Forms.Label();
           this.label2 = new System.Windows.Forms.Label();
           this.groupBox1 = new System.Windows.Forms.GroupBox();
+          this.GridViewShowWaypointsCheck = new System.Windows.Forms.CheckBox();
           this.OverlaySelectorRespawn = new MMEd.Util.OverlaySelector();
           this.OverlaySelectorCamera = new MMEd.Util.OverlaySelector();
           this.OverlaySelectorGrid = new MMEd.Util.OverlaySelector();
@@ -115,6 +116,7 @@ namespace MMEd
           this.OddCombo = new System.Windows.Forms.ComboBox();
           this.OddEditPictureBox = new System.Windows.Forms.PictureBox();
           this.ViewTabCamera = new System.Windows.Forms.TabPage();
+          this.CameraRenderingSurface = new GLTK.RenderingSurface();
           this.PanelCameraImage = new System.Windows.Forms.Panel();
           this.SliderElevation = new System.Windows.Forms.TrackBar();
           this.TextElevation = new System.Windows.Forms.TextBox();
@@ -140,7 +142,6 @@ namespace MMEd
           this.Viewer3DRenderingSurfaceTopRight = new GLTK.RenderingSurface();
           this.Viewer3DRenderingSurfaceBottomRight = new GLTK.RenderingSurface();
           this.ToolTip = new System.Windows.Forms.ToolTip(this.components);
-          this.GridViewShowWaypointsCheck = new System.Windows.Forms.CheckBox();
           this.mMenuStrip.SuspendLayout();
           this.MainSplitter.Panel1.SuspendLayout();
           this.MainSplitter.Panel2.SuspendLayout();
@@ -762,6 +763,16 @@ namespace MMEd
           this.groupBox1.TabStop = false;
           this.groupBox1.Text = "View Options";
           // 
+          // GridViewShowWaypointsCheck
+          // 
+          this.GridViewShowWaypointsCheck.AutoSize = true;
+          this.GridViewShowWaypointsCheck.Location = new System.Drawing.Point(6, 162);
+          this.GridViewShowWaypointsCheck.Name = "GridViewShowWaypointsCheck";
+          this.GridViewShowWaypointsCheck.Size = new System.Drawing.Size(103, 17);
+          this.GridViewShowWaypointsCheck.TabIndex = 13;
+          this.GridViewShowWaypointsCheck.Text = "Show waypoints";
+          this.GridViewShowWaypointsCheck.UseVisualStyleBackColor = true;
+          // 
           // OverlaySelectorRespawn
           // 
           this.OverlaySelectorRespawn.Checked = false;
@@ -1103,6 +1114,7 @@ namespace MMEd
           // 
           // ViewTabCamera
           // 
+          this.ViewTabCamera.Controls.Add(this.CameraRenderingSurface);
           this.ViewTabCamera.Controls.Add(this.PanelCameraImage);
           this.ViewTabCamera.Controls.Add(this.SliderElevation);
           this.ViewTabCamera.Controls.Add(this.TextElevation);
@@ -1120,6 +1132,14 @@ namespace MMEd
           this.ViewTabCamera.TabIndex = 5;
           this.ViewTabCamera.Text = "Camera";
           this.ViewTabCamera.UseVisualStyleBackColor = true;
+          // 
+          // CameraRenderingSurface
+          // 
+          this.CameraRenderingSurface.Location = new System.Drawing.Point(6, 181);
+          this.CameraRenderingSurface.Name = "CameraRenderingSurface";
+          this.CameraRenderingSurface.Size = new System.Drawing.Size(446, 300);
+          this.CameraRenderingSurface.TabIndex = 13;
+          this.CameraRenderingSurface.Text = "renderingSurface1";
           // 
           // PanelCameraImage
           // 
@@ -1366,16 +1386,6 @@ namespace MMEd
           this.Viewer3DRenderingSurfaceBottomRight.TabIndex = 0;
           this.Viewer3DRenderingSurfaceBottomRight.Text = "renderingSurface4";
           // 
-          // GridViewShowWaypointsCheck
-          // 
-          this.GridViewShowWaypointsCheck.AutoSize = true;
-          this.GridViewShowWaypointsCheck.Location = new System.Drawing.Point(6, 162);
-          this.GridViewShowWaypointsCheck.Name = "GridViewShowWaypointsCheck";
-          this.GridViewShowWaypointsCheck.Size = new System.Drawing.Size(103, 17);
-          this.GridViewShowWaypointsCheck.TabIndex = 13;
-          this.GridViewShowWaypointsCheck.Text = "Show waypoints";
-          this.GridViewShowWaypointsCheck.UseVisualStyleBackColor = true;
-          // 
           // MainForm
           // 
           this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1570,6 +1580,7 @@ namespace MMEd
       public System.Windows.Forms.Button ActionsTabImportTMDButton;
       public System.Windows.Forms.Button ActionsTabExportTMDButton;
       public System.Windows.Forms.CheckBox GridViewShowWaypointsCheck;
+      public GLTK.RenderingSurface CameraRenderingSurface;
     }
 }
 

@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Text;
+using System.Windows.Forms;
+using System.Xml.Serialization;
+using GLTK;
 using MMEd;
 using MMEd.Chunks;
-using System.Xml.Serialization;
-using System.IO;
-using System.Windows.Forms;
+using Point = System.Drawing.Point;
 
 namespace MMEd.Viewers
 {
@@ -46,10 +48,13 @@ namespace MMEd.Viewers
         throw new InvalidOperationException("Tried to view chunk of type {0} in CameraViewer");
       }
 
+      mMainForm.CameraRenderingSurface.Visible = true;
       mSubject = (CameraPosChunk)xiChunk;
       SetDirection(mSubject.Direction);
       mMainForm.TextDistance.Text = mSubject.Distance.ToString();
       mMainForm.TextElevation.Text = mSubject.Elevation.ToString();
+
+      InitialiseThreeDeeView();
     }
 
     private void SetDirection(int xiValue)
@@ -76,6 +81,7 @@ namespace MMEd.Viewers
       mMainForm.TextDirection.Text = xiValue.ToString();
       mSubject.Direction = (short)xiValue;
       UpdateCameraImage();
+      UpdateCameraThreeDee();
       mUpdating = false;
     }
 
@@ -91,6 +97,7 @@ namespace MMEd.Viewers
       mMainForm.TextDistance.Text = xiValue.ToString();
       mSubject.Distance = (short)xiValue;
       UpdateCameraImage();
+      UpdateCameraThreeDee();
       mUpdating = false;
     }
 
@@ -106,6 +113,7 @@ namespace MMEd.Viewers
       mMainForm.TextElevation.Text = xiValue.ToString();
       mSubject.Elevation = (short)xiValue;
       UpdateCameraImage();
+      UpdateCameraThreeDee();
       mUpdating = false;
     }
 
@@ -128,9 +136,80 @@ namespace MMEd.Viewers
       lPanel.BackgroundImage = lImage;
     }
 
-    private void SetSliderDirection(TrackBar xiSlider, int xiNewValue)
+    private void InitialiseThreeDeeView()
     {
-      xiSlider.Value = xiNewValue;
+      if (mSubject == null)
+      {
+        return;
+      }
+
+      int SCALE = 256;
+      int GRIDSIZE = 9; // Should be an odd number so the centre is the middle of a tile.
+      mRenderer = new ImmediateModeRenderer();
+      mRenderer.Attach(mMainForm.CameraRenderingSurface);
+
+      mScene = new Scene();
+      mCamera = new Camera(80, 0.1, 1e10);
+      mView = new GLTK.View(mScene, mCamera, mRenderer);
+
+      mScene.Clear();
+      if (mMainForm.RootChunk is Chunks.Level)
+      {
+        // Create a surface and fill it with a 10 x 10 grid of squares
+        MMEdEntity lSurface = new MMEdEntity(mSubject);
+
+        for (int x = 0; x < GRIDSIZE; x++)
+        {
+          for (int y = 0; y < GRIDSIZE; y++)
+          {
+            Mesh lSquare = new OwnedMesh(mSubject, PolygonMode.Quads);
+            lSquare.AddFace(
+              new Vertex(new GLTK.Point(x, y, 0), 0, 0),
+              new Vertex(new GLTK.Point(x + 1, y, 0), 1, 0),
+              new Vertex(new GLTK.Point(x + 1, y + 1, 0), 1, 1),
+              new Vertex(new GLTK.Point(x, y + 1, 0), 0, 1));
+            lSquare.RenderMode = RenderMode.Wireframe;
+            lSurface.Meshes.Add(lSquare);
+          }
+        }
+
+        // Add it to the scene at the origin
+        lSurface.Scale(SCALE, SCALE, 1.0);
+        short lOffset = (short)(-SCALE * GRIDSIZE / 2);
+        GLTK.Point lNewPos = ThreeDeeViewer.Short3CoordToPoint(new Short3Coord(lOffset, lOffset, 0));
+        lSurface.Position = new GLTK.Point(lNewPos.x, lNewPos.y, -lNewPos.z);        
+        mScene.AddRange(new MMEdEntity[] { lSurface });
+
+        // Use a random object from the level for now.
+        Level lLevel = ((Level)mMainForm.RootChunk);
+        TMDChunk lObject = lLevel.GetObjtById(1);
+        mScene.AddRange(lObject.GetEntities(
+          mMainForm.RootChunk,
+          MMEd.Viewers.ThreeDee.eTextureMode.NormalTextures,
+          eTexMetaDataEntries.Zero));
+
+        UpdateCameraThreeDee();
+      }
+      else
+      {
+        System.Windows.Forms.MessageBox.Show("3D view is only available when editing a level");
+        mMainForm.CameraRenderingSurface.Visible = false;
+      }
+    }
+
+    private void UpdateCameraThreeDee()
+    {
+      if (mCamera == null)
+      {
+        return;
+      }
+
+      // TODO: The elevation isn't rending quite right yet...
+      short x = (short)(Math.Sin(mSubject.Direction * Math.PI / 2048) * mSubject.Distance);
+      short y = (short)(Math.Cos(mSubject.Direction * Math.PI / 2048) * mSubject.Distance);
+      mCamera.Position = ThreeDeeViewer.Short3CoordToPoint(new Short3Coord(x, y, mSubject.Elevation));
+      mCamera.LookAt(new GLTK.Point(0, 0, 0), new GLTK.Vector(0, 0, 1));
+      mMainForm.CameraRenderingSurface.Invalidate();
     }
 
     public override System.Windows.Forms.TabPage Tab
@@ -208,5 +287,11 @@ namespace MMEd.Viewers
 
     private bool mUpdating = false;
     private static int mArbitraryMaximum = 1000;
+
+    Scene mScene;
+    Camera mCamera;
+    Light mLight;
+    ImmediateModeRenderer mRenderer;
+    GLTK.View mView;
   }
 }
