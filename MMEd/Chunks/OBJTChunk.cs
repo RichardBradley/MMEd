@@ -8,13 +8,14 @@ using MMEd.Util;
 
 namespace MMEd.Chunks
 {
-  public class OBJTChunk : Chunk
+  public class OBJTChunk : GroupingChunk
   {
+    public OBJTChunk():base() { }
 
-    public Chunk[] mChildren;
-
-    public OBJTChunk() { }
-    public OBJTChunk(Stream inStr, BinaryReader bin) { Deserialise(inStr, bin); }
+    public OBJTChunk(Stream inStr, BinaryReader bin):base()
+    {
+      Deserialise(inStr, bin); 
+    }
 
     public override void Deserialise(Stream inStr)
     {
@@ -79,16 +80,6 @@ namespace MMEd.Chunks
       {
         return "OBJT";
       }
-    }
-
-    public override Chunk[] GetChildren()
-    {
-      return mChildren;
-    }
-
-    public override void ReplaceChild(Chunk xiFrom, Chunk xiTo)
-    {
-
     }
   }
 }

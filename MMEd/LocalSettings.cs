@@ -10,6 +10,24 @@ namespace MMEd
 {
   public class LocalSettings
   {
+    #region MMEd local settings
+
+    public string LastOpenedFile;
+    public MainForm.eOpenType LastOpenedType = MainForm.eOpenType.LevelBinary;
+    public string LastSavedFile;
+    public string LastTIMFile;
+    public string LastTMDFile;
+
+    #endregion
+
+    #region Tiler local settings
+
+    public string TilerLastOpenedImage;
+
+    #endregion
+
+    #region persistence
+
     private static string GetExpectedFilename()
     {
       return Path.Combine(
@@ -17,12 +35,6 @@ namespace MMEd
              System.Environment.GetEnvironmentVariable("APPDATA"),
              "MMEd"), "LocalSettings.xml");
     }
-
-    public string LastOpenedFile;
-    public MainForm.eOpenType LastOpenedType = MainForm.eOpenType.LevelBinary;
-    public string LastSavedFile;
-    public string LastTIMFile;
-    public string LastTMDFile;
 
     // loads the local settings found on this machine,
     // or creates a new instance
@@ -55,5 +67,7 @@ namespace MMEd
         xs.Serialize(fs, this);
       }
     }
+
+    #endregion
   }
 }

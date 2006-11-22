@@ -55,9 +55,6 @@ namespace MMEd
       throw new Exception("This operation has not been implemented or is not permitted for this chunk type.");
     }
 
-    //qq I want this to be a non-serialised property, but
-    // the NonSerializedAttribute is only applicable to fields, and
-    // seems to be ignored by the XMLSerializer anyway.
     private TreeNode mTreeNode;
 
     [XmlIgnore]

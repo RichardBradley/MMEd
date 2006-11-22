@@ -19,7 +19,16 @@ namespace MMEd.Chunks
 
     public Chunk[] mChildren;
 
-    public override void Deserialise(System.IO.Stream inStr)
+    public NamedImageGroup() { }
+    public NamedImageGroup(Stream inStr, ref int xiTIMIdx) { Deserialise(inStr, ref xiTIMIdx); }
+
+    public override void Deserialise(Stream inStr)
+    {
+      int i = 0;
+      Deserialise(inStr, ref i);
+    }
+
+    public void Deserialise(Stream inStr, ref int xbTIMIdx)
     {
       BinaryReader bin = new BinaryReader(inStr);
       int length = bin.ReadInt32();
@@ -40,7 +49,7 @@ namespace MMEd.Chunks
         {
           try
           {
-            TIMChunk tim = new TIMChunk(children.Count, inStr, nextLen);
+            TIMChunk tim = new TIMChunk(xbTIMIdx++, inStr, nextLen);
             children.Add(tim);
           }
           catch (TIMChunk.TIMTypeNotImplementedException e)

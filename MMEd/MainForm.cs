@@ -38,7 +38,9 @@ namespace MMEd
 
       //register the viewer manager classes
       //qq there must be a better way of doing this, it seems a bit
-      //   odd
+      //   odd. Could use reflection. Might be a little slow or have
+      //   unexpected side-effects. It's nice to be able to control
+      //   the order the tabs appear in, too.
       ViewTabActions.Tag = ActionsViewer.InitialiseViewer(this);
       ViewTabXML.Tag = XMLViewer.InitialiseViewer(this);
       ViewTabFlat.Tag = FlatViewer.InitialiseViewer(this);

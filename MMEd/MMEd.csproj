@@ -86,6 +86,7 @@
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Util\EquivalenceCollection.cs" />
     <Compile Include="Util\OverlaySelector.cs">
       <SubType>UserControl</SubType>
     </Compile>

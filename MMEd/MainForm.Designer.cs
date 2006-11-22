@@ -128,7 +128,7 @@ namespace MMEd
           this.TextDirection = new System.Windows.Forms.TextBox();
           this.label12 = new System.Windows.Forms.Label();
           this.ViewTabVRAM = new System.Windows.Forms.TabPage();
-          this.panel1 = new System.Windows.Forms.Panel();
+          this.VRAMScrollPanel = new MMEd.Util.SmoothScrollingPanel();
           this.VRAMPictureBox = new System.Windows.Forms.PictureBox();
           this.VRAMStatusStrip = new System.Windows.Forms.StatusStrip();
           this.ViewTab3dEditor = new System.Windows.Forms.TabPage();
@@ -178,7 +178,7 @@ namespace MMEd
           ((System.ComponentModel.ISupportInitialize)(this.SliderDistance)).BeginInit();
           ((System.ComponentModel.ISupportInitialize)(this.SliderDirection)).BeginInit();
           this.ViewTabVRAM.SuspendLayout();
-          this.panel1.SuspendLayout();
+          this.VRAMScrollPanel.SuspendLayout();
           ((System.ComponentModel.ISupportInitialize)(this.VRAMPictureBox)).BeginInit();
           this.ViewTab3dEditor.SuspendLayout();
           this.panel2.SuspendLayout();
@@ -213,7 +213,7 @@ namespace MMEd
             this.saveToolStripMenuItem,
             this.toolStripMenuItem2});
           this.MnuFile.Name = "MnuFile";
-          this.MnuFile.Size = new System.Drawing.Size(42, 20);
+          this.MnuFile.Size = new System.Drawing.Size(35, 20);
           this.MnuFile.Text = "&File";
           // 
           // toolStripMenuItem1
@@ -222,7 +222,7 @@ namespace MMEd
           this.toolStripMenuItem1.ImageTransparentColor = System.Drawing.Color.Magenta;
           this.toolStripMenuItem1.Name = "toolStripMenuItem1";
           this.toolStripMenuItem1.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-          this.toolStripMenuItem1.Size = new System.Drawing.Size(243, 22);
+          this.toolStripMenuItem1.Size = new System.Drawing.Size(224, 22);
           this.toolStripMenuItem1.Text = "&Open Level Binary...";
           this.toolStripMenuItem1.ToolTipText = "Opens an MMv3 level file, as extracted from the CD";
           this.toolStripMenuItem1.Click += new System.EventHandler(this.OpenLevelBinaryClick);
@@ -231,7 +231,7 @@ namespace MMEd
           // 
           this.MnuiFileOpenLevel.ImageTransparentColor = System.Drawing.Color.Magenta;
           this.MnuiFileOpenLevel.Name = "MnuiFileOpenLevel";
-          this.MnuiFileOpenLevel.Size = new System.Drawing.Size(243, 22);
+          this.MnuiFileOpenLevel.Size = new System.Drawing.Size(224, 22);
           this.MnuiFileOpenLevel.Text = "&Open Unknown Binary...";
           this.MnuiFileOpenLevel.ToolTipText = "Opens any old binary file, and searches through it for recognisable MMv3 datastru" +
               "ctures";
@@ -241,7 +241,7 @@ namespace MMEd
           // 
           this.toolStripMenuItem3.ImageTransparentColor = System.Drawing.Color.Magenta;
           this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-          this.toolStripMenuItem3.Size = new System.Drawing.Size(243, 22);
+          this.toolStripMenuItem3.Size = new System.Drawing.Size(224, 22);
           this.toolStripMenuItem3.Text = "&Open XML...";
           this.toolStripMenuItem3.ToolTipText = "Opens an XML file saved from this program";
           this.toolStripMenuItem3.Click += new System.EventHandler(this.OpenXmlClick);
@@ -249,7 +249,7 @@ namespace MMEd
           // toolStripSeparator1
           // 
           this.toolStripSeparator1.Name = "toolStripSeparator1";
-          this.toolStripSeparator1.Size = new System.Drawing.Size(240, 6);
+          this.toolStripSeparator1.Size = new System.Drawing.Size(221, 6);
           // 
           // saveToolStripMenuItem
           // 
@@ -257,7 +257,7 @@ namespace MMEd
           this.saveToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
           this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
           this.saveToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-          this.saveToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
+          this.saveToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
           this.saveToolStripMenuItem.Text = "&Save As Binary...";
           this.saveToolStripMenuItem.ToolTipText = "Saves this file in an MMv3 binary format";
           this.saveToolStripMenuItem.Click += new System.EventHandler(this.SaveAsBinaryClick);
@@ -266,7 +266,7 @@ namespace MMEd
           // 
           this.toolStripMenuItem2.ImageTransparentColor = System.Drawing.Color.Magenta;
           this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-          this.toolStripMenuItem2.Size = new System.Drawing.Size(243, 22);
+          this.toolStripMenuItem2.Size = new System.Drawing.Size(224, 22);
           this.toolStripMenuItem2.Text = "&Save As XML...";
           this.toolStripMenuItem2.ToolTipText = "Saves this file as an XML tree\r\nCAUTION: the resulting file may not be openable\r\n" +
               "by future versions of MMEd!";
@@ -650,7 +650,7 @@ namespace MMEd
           // GridViewerStatusLabel
           // 
           this.GridViewerStatusLabel.Name = "GridViewerStatusLabel";
-          this.GridViewerStatusLabel.Size = new System.Drawing.Size(51, 17);
+          this.GridViewerStatusLabel.Size = new System.Drawing.Size(45, 17);
           this.GridViewerStatusLabel.Text = "(status)";
           // 
           // groupBox2
@@ -822,7 +822,7 @@ namespace MMEd
           this.GridViewZoomSlider.Maximum = 5;
           this.GridViewZoomSlider.Minimum = -5;
           this.GridViewZoomSlider.Name = "GridViewZoomSlider";
-          this.GridViewZoomSlider.Size = new System.Drawing.Size(122, 48);
+          this.GridViewZoomSlider.Size = new System.Drawing.Size(122, 42);
           this.GridViewZoomSlider.TabIndex = 6;
           this.ToolTip.SetToolTip(this.GridViewZoomSlider, "Set the zoom level");
           // 
@@ -830,7 +830,7 @@ namespace MMEd
           // 
           this.GridViewTransparencySlider.Location = new System.Drawing.Point(5, 73);
           this.GridViewTransparencySlider.Name = "GridViewTransparencySlider";
-          this.GridViewTransparencySlider.Size = new System.Drawing.Size(122, 48);
+          this.GridViewTransparencySlider.Size = new System.Drawing.Size(122, 42);
           this.GridViewTransparencySlider.TabIndex = 4;
           this.ToolTip.SetToolTip(this.GridViewTransparencySlider, "Set the transparency level for overlaid textures (bump, odd)");
           this.GridViewTransparencySlider.Value = 5;
@@ -1152,7 +1152,7 @@ namespace MMEd
           // 
           this.SliderElevation.Location = new System.Drawing.Point(68, 127);
           this.SliderElevation.Name = "SliderElevation";
-          this.SliderElevation.Size = new System.Drawing.Size(250, 48);
+          this.SliderElevation.Size = new System.Drawing.Size(250, 42);
           this.SliderElevation.TabIndex = 11;
           this.ToolTip.SetToolTip(this.SliderElevation, "Height of the camera from the vehicles");
           // 
@@ -1176,7 +1176,7 @@ namespace MMEd
           // 
           this.SliderDistance.Location = new System.Drawing.Point(68, 73);
           this.SliderDistance.Name = "SliderDistance";
-          this.SliderDistance.Size = new System.Drawing.Size(250, 48);
+          this.SliderDistance.Size = new System.Drawing.Size(250, 42);
           this.SliderDistance.TabIndex = 8;
           this.ToolTip.SetToolTip(this.SliderDistance, "Horizontal distance of the camera from the vehicles");
           // 
@@ -1203,7 +1203,7 @@ namespace MMEd
           this.SliderDirection.Maximum = 8;
           this.SliderDirection.Minimum = -8;
           this.SliderDirection.Name = "SliderDirection";
-          this.SliderDirection.Size = new System.Drawing.Size(250, 48);
+          this.SliderDirection.Size = new System.Drawing.Size(250, 42);
           this.SliderDirection.TabIndex = 5;
           this.SliderDirection.TickFrequency = 2;
           this.ToolTip.SetToolTip(this.SliderDirection, "Angle of the camera to the vehicles");
@@ -1226,7 +1226,7 @@ namespace MMEd
           // 
           // ViewTabVRAM
           // 
-          this.ViewTabVRAM.Controls.Add(this.panel1);
+          this.ViewTabVRAM.Controls.Add(this.VRAMScrollPanel);
           this.ViewTabVRAM.Controls.Add(this.VRAMStatusStrip);
           this.ViewTabVRAM.Location = new System.Drawing.Point(4, 22);
           this.ViewTabVRAM.Name = "ViewTabVRAM";
@@ -1234,17 +1234,17 @@ namespace MMEd
           this.ViewTabVRAM.TabIndex = 6;
           this.ViewTabVRAM.Text = "VRAM";
           // 
-          // panel1
+          // VRAMScrollPanel
           // 
-          this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+          this.VRAMScrollPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                       | System.Windows.Forms.AnchorStyles.Left)
                       | System.Windows.Forms.AnchorStyles.Right)));
-          this.panel1.AutoScroll = true;
-          this.panel1.Controls.Add(this.VRAMPictureBox);
-          this.panel1.Location = new System.Drawing.Point(0, 0);
-          this.panel1.Name = "panel1";
-          this.panel1.Size = new System.Drawing.Size(637, 510);
-          this.panel1.TabIndex = 2;
+          this.VRAMScrollPanel.AutoScroll = true;
+          this.VRAMScrollPanel.Controls.Add(this.VRAMPictureBox);
+          this.VRAMScrollPanel.Location = new System.Drawing.Point(0, 0);
+          this.VRAMScrollPanel.Name = "VRAMScrollPanel";
+          this.VRAMScrollPanel.Size = new System.Drawing.Size(637, 510);
+          this.VRAMScrollPanel.TabIndex = 2;
           // 
           // VRAMPictureBox
           // 
@@ -1447,8 +1447,8 @@ namespace MMEd
           ((System.ComponentModel.ISupportInitialize)(this.SliderDirection)).EndInit();
           this.ViewTabVRAM.ResumeLayout(false);
           this.ViewTabVRAM.PerformLayout();
-          this.panel1.ResumeLayout(false);
-          this.panel1.PerformLayout();
+          this.VRAMScrollPanel.ResumeLayout(false);
+          this.VRAMScrollPanel.PerformLayout();
           ((System.ComponentModel.ISupportInitialize)(this.VRAMPictureBox)).EndInit();
           this.ViewTab3dEditor.ResumeLayout(false);
           this.panel2.ResumeLayout(false);
@@ -1501,8 +1501,7 @@ namespace MMEd
         public System.Windows.Forms.TabPage ViewTabCamera;
         public System.Windows.Forms.PictureBox BumpEditPictureBox;
         public System.Windows.Forms.PictureBox OddEditPictureBox;
-        public System.Windows.Forms.TabPage ViewTabVRAM;
-        private System.Windows.Forms.Panel panel1;
+      public System.Windows.Forms.TabPage ViewTabVRAM;
         public System.Windows.Forms.PictureBox VRAMPictureBox;
         public System.Windows.Forms.StatusStrip VRAMStatusStrip;
         public System.Windows.Forms.ComboBox BumpCombo;
@@ -1581,6 +1580,7 @@ namespace MMEd
       public System.Windows.Forms.Button ActionsTabExportTMDButton;
       public System.Windows.Forms.CheckBox GridViewShowWaypointsCheck;
       public GLTK.RenderingSurface CameraRenderingSurface;
+      private MMEd.Util.SmoothScrollingPanel VRAMScrollPanel;
     }
 }
 

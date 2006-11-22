@@ -158,11 +158,11 @@ namespace MMEd.Chunks
       ArrayList imageGroups = new ArrayList();
 
       //now, an array of image or comment structs
+      int lTIMIdx = 0;
       while (nextInt != 0)
       {
         bin.BaseStream.Seek(-4, SeekOrigin.Current);
-        NamedImageGroup nim = new NamedImageGroup();
-        nim.Deserialise(bin.BaseStream);
+        NamedImageGroup nim = new NamedImageGroup(bin.BaseStream, ref lTIMIdx);
         imageGroups.Add(nim);
         nextInt = bin.ReadInt32();
       }
@@ -301,7 +301,15 @@ namespace MMEd.Chunks
       if (xiFrom == NamedImageGroups)
       {
         NamedImageGroups = (GroupingChunk)xiTo;
-      }//qq
+      }
+      else if (xiFrom == OBJTFalseStart)
+      {
+        OBJTFalseStart = (RawDataChunk)xiTo;
+      }
+      else if (xiFrom == OBJT)
+      {
+        OBJT = (OBJTChunk)xiTo;
+      }
       else if (xiFrom == Dunno)
       {
         Dunno = (RawDataChunk)xiTo;
@@ -312,7 +320,6 @@ namespace MMEd.Chunks
       }
       else
       {
-          throw new Exception("TODO");
           throw new ArgumentException("xifrom not found!");
       }
     }

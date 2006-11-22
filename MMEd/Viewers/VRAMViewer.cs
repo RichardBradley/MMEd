@@ -161,6 +161,22 @@ namespace MMEd.Viewers
         return;
       }
       g.DrawImage(c.ToBitmap(), lDestRect);
+      
+      if (c.Palette != null)
+      {
+        if (c.ClutCount != 1) throw new Exception("Don't know what to do with multi-CLUT TIMs");
+        for (int palIdx=0; palIdx<c.Palette.Length; palIdx++)
+        {
+          Color col = Color.FromArgb(Utils.PS16bitColorToARGB(c.Palette[palIdx]));
+          Brush br = new SolidBrush(col);
+          Rectangle rect = new Rectangle(
+            WIDTH_SCALE_FOR_4BPP_TIMS * (c.PaletteOrgX + palIdx),
+            c.PaletteOrgY,
+            WIDTH_SCALE_FOR_4BPP_TIMS,
+            1);
+          g.FillRectangle(br, rect);
+        }
+      }
     }
 
     public override System.Windows.Forms.TabPage Tab

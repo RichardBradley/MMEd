@@ -49,7 +49,7 @@ namespace MMEd.Chunks
     public short ClutCount;
 
     [Description("The palette, as defined by the CLUT(s)")]
-    public int[] Palette;
+    public short[] Palette;
 
     [Description("The total size, in bytes, of the image data, + 12")]
     public int ImageDataSize;
@@ -116,10 +116,10 @@ namespace MMEd.Chunks
           throw new DeserialisationException("Multi-clut TIMs are not yet supported. Please extend TIMChunk.cs using info from timgfx.txt");
 
         //CLUT:
-        Palette = new int[ClutCount * ClutColors];
+        Palette = new short[ClutCount * ClutColors];
         for (int i = 0; i < Palette.Length; i++)
         {
-          Palette[i] = Utils.PS16bitColorToARGB(bin.ReadInt16());
+          Palette[i] = bin.ReadInt16();
         }
       }
 
@@ -217,7 +217,7 @@ namespace MMEd.Chunks
         //CLUT:
         for (int i = 0; i < Palette.Length; i++)
         {
-          bout.Write((short)Utils.ARGBColorToPS16bit(Palette[i]));
+          bout.Write((short)Palette[i]);
         }
       }
 
@@ -336,8 +336,8 @@ namespace MMEd.Chunks
         for (int x = 0; x < ImageWidth; x += 2)
         {
           byte v = ImageData[y * ImageWidth / 2 + x / 2];
-          Color left = Color.FromArgb(Palette[v & 0xf]);
-          Color right = Color.FromArgb((Palette[(v >> 4) & 0xf]));
+          Color left = Color.FromArgb(Utils.PS16bitColorToARGB(Palette[v & 0xf]));
+          Color right = Color.FromArgb(Utils.PS16bitColorToARGB(Palette[(v >> 4) & 0xf]));
           acc.SetPixel(x, y, left);
           acc.SetPixel(x + 1, y, right);
         }
@@ -349,14 +349,21 @@ namespace MMEd.Chunks
     private Bitmap CreateBitmapManaged8bpp()
     {
       Bitmap acc = new Bitmap(ImageWidth, ImageHeight, PixelFormat.Format32bppArgb);
-      for (int y = 0; y < ImageHeight; y++)
+      try
       {
-        for (int x = 0; x < ImageWidth; x++)
+        for (int y = 0; y < ImageHeight; y++)
         {
-          byte v = ImageData[y * ImageWidth + x];
-          Color c = Color.FromArgb(Palette[v]);
-          acc.SetPixel(x, y, c);
+          for (int x = 0; x < ImageWidth; x++)
+          {
+            byte v = ImageData[y * ImageWidth + x];
+            Color c = Color.FromArgb(Utils.PS16bitColorToARGB(Palette[v]));
+            acc.SetPixel(x, y, c);
+          }
         }
+      }
+      catch
+      {
+        //qq continue on error. Needed for PRERACE.DAT @ 466444
       }
       return acc;
     }
@@ -436,9 +443,9 @@ namespace MMEd.Chunks
       bout.Write((int)0);//biClrImportant
       if (Palette != null)
       {
-        foreach (int c in Palette)
+        foreach (short c in Palette)
         {
-          bout.Write((int)(c & 0xffffff));
+          bout.Write((int)(Utils.PS16bitColorToARGB(c) & 0xffffff));
         }
       }
 
@@ -542,7 +549,7 @@ namespace MMEd.Chunks
         Dictionary<int, int> lColorToPaletteIdx = new Dictionary<int, int>();
         for (int i = Palette.Length - 1; i >= 0; i--)
         {
-          lColorToPaletteIdx[Palette[i]] = i;
+          lColorToPaletteIdx[Utils.PS16bitColorToARGB(Palette[i])] = i;
         }
 
         int x = -1, y = -1;
@@ -581,7 +588,7 @@ namespace MMEd.Chunks
           }
           else throw new Exception("unreachable case");
         }
-        catch (KeyNotFoundException e)
+        catch (KeyNotFoundException)
         {
           throw new Exception(string.Format("The color 0x{0:x} is used in the BMP at ({1},{2}), but doesn't appear in the TIM palette",
             c.ToArgb(), x, y));
