@@ -308,13 +308,13 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
       else if (Utils.ArrayCompare(NextN, new byte[] { 156, 255, 1, 0, 4, 0 }))
       {
         //applying POOL5 hack!! qqq
-        System.Windows.Forms.MessageBox.Show("Warning: applying POOL5 specific hack to trailing bytes of jumprmp3 Flat");
+        Console.Error.WriteLine("Warning: applying POOL5 specific hack to trailing bytes of jumprmp3 Flat");
         TrailingData = bin.ReadBytes(22);
       }
       else if (Utils.ArrayCompare(NextN, new byte[] { 106, 255, 1, 0, 243, 255 }))
       {
         //applying GARDEN3 hack!! qqq
-        System.Windows.Forms.MessageBox.Show("Warning: applying GARDEN3 specific hack to trailing bytes of grasssht Flat");
+        Console.Error.WriteLine("Warning: applying GARDEN3 specific hack to trailing bytes of grasssht Flat");
         TrailingData = bin.ReadBytes(22);
       }
     }

@@ -6,9 +6,8 @@ using System.Drawing;
 
 namespace MMEd.Util
 {
-  abstract class Utils
+  public abstract class Utils
   {
-
     /// <summary>
     ///  Converts a 16 bit PS colour into a 32 bit ARGB Color
     ///  structure

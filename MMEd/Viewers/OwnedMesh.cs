@@ -10,17 +10,21 @@ namespace MMEd.Viewers
   public class OwnedMesh : Mesh
   {
     public OwnedMesh() { }
+
     public OwnedMesh(object xiOwner) { this.mOwner = xiOwner; }
+
     public OwnedMesh(object xiOwner, PolygonMode xiMode) 
       : base(xiMode) 
     { 
       this.mOwner = xiOwner; 
     }
-    private object mOwner;
+
+    [System.Xml.Serialization.XmlIgnore()]
     public object Owner
     {
       get { return mOwner; }
       set { mOwner = value; }
     }
+    private object mOwner;
   }
 }

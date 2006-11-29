@@ -235,6 +235,102 @@ namespace MMEd.Viewers
 
     #endregion
 
+    #region Export flats to images
+
+    private string GetImageNameForFlat(string xiDirname, FlatChunk xiFlat)
+    {
+      string lName = string.Format("Flat-{0}-{1}.png", xiFlat.DeclaredIdx, xiFlat.DeclaredName);
+      lName.Replace('\\', '_');
+      lName.Replace('/', '_');
+      lName.Replace(':', '_');
+      lName.Replace('*', '_');
+      lName.Replace('?', '_');
+      lName.Replace('"', '_');
+      lName.Replace('<', '_');
+      lName.Replace('>', '_');
+      lName.Replace('|', '_');
+      return string.Format("{0}{1}{2}",
+        xiDirname,
+        Path.DirectorySeparatorChar,
+        lName);
+    }
+
+    void ActionsTabExportFlatImagesButton_Click(object sender, EventArgs e)
+    {
+      if (mSubject as Level != null)
+      {
+        Level lLevel = (Level)mSubject;
+        FolderBrowserDialog fbd = new FolderBrowserDialog();
+        fbd.SelectedPath = mMainForm.LocalSettings.LastFlatImagesDir;
+        if (fbd.ShowDialog(mMainForm) == DialogResult.OK)
+        {
+          string lExceptionWhen = "opening the directory";
+          try
+          {
+            foreach (FlatChunk lFlat in lLevel.SHET.Flats)
+            {
+              lExceptionWhen = string.Format("creating image for flat {0}", lFlat.DeclaredName);
+              TIMChunk lTopLeftTile = lLevel.GetTileById(lFlat.TextureIds[0][0]);
+              if (lTopLeftTile == null) throw new Exception("top left tile was null!");
+              int lTileWidth = lTopLeftTile.ImageWidth;
+              int lTileHeight = lTopLeftTile.ImageHeight;
+              if (lTileHeight != 64 || lTileWidth != 64) throw new Exception("Sorry, only 64x64 tiles are supported for this action.");
+              Bitmap lBmp = new Bitmap(lFlat.Width * lTileWidth, lFlat.Height * lTileHeight);
+              Graphics g = Graphics.FromImage(lBmp);
+              g.Clear(Color.Black);
+              for (int x = 0; x < lFlat.Width; x++)
+              {
+                for (int y = 0; y < lFlat.Height; y++)
+                {
+                  g.DrawImageUnscaled(
+                lLevel.GetTileById(lFlat.TextureIds[x][y]).ToBitmap(),
+                x * lTileWidth,
+                y * lTileHeight);
+                }
+              }
+
+              lExceptionWhen = string.Format("saving image for flat {0}", lFlat.DeclaredName);
+              using (FileStream fs = File.Create(GetImageNameForFlat(fbd.SelectedPath, lFlat)))
+              {
+                lBmp.Save(fs, System.Drawing.Imaging.ImageFormat.Png);
+              }
+            }
+          }
+          catch (Exception err)
+          {
+            MessageBox.Show(string.Format("Exception occurred while {0}: {1}", lExceptionWhen, err.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return;
+          }
+        }
+        mMainForm.LocalSettings.LastFlatImagesDir = fbd.SelectedPath;
+      }
+      else
+      {
+        MessageBox.Show("Error: mSubject is null!");
+      }
+    }
+
+    #endregion
+
+    #region Import flat textures from images 
+    
+    //this is going to be complex. Should be in its own class?
+
+    void ActionsTabImportFlatImagesButton_Click(object sender, EventArgs e)
+    {
+      if (mSubject as Level != null)
+      {
+        Level lLevel = (Level)mSubject;
+         MessageBox.Show("Sorry, not yet implemented");
+      }
+      else
+      {
+         MessageBox.Show("Error: mSubject is null!");
+      }
+    }
+
+    #endregion
+
     #region Import TIM Action 
 
     void ActionsTabImportTIMButton_Click(object sender, EventArgs e)
@@ -348,6 +444,8 @@ namespace MMEd.Viewers
       : base(xiMainForm) 
     {
       mMainForm.ActionsTabReindexBumpButton.Click += new EventHandler(ActionsTabReindexBumpButton_Click);
+      mMainForm.ActionsTabExportFlatImagesButton.Click += new EventHandler(ActionsTabExportFlatImagesButton_Click);
+      mMainForm.ActionsTabImportFlatImagesButton.Click += new EventHandler(ActionsTabImportFlatImagesButton_Click);
       mMainForm.ActionsTabCloneFlatButton.Click += new EventHandler(ActionsTabCloneFlatButton_Click);
       mMainForm.ActionsTabExportTIMButton.Click += new EventHandler(ActionsTabExportTIMButton_Click);
       mMainForm.ActionsTabImportTIMButton.Click += new EventHandler(ActionsTabImportTIMButton_Click);
@@ -385,6 +483,8 @@ namespace MMEd.Viewers
       if (mSubject == xiChunk) return;
       mSubject = xiChunk;
       mMainForm.ActionsTabReindexBumpButton.Enabled = (mSubject is Level);
+      mMainForm.ActionsTabExportFlatImagesButton.Enabled = (mSubject is Level);
+      mMainForm.ActionsTabImportFlatImagesButton.Enabled = (mSubject is Level);
       mMainForm.ActionsTabCloneFlatButton.Enabled = (mSubject is FlatChunk);
       mMainForm.ActionsTabImportTIMButton.Enabled = (mSubject is TIMChunk);
       mMainForm.ActionsTabExportTIMButton.Enabled = (mSubject is TIMChunk);

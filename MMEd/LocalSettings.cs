@@ -17,12 +17,15 @@ namespace MMEd
     public string LastSavedFile;
     public string LastTIMFile;
     public string LastTMDFile;
+    public string LastSavedSceneFile;
+    public string LastFlatImagesDir;
 
     #endregion
 
     #region Tiler local settings
 
     public string TilerLastOpenedImage;
+    public string TilerLastSaveTilesDir;
 
     #endregion
 

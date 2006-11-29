@@ -63,18 +63,13 @@ namespace MMEd
           this.XMLTextBox = new System.Windows.Forms.TextBox();
           this.ViewTabFlat = new System.Windows.Forms.TabPage();
           this.FlatViewerCommitBtn = new System.Windows.Forms.Button();
-          this.FlatPanel = new MMEd.Util.FlatEditorPanel();
           this.ViewTabImg = new System.Windows.Forms.TabPage();
           this.ImgPictureBox = new System.Windows.Forms.PictureBox();
           this.ViewTabGrid = new System.Windows.Forms.TabPage();
           this.GridViewSelImageGroupBox = new System.Windows.Forms.GroupBox();
-          this.GridViewSelPanelHolder = new MMEd.Util.SmoothScrollingPanel();
-          this.GridViewSelPanel = new System.Windows.Forms.Panel();
           this.statusStrip1 = new System.Windows.Forms.StatusStrip();
           this.GridViewerStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
           this.groupBox2 = new System.Windows.Forms.GroupBox();
-          this.smoothScrollingPanel1 = new MMEd.Util.SmoothScrollingPanel();
-          this.GridViewPalettePanel = new System.Windows.Forms.Panel();
           this.WorldCoordLabel = new System.Windows.Forms.Label();
           this.label4 = new System.Windows.Forms.Label();
           this.FlatCoordLabel = new System.Windows.Forms.Label();
@@ -83,18 +78,12 @@ namespace MMEd
           this.label2 = new System.Windows.Forms.Label();
           this.groupBox1 = new System.Windows.Forms.GroupBox();
           this.GridViewShowWaypointsCheck = new System.Windows.Forms.CheckBox();
-          this.OverlaySelectorRespawn = new MMEd.Util.OverlaySelector();
-          this.OverlaySelectorCamera = new MMEd.Util.OverlaySelector();
-          this.OverlaySelectorGrid = new MMEd.Util.OverlaySelector();
           this.GridViewShowObjectsCheck = new System.Windows.Forms.CheckBox();
           this.GridViewZoomSlider = new System.Windows.Forms.TrackBar();
           this.GridViewTransparencySlider = new System.Windows.Forms.TrackBar();
           this.GridViewViewModeCombo = new System.Windows.Forms.ComboBox();
           this.GridViewMetaTypeCombo = new System.Windows.Forms.ComboBox();
-          this.GridDisplayPanelHolder = new MMEd.Util.SmoothScrollingPanel();
-          this.GridDisplayPanel = new MMEd.Util.UserPaintDoubleBufferedPanel();
           this.ViewTab3D = new System.Windows.Forms.TabPage();
-          this.Viewer3DRenderingSurface = new GLTK.RenderingSurface();
           this.ViewTabBump = new System.Windows.Forms.TabPage();
           this.label18 = new System.Windows.Forms.Label();
           this.label17 = new System.Windows.Forms.Label();
@@ -116,7 +105,6 @@ namespace MMEd
           this.OddCombo = new System.Windows.Forms.ComboBox();
           this.OddEditPictureBox = new System.Windows.Forms.PictureBox();
           this.ViewTabCamera = new System.Windows.Forms.TabPage();
-          this.CameraRenderingSurface = new GLTK.RenderingSurface();
           this.PanelCameraImage = new System.Windows.Forms.Panel();
           this.SliderElevation = new System.Windows.Forms.TrackBar();
           this.TextElevation = new System.Windows.Forms.TextBox();
@@ -128,20 +116,36 @@ namespace MMEd
           this.TextDirection = new System.Windows.Forms.TextBox();
           this.label12 = new System.Windows.Forms.Label();
           this.ViewTabVRAM = new System.Windows.Forms.TabPage();
-          this.VRAMScrollPanel = new MMEd.Util.SmoothScrollingPanel();
-          this.VRAMPictureBox = new System.Windows.Forms.PictureBox();
           this.VRAMStatusStrip = new System.Windows.Forms.StatusStrip();
           this.ViewTab3dEditor = new System.Windows.Forms.TabPage();
           this.panel2 = new System.Windows.Forms.Panel();
           this.ThreeDeeEditorStatusLabel = new System.Windows.Forms.Label();
           this.LeftRightSplit = new System.Windows.Forms.SplitContainer();
           this.LeftHandSplit = new System.Windows.Forms.SplitContainer();
+          this.RightHandSplit = new System.Windows.Forms.SplitContainer();
+          this.ToolTip = new System.Windows.Forms.ToolTip(this.components);
+          this.ActionsTabExportFlatImagesButton = new System.Windows.Forms.Button();
+          this.label21 = new System.Windows.Forms.Label();
+          this.ActionsTabImportFlatImagesButton = new System.Windows.Forms.Button();
+          this.label22 = new System.Windows.Forms.Label();
+          this.FlatPanel = new MMEd.Util.FlatEditorPanel();
+          this.GridViewSelPanelHolder = new MMEd.Util.SmoothScrollingPanel();
+          this.GridViewSelPanel = new System.Windows.Forms.Panel();
+          this.smoothScrollingPanel1 = new MMEd.Util.SmoothScrollingPanel();
+          this.GridViewPalettePanel = new System.Windows.Forms.Panel();
+          this.OverlaySelectorRespawn = new MMEd.Util.OverlaySelector();
+          this.OverlaySelectorCamera = new MMEd.Util.OverlaySelector();
+          this.OverlaySelectorGrid = new MMEd.Util.OverlaySelector();
+          this.GridDisplayPanelHolder = new MMEd.Util.SmoothScrollingPanel();
+          this.GridDisplayPanel = new MMEd.Util.UserPaintDoubleBufferedPanel();
+          this.Viewer3DRenderingSurface = new GLTK.RenderingSurface();
+          this.CameraRenderingSurface = new GLTK.RenderingSurface();
+          this.VRAMScrollPanel = new MMEd.Util.SmoothScrollingPanel();
+          this.VRAMPictureBox = new System.Windows.Forms.PictureBox();
           this.Viewer3DRenderingSurfaceTopLeft = new GLTK.RenderingSurface();
           this.Viewer3DRenderingSurfaceBottomLeft = new GLTK.RenderingSurface();
-          this.RightHandSplit = new System.Windows.Forms.SplitContainer();
           this.Viewer3DRenderingSurfaceTopRight = new GLTK.RenderingSurface();
           this.Viewer3DRenderingSurfaceBottomRight = new GLTK.RenderingSurface();
-          this.ToolTip = new System.Windows.Forms.ToolTip(this.components);
           this.mMenuStrip.SuspendLayout();
           this.MainSplitter.Panel1.SuspendLayout();
           this.MainSplitter.Panel2.SuspendLayout();
@@ -158,14 +162,11 @@ namespace MMEd
           ((System.ComponentModel.ISupportInitialize)(this.ImgPictureBox)).BeginInit();
           this.ViewTabGrid.SuspendLayout();
           this.GridViewSelImageGroupBox.SuspendLayout();
-          this.GridViewSelPanelHolder.SuspendLayout();
           this.statusStrip1.SuspendLayout();
           this.groupBox2.SuspendLayout();
-          this.smoothScrollingPanel1.SuspendLayout();
           this.groupBox1.SuspendLayout();
           ((System.ComponentModel.ISupportInitialize)(this.GridViewZoomSlider)).BeginInit();
           ((System.ComponentModel.ISupportInitialize)(this.GridViewTransparencySlider)).BeginInit();
-          this.GridDisplayPanelHolder.SuspendLayout();
           this.ViewTab3D.SuspendLayout();
           this.ViewTabBump.SuspendLayout();
           ((System.ComponentModel.ISupportInitialize)(this.BumpViewPictureBox)).BeginInit();
@@ -178,8 +179,6 @@ namespace MMEd
           ((System.ComponentModel.ISupportInitialize)(this.SliderDistance)).BeginInit();
           ((System.ComponentModel.ISupportInitialize)(this.SliderDirection)).BeginInit();
           this.ViewTabVRAM.SuspendLayout();
-          this.VRAMScrollPanel.SuspendLayout();
-          ((System.ComponentModel.ISupportInitialize)(this.VRAMPictureBox)).BeginInit();
           this.ViewTab3dEditor.SuspendLayout();
           this.panel2.SuspendLayout();
           this.LeftRightSplit.Panel1.SuspendLayout();
@@ -191,6 +190,11 @@ namespace MMEd
           this.RightHandSplit.Panel1.SuspendLayout();
           this.RightHandSplit.Panel2.SuspendLayout();
           this.RightHandSplit.SuspendLayout();
+          this.GridViewSelPanelHolder.SuspendLayout();
+          this.smoothScrollingPanel1.SuspendLayout();
+          this.GridDisplayPanelHolder.SuspendLayout();
+          this.VRAMScrollPanel.SuspendLayout();
+          ((System.ComponentModel.ISupportInitialize)(this.VRAMPictureBox)).BeginInit();
           this.SuspendLayout();
           // 
           // mMenuStrip
@@ -344,7 +348,7 @@ namespace MMEd
           this.groupBox6.Controls.Add(this.label19);
           this.groupBox6.Controls.Add(this.ActionsTabImportTMDButton);
           this.groupBox6.Controls.Add(this.ActionsTabExportTMDButton);
-          this.groupBox6.Location = new System.Drawing.Point(1, 267);
+          this.groupBox6.Location = new System.Drawing.Point(1, 336);
           this.groupBox6.Name = "groupBox6";
           this.groupBox6.Size = new System.Drawing.Size(626, 83);
           this.groupBox6.TabIndex = 7;
@@ -393,7 +397,7 @@ namespace MMEd
           this.groupBox5.Controls.Add(this.label11);
           this.groupBox5.Controls.Add(this.ActionsTabExportTIMButton);
           this.groupBox5.Controls.Add(this.label10);
-          this.groupBox5.Location = new System.Drawing.Point(1, 146);
+          this.groupBox5.Location = new System.Drawing.Point(1, 219);
           this.groupBox5.Name = "groupBox5";
           this.groupBox5.Size = new System.Drawing.Size(627, 111);
           this.groupBox5.TabIndex = 6;
@@ -441,7 +445,7 @@ namespace MMEd
           // 
           this.groupBox4.Controls.Add(this.ActionsTabCloneFlatButton);
           this.groupBox4.Controls.Add(this.label9);
-          this.groupBox4.Location = new System.Drawing.Point(1, 85);
+          this.groupBox4.Location = new System.Drawing.Point(1, 158);
           this.groupBox4.Name = "groupBox4";
           this.groupBox4.Size = new System.Drawing.Size(627, 55);
           this.groupBox4.TabIndex = 5;
@@ -468,11 +472,15 @@ namespace MMEd
           // 
           // groupBox3
           // 
+          this.groupBox3.Controls.Add(this.ActionsTabImportFlatImagesButton);
+          this.groupBox3.Controls.Add(this.label22);
+          this.groupBox3.Controls.Add(this.ActionsTabExportFlatImagesButton);
+          this.groupBox3.Controls.Add(this.label21);
           this.groupBox3.Controls.Add(this.ActionsTabReindexBumpButton);
           this.groupBox3.Controls.Add(this.label1);
           this.groupBox3.Location = new System.Drawing.Point(1, 6);
           this.groupBox3.Name = "groupBox3";
-          this.groupBox3.Size = new System.Drawing.Size(627, 73);
+          this.groupBox3.Size = new System.Drawing.Size(627, 146);
           this.groupBox3.TabIndex = 4;
           this.groupBox3.TabStop = false;
           this.groupBox3.Text = "Level";
@@ -491,11 +499,10 @@ namespace MMEd
           this.label1.AutoSize = true;
           this.label1.Location = new System.Drawing.Point(157, 19);
           this.label1.Name = "label1";
-          this.label1.Size = new System.Drawing.Size(300, 39);
+          this.label1.Size = new System.Drawing.Size(300, 26);
           this.label1.TabIndex = 1;
           this.label1.Text = "Coalesce repeated bump map images, and update references \r\nto the removed bump im" +
-              "ages from any Flats which use them.\r\nPlease select the top node in the file tree" +
-              " before doing this.";
+              "ages from any Flats which use them.";
           // 
           // ViewTabXML
           // 
@@ -557,17 +564,6 @@ namespace MMEd
           this.FlatViewerCommitBtn.Text = "Commit";
           this.FlatViewerCommitBtn.UseVisualStyleBackColor = true;
           // 
-          // FlatPanel
-          // 
-          this.FlatPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                      | System.Windows.Forms.AnchorStyles.Left)
-                      | System.Windows.Forms.AnchorStyles.Right)));
-          this.FlatPanel.AutoScroll = true;
-          this.FlatPanel.Location = new System.Drawing.Point(0, 0);
-          this.FlatPanel.Name = "FlatPanel";
-          this.FlatPanel.Size = new System.Drawing.Size(637, 471);
-          this.FlatPanel.TabIndex = 0;
-          // 
           // ViewTabImg
           // 
           this.ViewTabImg.Controls.Add(this.ImgPictureBox);
@@ -618,25 +614,6 @@ namespace MMEd
           this.GridViewSelImageGroupBox.TabStop = false;
           this.GridViewSelImageGroupBox.Text = "Selected Images";
           // 
-          // GridViewSelPanelHolder
-          // 
-          this.GridViewSelPanelHolder.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                      | System.Windows.Forms.AnchorStyles.Left)
-                      | System.Windows.Forms.AnchorStyles.Right)));
-          this.GridViewSelPanelHolder.AutoScroll = true;
-          this.GridViewSelPanelHolder.Controls.Add(this.GridViewSelPanel);
-          this.GridViewSelPanelHolder.Location = new System.Drawing.Point(6, 19);
-          this.GridViewSelPanelHolder.Name = "GridViewSelPanelHolder";
-          this.GridViewSelPanelHolder.Size = new System.Drawing.Size(121, 87);
-          this.GridViewSelPanelHolder.TabIndex = 0;
-          // 
-          // GridViewSelPanel
-          // 
-          this.GridViewSelPanel.Location = new System.Drawing.Point(0, 0);
-          this.GridViewSelPanel.Name = "GridViewSelPanel";
-          this.GridViewSelPanel.Size = new System.Drawing.Size(90, 68);
-          this.GridViewSelPanel.TabIndex = 0;
-          // 
           // statusStrip1
           // 
           this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -670,25 +647,6 @@ namespace MMEd
           this.groupBox2.TabIndex = 2;
           this.groupBox2.TabStop = false;
           this.groupBox2.Text = "Image Palette";
-          // 
-          // smoothScrollingPanel1
-          // 
-          this.smoothScrollingPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                      | System.Windows.Forms.AnchorStyles.Left)
-                      | System.Windows.Forms.AnchorStyles.Right)));
-          this.smoothScrollingPanel1.AutoScroll = true;
-          this.smoothScrollingPanel1.Controls.Add(this.GridViewPalettePanel);
-          this.smoothScrollingPanel1.Location = new System.Drawing.Point(3, 19);
-          this.smoothScrollingPanel1.Name = "smoothScrollingPanel1";
-          this.smoothScrollingPanel1.Size = new System.Drawing.Size(627, 105);
-          this.smoothScrollingPanel1.TabIndex = 6;
-          // 
-          // GridViewPalettePanel
-          // 
-          this.GridViewPalettePanel.Location = new System.Drawing.Point(0, 0);
-          this.GridViewPalettePanel.Name = "GridViewPalettePanel";
-          this.GridViewPalettePanel.Size = new System.Drawing.Size(232, 59);
-          this.GridViewPalettePanel.TabIndex = 0;
           // 
           // WorldCoordLabel
           // 
@@ -773,39 +731,6 @@ namespace MMEd
           this.GridViewShowWaypointsCheck.Text = "Show waypoints";
           this.GridViewShowWaypointsCheck.UseVisualStyleBackColor = true;
           // 
-          // OverlaySelectorRespawn
-          // 
-          this.OverlaySelectorRespawn.Checked = false;
-          this.OverlaySelectorRespawn.CurrentColor = System.Drawing.Color.Transparent;
-          this.OverlaySelectorRespawn.DefaultColor = System.Drawing.Color.Red;
-          this.OverlaySelectorRespawn.Label = "Respawn";
-          this.OverlaySelectorRespawn.Location = new System.Drawing.Point(6, 216);
-          this.OverlaySelectorRespawn.Name = "OverlaySelectorRespawn";
-          this.OverlaySelectorRespawn.Size = new System.Drawing.Size(121, 20);
-          this.OverlaySelectorRespawn.TabIndex = 12;
-          // 
-          // OverlaySelectorCamera
-          // 
-          this.OverlaySelectorCamera.Checked = false;
-          this.OverlaySelectorCamera.CurrentColor = System.Drawing.Color.Transparent;
-          this.OverlaySelectorCamera.DefaultColor = System.Drawing.Color.White;
-          this.OverlaySelectorCamera.Label = "Camera";
-          this.OverlaySelectorCamera.Location = new System.Drawing.Point(6, 198);
-          this.OverlaySelectorCamera.Name = "OverlaySelectorCamera";
-          this.OverlaySelectorCamera.Size = new System.Drawing.Size(121, 20);
-          this.OverlaySelectorCamera.TabIndex = 11;
-          // 
-          // OverlaySelectorGrid
-          // 
-          this.OverlaySelectorGrid.Checked = false;
-          this.OverlaySelectorGrid.CurrentColor = System.Drawing.Color.Transparent;
-          this.OverlaySelectorGrid.DefaultColor = System.Drawing.Color.Gray;
-          this.OverlaySelectorGrid.Label = "Grid";
-          this.OverlaySelectorGrid.Location = new System.Drawing.Point(6, 180);
-          this.OverlaySelectorGrid.Name = "OverlaySelectorGrid";
-          this.OverlaySelectorGrid.Size = new System.Drawing.Size(121, 20);
-          this.OverlaySelectorGrid.TabIndex = 10;
-          // 
           // GridViewShowObjectsCheck
           // 
           this.GridViewShowObjectsCheck.AutoSize = true;
@@ -855,25 +780,6 @@ namespace MMEd
           this.ToolTip.SetToolTip(this.GridViewMetaTypeCombo, "Change the selected meta type, for use when viewing \"odd\" images or changing nume" +
                   "ric meta data");
           // 
-          // GridDisplayPanelHolder
-          // 
-          this.GridDisplayPanelHolder.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                      | System.Windows.Forms.AnchorStyles.Left)
-                      | System.Windows.Forms.AnchorStyles.Right)));
-          this.GridDisplayPanelHolder.AutoScroll = true;
-          this.GridDisplayPanelHolder.Controls.Add(this.GridDisplayPanel);
-          this.GridDisplayPanelHolder.Location = new System.Drawing.Point(6, 6);
-          this.GridDisplayPanelHolder.Name = "GridDisplayPanelHolder";
-          this.GridDisplayPanelHolder.Size = new System.Drawing.Size(492, 364);
-          this.GridDisplayPanelHolder.TabIndex = 1;
-          // 
-          // GridDisplayPanel
-          // 
-          this.GridDisplayPanel.Location = new System.Drawing.Point(0, 0);
-          this.GridDisplayPanel.Name = "GridDisplayPanel";
-          this.GridDisplayPanel.Size = new System.Drawing.Size(200, 192);
-          this.GridDisplayPanel.TabIndex = 1;
-          // 
           // ViewTab3D
           // 
           this.ViewTab3D.Controls.Add(this.Viewer3DRenderingSurface);
@@ -884,17 +790,6 @@ namespace MMEd
           this.ViewTab3D.TabIndex = 4;
           this.ViewTab3D.Text = "3D";
           this.ViewTab3D.UseVisualStyleBackColor = true;
-          // 
-          // Viewer3DRenderingSurface
-          // 
-          this.Viewer3DRenderingSurface.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                      | System.Windows.Forms.AnchorStyles.Left)
-                      | System.Windows.Forms.AnchorStyles.Right)));
-          this.Viewer3DRenderingSurface.Location = new System.Drawing.Point(-4, 0);
-          this.Viewer3DRenderingSurface.Name = "Viewer3DRenderingSurface";
-          this.Viewer3DRenderingSurface.Size = new System.Drawing.Size(640, 512);
-          this.Viewer3DRenderingSurface.TabIndex = 0;
-          this.Viewer3DRenderingSurface.Text = "renderingSurface1";
           // 
           // ViewTabBump
           // 
@@ -1133,14 +1028,6 @@ namespace MMEd
           this.ViewTabCamera.Text = "Camera";
           this.ViewTabCamera.UseVisualStyleBackColor = true;
           // 
-          // CameraRenderingSurface
-          // 
-          this.CameraRenderingSurface.Location = new System.Drawing.Point(6, 181);
-          this.CameraRenderingSurface.Name = "CameraRenderingSurface";
-          this.CameraRenderingSurface.Size = new System.Drawing.Size(446, 300);
-          this.CameraRenderingSurface.TabIndex = 13;
-          this.CameraRenderingSurface.Text = "renderingSurface1";
-          // 
           // PanelCameraImage
           // 
           this.PanelCameraImage.Location = new System.Drawing.Point(324, 19);
@@ -1234,29 +1121,6 @@ namespace MMEd
           this.ViewTabVRAM.TabIndex = 6;
           this.ViewTabVRAM.Text = "VRAM";
           // 
-          // VRAMScrollPanel
-          // 
-          this.VRAMScrollPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                      | System.Windows.Forms.AnchorStyles.Left)
-                      | System.Windows.Forms.AnchorStyles.Right)));
-          this.VRAMScrollPanel.AutoScroll = true;
-          this.VRAMScrollPanel.Controls.Add(this.VRAMPictureBox);
-          this.VRAMScrollPanel.Location = new System.Drawing.Point(0, 0);
-          this.VRAMScrollPanel.Name = "VRAMScrollPanel";
-          this.VRAMScrollPanel.Size = new System.Drawing.Size(637, 510);
-          this.VRAMScrollPanel.TabIndex = 2;
-          // 
-          // VRAMPictureBox
-          // 
-          this.VRAMPictureBox.BackColor = System.Drawing.Color.White;
-          this.VRAMPictureBox.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-          this.VRAMPictureBox.Location = new System.Drawing.Point(0, 0);
-          this.VRAMPictureBox.Name = "VRAMPictureBox";
-          this.VRAMPictureBox.Size = new System.Drawing.Size(304, 254);
-          this.VRAMPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-          this.VRAMPictureBox.TabIndex = 1;
-          this.VRAMPictureBox.TabStop = false;
-          // 
           // VRAMStatusStrip
           // 
           this.VRAMStatusStrip.Location = new System.Drawing.Point(0, 513);
@@ -1332,24 +1196,6 @@ namespace MMEd
           this.LeftHandSplit.SplitterDistance = 221;
           this.LeftHandSplit.TabIndex = 0;
           // 
-          // Viewer3DRenderingSurfaceTopLeft
-          // 
-          this.Viewer3DRenderingSurfaceTopLeft.Dock = System.Windows.Forms.DockStyle.Fill;
-          this.Viewer3DRenderingSurfaceTopLeft.Location = new System.Drawing.Point(0, 0);
-          this.Viewer3DRenderingSurfaceTopLeft.Name = "Viewer3DRenderingSurfaceTopLeft";
-          this.Viewer3DRenderingSurfaceTopLeft.Size = new System.Drawing.Size(276, 221);
-          this.Viewer3DRenderingSurfaceTopLeft.TabIndex = 0;
-          this.Viewer3DRenderingSurfaceTopLeft.Text = "renderingSurface1";
-          // 
-          // Viewer3DRenderingSurfaceBottomLeft
-          // 
-          this.Viewer3DRenderingSurfaceBottomLeft.Dock = System.Windows.Forms.DockStyle.Fill;
-          this.Viewer3DRenderingSurfaceBottomLeft.Location = new System.Drawing.Point(0, 0);
-          this.Viewer3DRenderingSurfaceBottomLeft.Name = "Viewer3DRenderingSurfaceBottomLeft";
-          this.Viewer3DRenderingSurfaceBottomLeft.Size = new System.Drawing.Size(276, 268);
-          this.Viewer3DRenderingSurfaceBottomLeft.TabIndex = 0;
-          this.Viewer3DRenderingSurfaceBottomLeft.Text = "renderingSurface3";
-          // 
           // RightHandSplit
           // 
           this.RightHandSplit.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -1367,6 +1213,205 @@ namespace MMEd
           this.RightHandSplit.Size = new System.Drawing.Size(350, 493);
           this.RightHandSplit.SplitterDistance = 223;
           this.RightHandSplit.TabIndex = 0;
+          // 
+          // ActionsTabExportFlatImagesButton
+          // 
+          this.ActionsTabExportFlatImagesButton.Location = new System.Drawing.Point(9, 58);
+          this.ActionsTabExportFlatImagesButton.Name = "ActionsTabExportFlatImagesButton";
+          this.ActionsTabExportFlatImagesButton.Size = new System.Drawing.Size(142, 23);
+          this.ActionsTabExportFlatImagesButton.TabIndex = 2;
+          this.ActionsTabExportFlatImagesButton.Text = "Export flats to images";
+          this.ActionsTabExportFlatImagesButton.UseVisualStyleBackColor = true;
+          // 
+          // label21
+          // 
+          this.label21.AutoSize = true;
+          this.label21.Location = new System.Drawing.Point(157, 58);
+          this.label21.Name = "label21";
+          this.label21.Size = new System.Drawing.Size(304, 26);
+          this.label21.TabIndex = 3;
+          this.label21.Text = "Choose a directory to save images of the textures of all the flats\r\nin the level";
+          // 
+          // ActionsTabImportFlatImagesButton
+          // 
+          this.ActionsTabImportFlatImagesButton.Location = new System.Drawing.Point(9, 96);
+          this.ActionsTabImportFlatImagesButton.Name = "ActionsTabImportFlatImagesButton";
+          this.ActionsTabImportFlatImagesButton.Size = new System.Drawing.Size(142, 23);
+          this.ActionsTabImportFlatImagesButton.TabIndex = 4;
+          this.ActionsTabImportFlatImagesButton.Text = "Import flats from images";
+          this.ActionsTabImportFlatImagesButton.UseVisualStyleBackColor = true;
+          // 
+          // label22
+          // 
+          this.label22.AutoSize = true;
+          this.label22.Location = new System.Drawing.Point(157, 96);
+          this.label22.Name = "label22";
+          this.label22.Size = new System.Drawing.Size(333, 39);
+          this.label22.TabIndex = 5;
+          this.label22.Text = "Looks in the given directory for images of the the flats in the\r\nlevel, then atte" +
+              "mpts to retexture the flats accordingly.\r\nAny flats which do not have correspond" +
+              "ing images will be unchanged";
+          // 
+          // FlatPanel
+          // 
+          this.FlatPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                      | System.Windows.Forms.AnchorStyles.Left)
+                      | System.Windows.Forms.AnchorStyles.Right)));
+          this.FlatPanel.AutoScroll = true;
+          this.FlatPanel.Location = new System.Drawing.Point(0, 0);
+          this.FlatPanel.Name = "FlatPanel";
+          this.FlatPanel.Size = new System.Drawing.Size(637, 471);
+          this.FlatPanel.TabIndex = 0;
+          // 
+          // GridViewSelPanelHolder
+          // 
+          this.GridViewSelPanelHolder.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                      | System.Windows.Forms.AnchorStyles.Left)
+                      | System.Windows.Forms.AnchorStyles.Right)));
+          this.GridViewSelPanelHolder.AutoScroll = true;
+          this.GridViewSelPanelHolder.Controls.Add(this.GridViewSelPanel);
+          this.GridViewSelPanelHolder.Location = new System.Drawing.Point(6, 19);
+          this.GridViewSelPanelHolder.Name = "GridViewSelPanelHolder";
+          this.GridViewSelPanelHolder.Size = new System.Drawing.Size(121, 87);
+          this.GridViewSelPanelHolder.TabIndex = 0;
+          // 
+          // GridViewSelPanel
+          // 
+          this.GridViewSelPanel.Location = new System.Drawing.Point(0, 0);
+          this.GridViewSelPanel.Name = "GridViewSelPanel";
+          this.GridViewSelPanel.Size = new System.Drawing.Size(90, 68);
+          this.GridViewSelPanel.TabIndex = 0;
+          // 
+          // smoothScrollingPanel1
+          // 
+          this.smoothScrollingPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                      | System.Windows.Forms.AnchorStyles.Left)
+                      | System.Windows.Forms.AnchorStyles.Right)));
+          this.smoothScrollingPanel1.AutoScroll = true;
+          this.smoothScrollingPanel1.Controls.Add(this.GridViewPalettePanel);
+          this.smoothScrollingPanel1.Location = new System.Drawing.Point(3, 19);
+          this.smoothScrollingPanel1.Name = "smoothScrollingPanel1";
+          this.smoothScrollingPanel1.Size = new System.Drawing.Size(627, 105);
+          this.smoothScrollingPanel1.TabIndex = 6;
+          // 
+          // GridViewPalettePanel
+          // 
+          this.GridViewPalettePanel.Location = new System.Drawing.Point(0, 0);
+          this.GridViewPalettePanel.Name = "GridViewPalettePanel";
+          this.GridViewPalettePanel.Size = new System.Drawing.Size(232, 59);
+          this.GridViewPalettePanel.TabIndex = 0;
+          // 
+          // OverlaySelectorRespawn
+          // 
+          this.OverlaySelectorRespawn.Checked = false;
+          this.OverlaySelectorRespawn.CurrentColor = System.Drawing.Color.Transparent;
+          this.OverlaySelectorRespawn.DefaultColor = System.Drawing.Color.Red;
+          this.OverlaySelectorRespawn.Label = "Respawn";
+          this.OverlaySelectorRespawn.Location = new System.Drawing.Point(6, 216);
+          this.OverlaySelectorRespawn.Name = "OverlaySelectorRespawn";
+          this.OverlaySelectorRespawn.Size = new System.Drawing.Size(121, 20);
+          this.OverlaySelectorRespawn.TabIndex = 12;
+          // 
+          // OverlaySelectorCamera
+          // 
+          this.OverlaySelectorCamera.Checked = false;
+          this.OverlaySelectorCamera.CurrentColor = System.Drawing.Color.Transparent;
+          this.OverlaySelectorCamera.DefaultColor = System.Drawing.Color.White;
+          this.OverlaySelectorCamera.Label = "Camera";
+          this.OverlaySelectorCamera.Location = new System.Drawing.Point(6, 198);
+          this.OverlaySelectorCamera.Name = "OverlaySelectorCamera";
+          this.OverlaySelectorCamera.Size = new System.Drawing.Size(121, 20);
+          this.OverlaySelectorCamera.TabIndex = 11;
+          // 
+          // OverlaySelectorGrid
+          // 
+          this.OverlaySelectorGrid.Checked = false;
+          this.OverlaySelectorGrid.CurrentColor = System.Drawing.Color.Transparent;
+          this.OverlaySelectorGrid.DefaultColor = System.Drawing.Color.Gray;
+          this.OverlaySelectorGrid.Label = "Grid";
+          this.OverlaySelectorGrid.Location = new System.Drawing.Point(6, 180);
+          this.OverlaySelectorGrid.Name = "OverlaySelectorGrid";
+          this.OverlaySelectorGrid.Size = new System.Drawing.Size(121, 20);
+          this.OverlaySelectorGrid.TabIndex = 10;
+          // 
+          // GridDisplayPanelHolder
+          // 
+          this.GridDisplayPanelHolder.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                      | System.Windows.Forms.AnchorStyles.Left)
+                      | System.Windows.Forms.AnchorStyles.Right)));
+          this.GridDisplayPanelHolder.AutoScroll = true;
+          this.GridDisplayPanelHolder.Controls.Add(this.GridDisplayPanel);
+          this.GridDisplayPanelHolder.Location = new System.Drawing.Point(6, 6);
+          this.GridDisplayPanelHolder.Name = "GridDisplayPanelHolder";
+          this.GridDisplayPanelHolder.Size = new System.Drawing.Size(492, 364);
+          this.GridDisplayPanelHolder.TabIndex = 1;
+          // 
+          // GridDisplayPanel
+          // 
+          this.GridDisplayPanel.Location = new System.Drawing.Point(0, 0);
+          this.GridDisplayPanel.Name = "GridDisplayPanel";
+          this.GridDisplayPanel.Size = new System.Drawing.Size(200, 192);
+          this.GridDisplayPanel.TabIndex = 1;
+          // 
+          // Viewer3DRenderingSurface
+          // 
+          this.Viewer3DRenderingSurface.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                      | System.Windows.Forms.AnchorStyles.Left)
+                      | System.Windows.Forms.AnchorStyles.Right)));
+          this.Viewer3DRenderingSurface.Location = new System.Drawing.Point(-4, 0);
+          this.Viewer3DRenderingSurface.Name = "Viewer3DRenderingSurface";
+          this.Viewer3DRenderingSurface.Size = new System.Drawing.Size(640, 512);
+          this.Viewer3DRenderingSurface.TabIndex = 0;
+          this.Viewer3DRenderingSurface.Text = "renderingSurface1";
+          // 
+          // CameraRenderingSurface
+          // 
+          this.CameraRenderingSurface.Location = new System.Drawing.Point(6, 181);
+          this.CameraRenderingSurface.Name = "CameraRenderingSurface";
+          this.CameraRenderingSurface.Size = new System.Drawing.Size(446, 300);
+          this.CameraRenderingSurface.TabIndex = 13;
+          this.CameraRenderingSurface.Text = "renderingSurface1";
+          // 
+          // VRAMScrollPanel
+          // 
+          this.VRAMScrollPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                      | System.Windows.Forms.AnchorStyles.Left)
+                      | System.Windows.Forms.AnchorStyles.Right)));
+          this.VRAMScrollPanel.AutoScroll = true;
+          this.VRAMScrollPanel.Controls.Add(this.VRAMPictureBox);
+          this.VRAMScrollPanel.Location = new System.Drawing.Point(0, 0);
+          this.VRAMScrollPanel.Name = "VRAMScrollPanel";
+          this.VRAMScrollPanel.Size = new System.Drawing.Size(637, 510);
+          this.VRAMScrollPanel.TabIndex = 2;
+          // 
+          // VRAMPictureBox
+          // 
+          this.VRAMPictureBox.BackColor = System.Drawing.Color.White;
+          this.VRAMPictureBox.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+          this.VRAMPictureBox.Location = new System.Drawing.Point(0, 0);
+          this.VRAMPictureBox.Name = "VRAMPictureBox";
+          this.VRAMPictureBox.Size = new System.Drawing.Size(304, 254);
+          this.VRAMPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+          this.VRAMPictureBox.TabIndex = 1;
+          this.VRAMPictureBox.TabStop = false;
+          // 
+          // Viewer3DRenderingSurfaceTopLeft
+          // 
+          this.Viewer3DRenderingSurfaceTopLeft.Dock = System.Windows.Forms.DockStyle.Fill;
+          this.Viewer3DRenderingSurfaceTopLeft.Location = new System.Drawing.Point(0, 0);
+          this.Viewer3DRenderingSurfaceTopLeft.Name = "Viewer3DRenderingSurfaceTopLeft";
+          this.Viewer3DRenderingSurfaceTopLeft.Size = new System.Drawing.Size(276, 221);
+          this.Viewer3DRenderingSurfaceTopLeft.TabIndex = 0;
+          this.Viewer3DRenderingSurfaceTopLeft.Text = "renderingSurface1";
+          // 
+          // Viewer3DRenderingSurfaceBottomLeft
+          // 
+          this.Viewer3DRenderingSurfaceBottomLeft.Dock = System.Windows.Forms.DockStyle.Fill;
+          this.Viewer3DRenderingSurfaceBottomLeft.Location = new System.Drawing.Point(0, 0);
+          this.Viewer3DRenderingSurfaceBottomLeft.Name = "Viewer3DRenderingSurfaceBottomLeft";
+          this.Viewer3DRenderingSurfaceBottomLeft.Size = new System.Drawing.Size(276, 268);
+          this.Viewer3DRenderingSurfaceBottomLeft.TabIndex = 0;
+          this.Viewer3DRenderingSurfaceBottomLeft.Text = "renderingSurface3";
           // 
           // Viewer3DRenderingSurfaceTopRight
           // 
@@ -1420,17 +1465,14 @@ namespace MMEd
           this.ViewTabGrid.ResumeLayout(false);
           this.ViewTabGrid.PerformLayout();
           this.GridViewSelImageGroupBox.ResumeLayout(false);
-          this.GridViewSelPanelHolder.ResumeLayout(false);
           this.statusStrip1.ResumeLayout(false);
           this.statusStrip1.PerformLayout();
           this.groupBox2.ResumeLayout(false);
           this.groupBox2.PerformLayout();
-          this.smoothScrollingPanel1.ResumeLayout(false);
           this.groupBox1.ResumeLayout(false);
           this.groupBox1.PerformLayout();
           ((System.ComponentModel.ISupportInitialize)(this.GridViewZoomSlider)).EndInit();
           ((System.ComponentModel.ISupportInitialize)(this.GridViewTransparencySlider)).EndInit();
-          this.GridDisplayPanelHolder.ResumeLayout(false);
           this.ViewTab3D.ResumeLayout(false);
           this.ViewTabBump.ResumeLayout(false);
           this.ViewTabBump.PerformLayout();
@@ -1447,9 +1489,6 @@ namespace MMEd
           ((System.ComponentModel.ISupportInitialize)(this.SliderDirection)).EndInit();
           this.ViewTabVRAM.ResumeLayout(false);
           this.ViewTabVRAM.PerformLayout();
-          this.VRAMScrollPanel.ResumeLayout(false);
-          this.VRAMScrollPanel.PerformLayout();
-          ((System.ComponentModel.ISupportInitialize)(this.VRAMPictureBox)).EndInit();
           this.ViewTab3dEditor.ResumeLayout(false);
           this.panel2.ResumeLayout(false);
           this.panel2.PerformLayout();
@@ -1462,6 +1501,12 @@ namespace MMEd
           this.RightHandSplit.Panel1.ResumeLayout(false);
           this.RightHandSplit.Panel2.ResumeLayout(false);
           this.RightHandSplit.ResumeLayout(false);
+          this.GridViewSelPanelHolder.ResumeLayout(false);
+          this.smoothScrollingPanel1.ResumeLayout(false);
+          this.GridDisplayPanelHolder.ResumeLayout(false);
+          this.VRAMScrollPanel.ResumeLayout(false);
+          this.VRAMScrollPanel.PerformLayout();
+          ((System.ComponentModel.ISupportInitialize)(this.VRAMPictureBox)).EndInit();
           this.ResumeLayout(false);
           this.PerformLayout();
 
@@ -1581,6 +1626,10 @@ namespace MMEd
       public System.Windows.Forms.CheckBox GridViewShowWaypointsCheck;
       public GLTK.RenderingSurface CameraRenderingSurface;
       private MMEd.Util.SmoothScrollingPanel VRAMScrollPanel;
+      public System.Windows.Forms.Button ActionsTabImportFlatImagesButton;
+      private System.Windows.Forms.Label label22;
+      public System.Windows.Forms.Button ActionsTabExportFlatImagesButton;
+      private System.Windows.Forms.Label label21;
     }
 }
 

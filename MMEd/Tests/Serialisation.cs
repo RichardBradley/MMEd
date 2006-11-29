@@ -125,7 +125,11 @@ namespace MMEd.Tests
     [Test]
     public void TestSerialisationCHOOSE()
     {
-      TestBinaryUnkSerialisationIsInvertible(@"E:\MMs\mm3\public_html\MMs\FRONTEND\CHOOSE.DAT");
+      //N.B. This test only really works if you're rtb
+      string file = System.Environment.GetEnvironmentVariable("USERDOMAIN") == "ZOO"
+        ? @"E:\MMs\mm3\public_html\MMs\FRONTEND\CHOOSE.DAT"
+        : @"D:\mm3\binextract\MMV3\FRONTEND\CHOOSE.DAT";
+      TestBinaryUnkSerialisationIsInvertible(file);
     }
 
     // There must be a way to dynamically generate tests for NUnit...

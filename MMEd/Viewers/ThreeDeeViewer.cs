@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using MMEd;
@@ -6,6 +7,7 @@ using MMEd.Chunks;
 using MMEd.Util;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 using GLTK;
 using MMEd.Viewers.ThreeDee;
 
@@ -15,6 +17,7 @@ namespace MMEd.Viewers
   public class ThreeDeeViewer : Viewer
   {
     private double MOVE_SCALE = 100;
+    private const bool DEBUG_ALLOW_LOAD_SAVE_SCENE = true;
 
     private ThreeDeeViewer(MainForm xiMainForm)
       : base(xiMainForm)
@@ -61,8 +64,23 @@ namespace MMEd.Viewers
       mOptionsMenu.DropDownItems.Add(new ToolStripSeparator());
       //
       mOptionsMenu.DropDownItems.Add(new ToolStripMenuItem("Hide all Flats without FlgD", null, new EventHandler(this.HideAllFlatsWithoutFlgDClicked)));
+      //
+      if (DEBUG_ALLOW_LOAD_SAVE_SCENE)
+      {
+        mOptionsMenu.DropDownItems.Add(new ToolStripSeparator());
+        mOptionsMenu.DropDownItems.Add(new ToolStripMenuItem(
+          "Save scene to XML...",
+          null,
+          new EventHandler(this.SaveSceneToXML)));
+        mOptionsMenu.DropDownItems.Add(new ToolStripMenuItem(
+          "Load scene from XML...",
+          null,
+          new EventHandler(this.LoadSceneFromXML)));
+      }
+      //
       mMainForm.mMenuStrip.Items.Add(mOptionsMenu);
     }
+
     Light mLight;
     void ChunkTreeView_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
     {
@@ -488,5 +506,173 @@ namespace MMEd.Viewers
 
       InvalidateViewer();
     }
+
+    #region scene saving and loading
+
+    private void LoadSceneFromXML(object sender, EventArgs e)
+    {
+      OpenFileDialog ofd = new OpenFileDialog();
+      ofd.FileName = mMainForm.LocalSettings.LastSavedSceneFile;
+      DialogResult res = ofd.ShowDialog(mMainForm);
+      if (res == DialogResult.OK)
+      {
+        string lExceptionWhen = "";
+        try
+        {
+          SceneHolder sh;
+          lExceptionWhen = "opening file";
+          using (FileStream fs = File.OpenRead(ofd.FileName))
+          {
+            lExceptionWhen = "deserialising the scene";
+            XmlSerializer xs = new XmlSerializer(typeof(SceneHolder));
+            sh = (SceneHolder) xs.Deserialize(fs);
+          }
+          lExceptionWhen = "fixing texture ids";
+          Dictionary<int, int> lSavedTexIdsToLiveTexIds = new Dictionary<int, int>();
+          foreach (TextureHolder th in sh.Textures)
+          {
+            if (th.Bitmap != null)
+            {
+              lSavedTexIdsToLiveTexIds[th.ID] = AbstractRenderer.ImageToTextureId(th.Bitmap);
+            }
+            else
+            {
+              lSavedTexIdsToLiveTexIds[th.ID] = 0;
+            }
+          }
+          foreach (Entity ent in sh.Entities)
+          {
+            foreach (Mesh m in ent.Meshes)
+            {
+              if (m.RenderMode == RenderMode.Textured)
+              {
+                m.Texture = lSavedTexIdsToLiveTexIds[m.Texture];
+              }
+            }
+          }
+          mScene.Objects.Clear();
+          mScene.Objects.AddRange(sh.Entities);
+          InvalidateViewer();
+        }
+        catch (Exception err)
+        {
+          System.Diagnostics.Trace.WriteLine(err);
+          MessageBox.Show(string.Format("Exception occurred while {0}: {1}", lExceptionWhen, err.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+          return;
+        }
+      }
+      mMainForm.LocalSettings.LastSavedSceneFile = ofd.FileName;
+    }
+
+    private void SaveSceneToXML(object sender, EventArgs e)
+    {
+      SaveFileDialog sfd = new SaveFileDialog();
+      sfd.FileName = mMainForm.LocalSettings.LastSavedSceneFile;
+      DialogResult res = sfd.ShowDialog(mMainForm);
+      if (res == DialogResult.OK)
+      {
+        string lExceptionWhen = "";
+        try
+        {
+          lExceptionWhen = "creating the scene holder";
+          SceneHolder sh = new SceneHolder(mScene);
+          
+          lExceptionWhen = "opening file";
+          using (FileStream fs = File.Create(sfd.FileName))
+          {
+            lExceptionWhen = "serialising the scene";
+            XmlSerializer xs = new XmlSerializer(typeof(SceneHolder));
+            xs.Serialize(fs, sh);
+          }
+        }
+        catch (Exception err)
+        {
+          System.Diagnostics.Trace.WriteLine(err);
+          MessageBox.Show(string.Format("Exception occurred while {0}: {1}", lExceptionWhen, err.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+          return;
+        }
+      }
+      mMainForm.LocalSettings.LastSavedSceneFile = sfd.FileName;
+    }
+
+    [XmlInclude(typeof(MMEdEntity)), XmlInclude(typeof(OwnedMesh))]
+    public class SceneHolder
+    {
+      public SceneHolder() { }
+
+      public SceneHolder(Scene xiScene)
+      {
+        Entities = new List<Entity>();
+        Entities.AddRange(xiScene.Entities);
+
+        Textures = new List<TextureHolder>();
+        Dictionary<int,bool> lTextureIdsSeen = new Dictionary<int,bool>();
+        foreach (Entity e in Entities)
+        {
+          foreach (Mesh m in e.Meshes)
+          {
+            if (m.RenderMode == RenderMode.Textured)
+            {
+              if (!lTextureIdsSeen.ContainsKey(m.Texture))
+              {
+                lTextureIdsSeen[m.Texture] = true;
+                Textures.Add(new TextureHolder(
+                  m.Texture, 
+                  AbstractRenderer.TextureIdToImage(m.Texture)));
+              }
+            }
+          }
+        }
+      }
+
+      public List<Entity> Entities;
+
+      public List<TextureHolder> Textures;
+    }
+
+    public class TextureHolder
+    {
+      public TextureHolder() { }
+
+      public TextureHolder(int xiId, Bitmap xiBitmap)
+      {
+        ID = xiId;
+        mBitmap = xiBitmap;
+      }
+
+      public int ID;
+
+      public Bitmap Bitmap
+      {
+        get 
+        {
+          if (mBitmap == null && mBitmapData != null)
+          {
+            mBitmap = new Bitmap(new MemoryStream(mBitmapData));
+          }
+          return mBitmap;
+        }
+      }
+
+      public byte[] BitmapData
+      {
+        get
+        {
+          if (mBitmapData == null && Bitmap != null)
+          {
+            MemoryStream ms = new MemoryStream();
+            Bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+            mBitmapData = ms.ToArray();
+          }
+          return mBitmapData;
+        }
+        set { mBitmapData = value; }
+      }
+
+      private Bitmap mBitmap;
+      private byte[] mBitmapData;
+    }
+
+    #endregion
   }
 }

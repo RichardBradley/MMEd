@@ -308,7 +308,7 @@ namespace MMEd.Chunks
         {
           //I seem to get a fair number of GDI+ exceptions from the
           //unmanaged call. Don't really know why.
-          Console.Error.WriteLine(e);
+          //qq Console.Error.WriteLine(e);
           switch (BPP)
           {
             case TimBPP._4BPP:

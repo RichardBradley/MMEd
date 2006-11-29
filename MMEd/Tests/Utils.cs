@@ -82,5 +82,31 @@ namespace MMEd.Tests
             bComp.Compare(ba, bb));
         }
     }
+
+    [Test]
+    public void TestEquivalenceCollection()
+    {
+      EquivalenceCollection<int, int> lColl = new EquivalenceCollection<int, int>();
+      int[] lCount = new int[10];
+      Random rnd = new Random();
+      for (int i = 0; i < 50; i++)
+      {
+        int v = rnd.Next(10);
+        lCount[v]++;
+        lColl.Add(i, v);
+      }
+      int[] lCount2 = new int[lCount.Length];
+      foreach (List<int> lList in lColl)
+      {
+        int i = lList[0];
+        Assert.AreEqual(0, lCount2[i]);
+        lCount2[i] = lList.Count;
+        Assert.AreEqual(lCount[i], lCount2[i]);
+      }
+      for (int i = 0; i < lCount.Length; i++)
+      {
+        Assert.AreEqual(lCount[i], lCount2[i]);
+      }
+    }
   }
 }

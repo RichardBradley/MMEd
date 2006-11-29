@@ -138,6 +138,7 @@
     <Compile Include="Util\FlatEditorPanel.Designer.cs">
       <DependentUpon>FlatEditorPanel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Util\Pair.cs" />
     <Compile Include="Util\UserPaintDoubleBufferedPanel.cs">
       <SubType>Component</SubType>
     </Compile>

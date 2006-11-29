@@ -64,7 +64,7 @@ namespace MMEd.Viewers
       mUpdating = true;
 
       int lSliderValue =
-        (xiValue / (2048 / mMainForm.SliderDirection.Maximum)) % 
+        (xiValue / (2048 / mMainForm.SliderDirection.Maximum)) %
         (mMainForm.SliderDirection.Maximum * 2);
 
       if (lSliderValue > mMainForm.SliderDirection.Maximum)
@@ -123,10 +123,10 @@ namespace MMEd.Viewers
       Bitmap lImage = new Bitmap(lPanel.Width, lPanel.Height);
       Graphics g = Graphics.FromImage(lImage);
       g.FillRectangle(
-        new SolidBrush(Color.White), 
-        0, 
-        0, 
-        lPanel.Width, 
+        new SolidBrush(Color.White),
+        0,
+        0,
+        lPanel.Width,
         lPanel.Height);
       mSubject.Draw(
         g,
@@ -177,7 +177,7 @@ namespace MMEd.Viewers
         lSurface.Scale(SCALE, SCALE, 1.0);
         short lOffset = (short)(-SCALE * GRIDSIZE / 2);
         GLTK.Point lNewPos = ThreeDeeViewer.Short3CoordToPoint(new Short3Coord(lOffset, lOffset, 0));
-        lSurface.Position = new GLTK.Point(lNewPos.x, lNewPos.y, -lNewPos.z);        
+        lSurface.Position = new GLTK.Point(lNewPos.x, lNewPos.y, -lNewPos.z);
         mScene.AddRange(new MMEdEntity[] { lSurface });
 
         // Use a random object from the level for now.
@@ -187,6 +187,53 @@ namespace MMEd.Viewers
           mMainForm.RootChunk,
           MMEd.Viewers.ThreeDee.eTextureMode.NormalTextures,
           eTexMetaDataEntries.Zero));
+
+        string lExceptionWhen = "opening file";
+        try
+        {
+          ThreeDeeViewer.SceneHolder sh;
+          string lFilename = string.Format("{0}{1}..{1}camera-editor-scene.xml",
+            Path.GetDirectoryName(
+              new Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath),
+            Path.DirectorySeparatorChar);
+
+          using (FileStream fs = File.OpenRead(lFilename))
+          {
+            lExceptionWhen = "deserialising the scene";
+            XmlSerializer xs = new XmlSerializer(typeof(ThreeDeeViewer.SceneHolder));
+            sh = (ThreeDeeViewer.SceneHolder)xs.Deserialize(fs);
+          }
+          lExceptionWhen = "fixing texture ids";
+          Dictionary<int, int> lSavedTexIdsToLiveTexIds = new Dictionary<int, int>();
+          foreach (ThreeDeeViewer.TextureHolder th in sh.Textures)
+          {
+            if (th.Bitmap != null)
+            {
+              lSavedTexIdsToLiveTexIds[th.ID] = AbstractRenderer.ImageToTextureId(th.Bitmap);
+            }
+            else
+            {
+              lSavedTexIdsToLiveTexIds[th.ID] = 0;
+            }
+          }
+          foreach (Entity ent in sh.Entities)
+          {
+            foreach (Mesh m in ent.Meshes)
+            {
+              if (m.RenderMode == RenderMode.Textured)
+              {
+                m.Texture = lSavedTexIdsToLiveTexIds[m.Texture];
+              }
+            }
+          }
+          mScene.Objects.Clear();
+          mScene.AddRange(sh.Entities);
+        }
+        catch (Exception err)
+        {
+          System.Diagnostics.Trace.WriteLine(err);
+          MessageBox.Show(string.Format("Exception occurred while {0}: {1}", lExceptionWhen, err.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
 
         UpdateCameraThreeDee();
       }

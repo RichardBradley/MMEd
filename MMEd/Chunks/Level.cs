@@ -191,7 +191,8 @@ namespace MMEd.Chunks
       }
       catch (DeserialisationException e)
       {
-        Console.Error.WriteLine("OBJT false start found, searching for restart...");
+        //Console.Error.WriteLine("OBJT false start found, searching for restart...");
+
         //look for X,0,65,0 in first bit:
         inStr.Seek(lObjtFalseStartPos, SeekOrigin.Begin);
         int lX = bin.ReadInt32();

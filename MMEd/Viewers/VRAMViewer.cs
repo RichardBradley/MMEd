@@ -13,12 +13,9 @@ namespace MMEd.Viewers
 {
   public class VRAMViewer : Viewer
   {
-    // the VRAM is scaled horizontally by a factor of
-    // 4, to allow for 4bpp TIMs (I would have expected this to be 2...)
-    // How to deal with TIMs of other bit depths is not yet decided
-    public const int WIDTH_SCALE_FOR_4BPP_TIMS = 4;
+    public const int WIDTH_SCALE = 4;
 
-    public const int TEX_PAGE_WIDTH = 64 * WIDTH_SCALE_FOR_4BPP_TIMS;
+    public const int TEX_PAGE_WIDTH = 64 * WIDTH_SCALE;
     public const int TEX_PAGE_HEIGHT = 256;
 
     private VRAMViewer(MainForm xiMainForm) : base(xiMainForm) 
@@ -97,7 +94,7 @@ namespace MMEd.Viewers
         }
         else
         {
-          lNewImage = GetTexturePage(mMainForm.RootChunk, SelectedPage);
+          lNewImage = GetTexturePage(mSubject, SelectedPage);
         }
 
         mMainForm.VRAMPictureBox.Image = lNewImage;
@@ -122,11 +119,11 @@ namespace MMEd.Viewers
       //cache miss?
       if (mCachedTexPages[xiPageId] == null)
       {
-        Bitmap lPage = new Bitmap(WIDTH_SCALE_FOR_4BPP_TIMS * 64, 256); //(i.e. 256x256)
+        Bitmap lPage = new Bitmap(WIDTH_SCALE * 64, 256); //(i.e. 256x256)
         Graphics g = Graphics.FromImage(lPage);
         g.Clear(Color.Black);
         g.Clip = new Region(new Rectangle(new Point(), lPage.Size));
-        g.TranslateTransform(-(xiPageId % 16) * (WIDTH_SCALE_FOR_4BPP_TIMS * 64), -xiPageId / 16 * 256);
+        g.TranslateTransform(-(xiPageId % 16) * (WIDTH_SCALE * 64), -xiPageId / 16 * 256);
         AddChunkToImage(mRootChunkForCachedTexPages, g);
         mCachedTexPages[xiPageId] = lPage;
       }
@@ -139,6 +136,8 @@ namespace MMEd.Viewers
 
     private void AddChunkToImage(Chunk c, Graphics g)
     {
+      if (c is TIMChunk) AddChunkToImage((TIMChunk)c, g);
+
       foreach (Chunk child in c.GetChildren())
       {
         if (child is TIMChunk)
@@ -154,7 +153,26 @@ namespace MMEd.Viewers
 
     private void AddChunkToImage(TIMChunk c, Graphics g)
     {
-      RectangleF lDestRect = new RectangleF(WIDTH_SCALE_FOR_4BPP_TIMS * c.ImageOrgX, c.ImageOrgY, c.ImageWidth, c.ImageHeight);
+      int lPixelsPerTwoBytes;
+      switch (c.BPP)
+      {
+        case TIMChunk.TimBPP._4BPP:
+          lPixelsPerTwoBytes = 4;
+          break;
+        case TIMChunk.TimBPP._8BPP:
+          lPixelsPerTwoBytes = 2;
+          break;
+        case TIMChunk.TimBPP._16BPP:
+          lPixelsPerTwoBytes = 1;
+          break;
+        default: throw new Exception("Can't deal with this BPP");
+      }
+
+      RectangleF lDestRect = new RectangleF(
+        WIDTH_SCALE * c.ImageOrgX,
+        c.ImageOrgY,
+        c.ImageWidth * WIDTH_SCALE / lPixelsPerTwoBytes,
+        c.ImageHeight);
       RectangleF lClipRect = g.ClipBounds;
       if (!(lClipRect.IntersectsWith(lDestRect)))
       {
@@ -170,9 +188,9 @@ namespace MMEd.Viewers
           Color col = Color.FromArgb(Utils.PS16bitColorToARGB(c.Palette[palIdx]));
           Brush br = new SolidBrush(col);
           Rectangle rect = new Rectangle(
-            WIDTH_SCALE_FOR_4BPP_TIMS * (c.PaletteOrgX + palIdx),
+            WIDTH_SCALE * (c.PaletteOrgX + palIdx),
             c.PaletteOrgY,
-            WIDTH_SCALE_FOR_4BPP_TIMS,
+            WIDTH_SCALE,
             1);
           g.FillRectangle(br, rect);
         }
