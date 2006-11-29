@@ -2,11 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
+using System.Xml.Serialization;
 
 namespace GLTK
 {
   public class Vertex
   {
+    public Vertex() { }
+
     public Vertex(Point xiPosition)
     {
       mPosition = xiPosition;
@@ -53,10 +56,19 @@ namespace GLTK
       set { mNormal = value; }
     }
 
+    [XmlIgnore]
     public Color Color
     {
       get { return mColor; }
       set { mColor = value; }
+    }
+
+    //required for XML serialisation, since Color structs can't be
+    //serialised directly
+    public int ColorAsARGB
+    {
+      get { return Color.ToArgb(); }
+      set { Color = Color.FromArgb(value); }
     }
 
     public double TexCoordX

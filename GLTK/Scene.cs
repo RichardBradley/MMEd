@@ -61,7 +61,15 @@ namespace GLTK
       }
     }
 
-    internal List<Entity> Objects
+    public List<Entity> Objects
+    {
+      get
+      {
+        return mObjects;
+      }
+    }
+
+    public IEnumerable<Entity> Entities
     {
       get
       {

@@ -2,11 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Diagnostics;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 using Tao.OpenGl;
 
 namespace GLTK
 {
-  public struct Point
+  public struct Point : IXmlSerializable
   {
     public static Point Origin = new Point(0, 0, 0);
 
@@ -93,6 +96,33 @@ namespace GLTK
     {
       return base.GetHashCode(); //qq
     }
+
+    #region IXmlSerializable implementation
+
+    public void WriteXml(XmlWriter writer)
+    {
+      writer.WriteElementString("X", x.ToString());
+      writer.WriteElementString("Y", y.ToString());
+      writer.WriteElementString("Z", z.ToString());
+    }
+
+    public void ReadXml(XmlReader reader)
+    {
+      //the first element will be the name of the field. We just have to consume it!!
+      reader.ReadStartElement(); 
+      mElements = new double[3];
+      mElements[0] = reader.ReadElementContentAsDouble("X", reader.NamespaceURI);
+      mElements[1] = reader.ReadElementContentAsDouble("Y", reader.NamespaceURI);
+      mElements[2] = reader.ReadElementContentAsDouble("Z", reader.NamespaceURI);
+      reader.ReadEndElement();
+    }
+
+    public XmlSchema GetSchema()
+    {
+      return (null);
+    }
+
+    #endregion
 
     private double[] mElements;
   }

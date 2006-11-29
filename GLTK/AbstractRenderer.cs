@@ -409,9 +409,9 @@ namespace GLTK
     {
       //WeakReference lRef = new WeakReference(xiTexture); //gives strange behaviour
       Bitmap lRef = xiTexture;
-      if (mImageToTextureIdMap.Contains(lRef))
+      if (mImageToTextureIdMap.ContainsKey(lRef))
       {
-        return (int)mImageToTextureIdMap[lRef];
+        return mImageToTextureIdMap[lRef];
       }
       else
       {
@@ -419,6 +419,21 @@ namespace GLTK
         mImageToTextureIdMap[lRef] = lRet;
         return lRet;
       }
+    }
+
+    //not guaranteed to be the same bitmap
+    public static Bitmap TextureIdToImage(int xiTexID)
+    {
+      // while there is a "containsValue" method, there is no "fetchKeyByValue"
+      // method :-(
+      foreach (KeyValuePair<Bitmap, int> lEntry in mImageToTextureIdMap)
+      {
+        if (lEntry.Value == xiTexID)
+        {
+          return lEntry.Key;
+        }
+      }
+      return null;
     }
 
     private static int LoadTexture(Bitmap xiTexture)
@@ -590,7 +605,7 @@ namespace GLTK
     private RenderingSurface mSurface;
     private IntPtr mRenderingContext = IntPtr.Zero;
     private static List<IntPtr> mRenderingContexts = new List<IntPtr>();
-    private static Hashtable mImageToTextureIdMap = new Hashtable();
+    private static Dictionary<Bitmap, int> mImageToTextureIdMap = new Dictionary<Bitmap, int>();
 
     private bool mPickMode = false;
     private int mPickIndex = 0;

@@ -74,9 +74,12 @@ namespace GLTK
       set { mRenderMode = value; }
     }
 
+    // the behaviour is undefined if PolygonMode is changed while
+    // Vertices is non-empty
     public PolygonMode PolygonMode
     {
       get { return mPolygonMode; }
+      set { mPolygonMode = value; }
     }
 
     List<Vertex> mVertices = new List<Vertex>();

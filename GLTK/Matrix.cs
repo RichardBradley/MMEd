@@ -2,11 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Diagnostics;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 using Tao.OpenGl;
 
 namespace GLTK
 {
-  public struct Matrix
+  public struct Matrix : IXmlSerializable
   {
     public static Matrix Identity = new Matrix(
       1, 0, 0, 0,
@@ -35,7 +38,6 @@ namespace GLTK
         0, 0, 0, 1);
     }
 
-    //qq:AIT please check name is OK?
     public static Matrix ScalingMatrix(double x, double y, double z)
     {
       return new Matrix(
@@ -50,8 +52,7 @@ namespace GLTK
         double ca, double cb, double cc, double cd,
         double da, double db, double dc, double dd)
     {
-      mElements = new double[4,4];
-
+      mElements = new double[4, 4];
       mElements[0, 0] = aa; mElements[0, 1] = ab; mElements[0, 2] = ac; mElements[0, 3] = ad;
       mElements[1, 0] = ba; mElements[1, 1] = bb; mElements[1, 2] = bc; mElements[1, 3] = bd;
       mElements[2, 0] = ca; mElements[2, 1] = cb; mElements[2, 2] = cc; mElements[2, 3] = cd;
@@ -61,7 +62,6 @@ namespace GLTK
     public Matrix(double[,] xiArray)
     {
       mElements = new double[4, 4];
-
       mElements[0, 0] = xiArray[0, 0]; mElements[0, 1] = xiArray[0, 1]; mElements[0, 2] = xiArray[0, 2]; mElements[0, 3] = xiArray[0, 3];
       mElements[1, 0] = xiArray[1, 0]; mElements[1, 1] = xiArray[1, 1]; mElements[1, 2] = xiArray[1, 2]; mElements[1, 3] = xiArray[1, 3];
       mElements[2, 0] = xiArray[2, 0]; mElements[2, 1] = xiArray[2, 1]; mElements[2, 2] = xiArray[2, 2]; mElements[2, 3] = xiArray[2, 3];
@@ -71,7 +71,6 @@ namespace GLTK
     public Matrix(double[] xiArray)
     {
       mElements = new double[4, 4];
-
       mElements[0, 0] = xiArray[0]; mElements[0, 1] = xiArray[1]; mElements[0, 2] = xiArray[2]; mElements[0, 3] = xiArray[3];
       mElements[1, 0] = xiArray[4]; mElements[1, 1] = xiArray[5]; mElements[1, 2] = xiArray[6]; mElements[1, 3] = xiArray[7];
       mElements[2, 0] = xiArray[8]; mElements[2, 1] = xiArray[9]; mElements[2, 2] = xiArray[10]; mElements[2, 3] = xiArray[11];
@@ -95,6 +94,9 @@ namespace GLTK
       }
     }
 
+    //qq:rtb this method will perform very badly in certain cases
+    //see e.g. the public domain JAMA library for examples of how to 
+    //fix this.
     public Matrix Inverse()
     {
       return new Matrix(subDet(0, 0), -subDet(1, 0), subDet(2, 0), -subDet(3, 0),
@@ -154,7 +156,6 @@ namespace GLTK
     {
       return !xiLhs.Equals(xiRhs);
     }
-
 
     public static Matrix operator +(Matrix xiLhs, Matrix xiRhs)
     {
@@ -288,8 +289,42 @@ namespace GLTK
       return new Matrix((double[,])mElements.Clone());
     }
 
-    private double[,] mElements;
+    #region IXmlSerializable implementation
 
+    public void WriteXml(XmlWriter writer)
+    {
+      for (int x = 0; x < 4; x++)
+      {
+        for (int y = 0; y < 4; y++)
+        {
+          writer.WriteElementString("Element", mElements[x,y].ToString());
+        }
+      }
+    }
+
+    public void ReadXml(XmlReader reader)
+    {
+      //the first element will be the name of the field. We just have to consume it!!
+      reader.ReadStartElement();
+      mElements = new double[4, 4];
+      for (int x = 0; x < 4; x++)
+      {
+        for (int y = 0; y < 4; y++)
+        {
+          mElements[x, y] = reader.ReadElementContentAsDouble("Element", reader.NamespaceURI);
+        }
+      }
+      reader.ReadEndElement();
+    }
+
+    public XmlSchema GetSchema()
+    {
+      return (null);
+    }
+
+    #endregion
+
+    private double[,] mElements;
   }
 }
 
