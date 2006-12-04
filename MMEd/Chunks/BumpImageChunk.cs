@@ -148,7 +148,7 @@ namespace MMEd.Chunks
       mBumpTypes[0x1F] = new BumpTypeInfo("unknown1f", 0x909090);
       mBumpTypes[0x20] = new BumpTypeInfo("jumpWhoosh2", 0xfff400, "Allegedly like jumpWhoosh. But appears to have a one-way property in some cases, and energetic attempts to violate this result in a \"splash\"");
       mBumpTypes[0x21] = new BumpTypeInfo("enterTeleport", 0xff8800);
-      mBumpTypes[0x22] = new BumpTypeInfo("unknown22", 0x989898);
+      mBumpTypes[0x22] = new BumpTypeInfo("lilyPadEdge", 0x66FF66, "Land/water boundary, can be jumped");
       mBumpTypes[0x23] = new BumpTypeInfo("sand", 0xc9b549);
       mBumpTypes[0x24] = new BumpTypeInfo("unknown1f", 0xa0a0a0);
       mBumpTypes[0x25] = new BumpTypeInfo("unknown1f", 0xa8a8a8);
