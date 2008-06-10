@@ -36,6 +36,17 @@ namespace MMEd
       this.mGlobalSettings = new GlobalSettings();
       this.mLocalSettings = LocalSettings.GetInstance();
 
+      // Restore the size
+      Size = mLocalSettings.m_size;
+      if ((Size.Height < 100) || (Size.Width < 200))
+      {
+          Size lsize = new Size();
+          lsize.Height = 500;
+          lsize.Width = 800;
+
+          this.Size = lsize;
+      }
+
       //register the viewer manager classes
       //qq there must be a better way of doing this, it seems a bit
       //   odd. Could use reflection. Might be a little slow or have
@@ -320,5 +331,10 @@ namespace MMEd
     }
 
     public event KeyEventHandler DialogKey;
+
+    private void OnResizeEnd(object sender, EventArgs e)
+    {
+        mLocalSettings.m_size = Size;
+    }
   }
 }
