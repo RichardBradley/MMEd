@@ -517,6 +517,7 @@ namespace MMEd.Viewers
       switch (xiAction)
       {
         case eWaypointAction.Insert:
+        case eWaypointAction.AddIncrement:
           if (mCurrentWaypoint == 255 && lWaypoint == 0)
           {
             System.Windows.Forms.MessageBox.Show(
@@ -526,9 +527,14 @@ namespace MMEd.Viewers
               MessageBoxButtons.OK,
               MessageBoxIcon.Error);
           }
-          else if (lWaypoint == 0)
+          else if ((lWaypoint == 0) || (xiAction == eWaypointAction.AddIncrement))
           {
-            AdjustWaypoints(++mCurrentWaypoint, 1);
+            mCurrentWaypoint++;
+
+            if (xiAction == eWaypointAction.Insert)
+            {
+                AdjustWaypoints(mCurrentWaypoint, 1);
+            }
             mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Waypoint] = mCurrentWaypoint;
           }
           else
@@ -541,6 +547,15 @@ namespace MMEd.Viewers
         case eWaypointAction.Duplicate:
           mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Waypoint] = mCurrentWaypoint;
           break;
+        case eWaypointAction.Decrement:
+          mCurrentWaypoint = mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Waypoint];
+          if (mCurrentWaypoint > 1)
+          {
+              mCurrentWaypoint--;
+              AdjustWaypoints(mCurrentWaypoint + 1, -1);
+          }
+          break;
+
         case eWaypointAction.Eyedropper:
           mCurrentWaypoint = lWaypoint;
           break;
@@ -1358,6 +1373,9 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
         case (int)eWaypointAction.Insert:
           lLabel = "Add path";
           break;
+        case (int)eWaypointAction.AddIncrement:
+          lLabel = "Add";
+          break;
         default:
           lLabel = ((eWaypointAction)i).ToString();
           break;
@@ -1562,10 +1580,12 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
     private enum eWaypointAction
     {
       Insert = 0,
-      Duplicate = 1,
-      Eyedropper = 2,
-      Erase = 3,
-      Waypoints = 4
+      AddIncrement = 1,
+      Duplicate = 2,
+      Decrement = 3,
+      Eyedropper = 4,
+      Erase = 5,
+      Waypoints = 6,
     }
 
     #endregion
