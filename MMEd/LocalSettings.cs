@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Xml.Serialization;
+using System.Drawing;
 
 // Holds local settings like the last file opened
 
@@ -19,6 +20,7 @@ namespace MMEd
     public string LastTMDFile;
     public string LastSavedSceneFile;
     public string LastFlatImagesDir;
+    public Size m_size;
 
     #endregion
 
