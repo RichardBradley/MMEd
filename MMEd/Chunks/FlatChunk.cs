@@ -21,7 +21,7 @@ namespace MMEd.Chunks
   // dimension of the TexMetaData array
   public enum eTexMetaDataEntries
   {
-    Zero = 0, // something which also follows the course. Can't be zeroed out without invalidating the level
+    Odds = 0, // something which also follows the course. Can't be zeroed out without invalidating the level
     One = 1, // something which seems to always be zero
     Two = 2, // something to do with the corners? No immediately noticeable difference when zeroed out.
     CameraPos = 3, // the camera position idx. Indexes entries in qq

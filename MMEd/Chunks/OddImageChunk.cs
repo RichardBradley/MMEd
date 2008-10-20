@@ -18,12 +18,28 @@ using System.Drawing;
 
 namespace MMEd.Chunks
 {
-  public class OddImageChunk : Chunk, Viewers.ImageViewer.IImageProvider
+  public class OddImageChunk : Chunk, Viewers.ImageViewer.IImageProvider, IReindexableChunk
   {
     int mIdx;
+    private byte[] mData;
 
     [Description("The data.")]
-    public byte[] Data;
+    public byte[] Data
+    {
+      get { return mData; }
+      set
+      {
+        mData = value;
+        mBitmapCache = null;
+      }
+    }
+
+    //set the odd to be all zero
+    public void Clear()
+    {
+      Array.Clear(Data, 0, Data.Length);
+      mBitmapCache = null;
+    }
 
     public OddImageChunk() { }
     public OddImageChunk(int idx, byte xiValue)

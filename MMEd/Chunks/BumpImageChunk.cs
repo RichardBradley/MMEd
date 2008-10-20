@@ -14,9 +14,16 @@ using MMEd.Util;
 
 namespace MMEd.Chunks
 {
-  public class BumpImageChunk : Chunk, Viewers.ImageViewer.IImageProvider
+  public class BumpImageChunk : Chunk, Viewers.ImageViewer.IImageProvider, IReindexableChunk
   {
     public BumpImageChunk() { }
+
+    public BumpImageChunk(int idx) 
+    {
+      mIdx = idx;
+      Data = new byte[64];
+    }
+
     public BumpImageChunk(int idx, Stream inStr)
     {
       mIdx = idx;
@@ -134,7 +141,7 @@ namespace MMEd.Chunks
       mBumpTypes[0x11] = new BumpTypeInfo("clearGoo", 0xffeedd);
       mBumpTypes[0x12] = new BumpTypeInfo("powderSpill", 0x3333ff);
       mBumpTypes[0x13] = new BumpTypeInfo("greenGoo", 0x33ff33);
-      mBumpTypes[0x14] = new BumpTypeInfo("redGoo", 0xff3333);
+      mBumpTypes[0x14] = new BumpTypeInfo("redGoo", 0xff3333, "Makes you invisible");
       mBumpTypes[0x15] = new BumpTypeInfo("roadBorderLab", 0x89cbfd);
       mBumpTypes[0x16] = new BumpTypeInfo("jumpWoosh", 0xffe400);
       mBumpTypes[0x17] = new BumpTypeInfo("unknown17", 0x707070);
@@ -154,11 +161,11 @@ namespace MMEd.Chunks
       mBumpTypes[0x25] = new BumpTypeInfo("unknown1f", 0xa8a8a8);
       mBumpTypes[0x26] = new BumpTypeInfo("unknown1f", 0xb0b0b0);
       mBumpTypes[0x27] = new BumpTypeInfo("unknown27", 0xff00ff, "Driving over this has no discernable effect in Rack & Roll.");
-      mBumpTypes[0x28] = new BumpTypeInfo("teleport1", 0xffaa00, "Teleport. Destination unknown.");
-      mBumpTypes[0x29] = new BumpTypeInfo("teleport2", 0xffdd00, "Teleport. Destination unknown.");
-      mBumpTypes[0x2A] = new BumpTypeInfo("teleport3", 0xffbb00, "Teleport. Destination unknown.");
-      mBumpTypes[0x2B] = new BumpTypeInfo("teleport4", 0xffee00, "Teleport. Destination unknown.");
-      mBumpTypes[0x2C] = new BumpTypeInfo("teleport5", 0xffcc00, "Teleport. Destination unknown.");
+      mBumpTypes[0x28] = new BumpTypeInfo("teleport1", 0xffaa00, "Teleport to world coord approx (??, ??)");
+      mBumpTypes[0x29] = new BumpTypeInfo("teleport2", 0xffdd00, "Teleport to world coord approx (??, ??)");
+      mBumpTypes[0x2A] = new BumpTypeInfo("teleport3", 0xffbb00, "Teleport to world coord approx (5137, 11055)");
+      mBumpTypes[0x2B] = new BumpTypeInfo("teleport4", 0xffee00, "Teleport to world coord approx (??, ??)");
+      mBumpTypes[0x2C] = new BumpTypeInfo("teleport5", 0xffcc00, "Teleport to world coord approx (??, ??)");
       mBumpTypes[0x2D] = new BumpTypeInfo("splash", 0x4444ff, "A \"splash\" - death trap.");
       return mBumpTypes;
     }

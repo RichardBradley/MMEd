@@ -186,7 +186,7 @@ namespace MMEd.Viewers
         mScene.AddRange(lObject.GetEntities(
           mMainForm.RootChunk,
           MMEd.Viewers.ThreeDee.eTextureMode.NormalTextures,
-          eTexMetaDataEntries.Zero));
+          eTexMetaDataEntries.Odds));
 
         string lExceptionWhen = "opening file";
         try

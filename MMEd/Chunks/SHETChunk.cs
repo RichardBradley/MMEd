@@ -198,7 +198,7 @@ Each entry has three components, which are height, pitch and yaw, in some order"
     }
 
     ///========================================================================
-    ///  Method : AddFlat
+    /// Method : AddFlat
     /// 
     /// <summary>
     /// 	Add a new Flat, returning the size of the added Flat in bytes
@@ -216,13 +216,110 @@ Each entry has three components, which are height, pitch and yaw, in some order"
       return xiFlat.ByteSize;
     }
 
-    public void AddOdd(OddImageChunk xiOdd)
+    ///========================================================================
+    /// Method : AddOdd
+    /// 
+    /// <summary>
+    /// 	Add a new Odd, returning the size of the added Odd in bytes
+    /// </summary>
+    /// <param name="xiOdd"></param>
+    /// <returns></returns>
+    ///========================================================================
+    public int AddOdd(OddImageChunk xiOdd)
     {
       Chunk[] lNewOddArray = new Chunk[OddImages.mChildren.Length + 1];
       Array.Copy(OddImages.mChildren, lNewOddArray, OddImages.mChildren.Length);
       lNewOddArray[OddImages.mChildren.Length] = xiOdd;
       OddImages.mChildren = lNewOddArray;
+
+      return xiOdd.Data.Length;
     }
+
+    ///========================================================================
+    /// Method : AddBump
+    /// 
+    /// <summary>
+    /// 	Add a new Bump, returning the size of the added Bump in bytes
+    /// </summary>
+    /// <param name="xiOdd"></param>
+    /// <returns></returns>
+    ///========================================================================
+    public int AddBump(BumpImageChunk xiBump)
+    {
+      Chunk[] lNewBumpArray = new Chunk[BumpImages.mChildren.Length + 1];
+      Array.Copy(BumpImages.mChildren, lNewBumpArray, BumpImages.mChildren.Length);
+      lNewBumpArray[BumpImages.mChildren.Length] = xiBump;
+      BumpImages.mChildren = lNewBumpArray;
+
+      return xiBump.Data.Length;
+    }
+
+
+    #region Bump manipulation
+
+    [XmlIgnore]
+    public Hashtable UnusedBumps
+    {
+      get
+      {
+        if (mUnusedBumps == null)
+        {
+          mUnusedBumps = new Hashtable();
+          FindUnusedBumps();
+        }
+
+        return mUnusedBumps;
+      }
+      set
+      {
+        mUnusedBumps = value;
+      }
+    }
+
+    private void FindUnusedBumps()
+    {
+      //=======================================================================
+      // Get a list of all bumps to start with.
+      //=======================================================================
+      for (int i = 0; i < BumpImages.mChildren.Length; i++)
+      {
+        if (!(BumpImages.mChildren[i] is BumpImageChunk))
+        {
+          continue;
+        }
+
+        BumpImageChunk lBump = (BumpImageChunk)BumpImages.mChildren[i];
+        mUnusedBumps[i] = lBump;
+      }
+
+      //=======================================================================
+      // Now remove all used bumps.
+      //=======================================================================
+      foreach (FlatChunk lFlat in Flats)
+      {
+        if (lFlat.TexMetaData == null)
+        {
+          continue;
+        }
+
+        for (int x = 0; x < lFlat.Width; x++)
+        {
+          for (int y = 0; y < lFlat.Height; y++)
+          {
+            int lBumpId = lFlat.TexMetaData[x][y][(byte)eTexMetaDataEntries.Bumpmap];
+
+            if (mUnusedBumps.ContainsKey(lBumpId))
+            {
+              mUnusedBumps.Remove(lBumpId);
+            }
+          }
+        }
+      }
+    }
+
+    private Hashtable mUnusedBumps = null;
+
+    #endregion
 
     #region Odds manipulation
 
@@ -275,7 +372,7 @@ Each entry has three components, which are height, pitch and yaw, in some order"
         {
           for (int y = 0; y < lFlat.Height; y++)
           {
-            int lOddId = lFlat.TexMetaData[x][y][(byte)eTexMetaDataEntries.Zero];
+            int lOddId = lFlat.TexMetaData[x][y][(byte)eTexMetaDataEntries.Odds];
 
             if (mUnusedOdds.ContainsKey(lOddId))
             {

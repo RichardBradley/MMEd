@@ -8,7 +8,7 @@ using MMEd.Util;
 
 namespace MMEd.Chunks
 {
-  public class CameraPosChunk : Chunk, Viewers.ImageViewer.IImageProvider
+  public class CameraPosChunk : Chunk, Viewers.ImageViewer.IImageProvider, IReindexableChunk
   {
     int mIdx;
 
@@ -150,5 +150,48 @@ namespace MMEd.Chunks
     short mElevation;
     Bitmap mBitmapCache;
     public const int SCALE = 16;
+
+    #region IReindexableChunk Members
+
+    ///========================================================================
+    /// Property : Data
+    /// 
+    /// <summary>
+    /// 	Represent the camera position data as byte array
+    /// </summary>
+    ///========================================================================
+    public byte[] Data
+    {
+      get
+      {
+        byte[] lRet = new byte[6];
+        BitConverter.GetBytes(Direction).CopyTo(lRet, 0);
+        BitConverter.GetBytes(Distance).CopyTo(lRet, 2);
+        BitConverter.GetBytes(Elevation).CopyTo(lRet, 4);
+        return lRet;
+      }
+      set
+      {
+        Direction = BitConverter.ToInt16(value, 0);
+        Distance = BitConverter.ToInt16(value, 2);
+        Elevation = BitConverter.ToInt16(value, 4);
+      }
+    }
+
+    ///========================================================================
+    /// Method : Clear
+    /// 
+    /// <summary>
+    /// 	Reset the camera position data
+    /// </summary>
+    ///========================================================================
+    public void Clear()
+    {
+      mDirection = 0;
+      mDistance = 0;
+      mElevation = 0;
+    }
+
+    #endregion
   }
 }

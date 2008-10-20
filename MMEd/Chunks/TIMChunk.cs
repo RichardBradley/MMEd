@@ -304,7 +304,7 @@ namespace MMEd.Chunks
         {
           mBitmapCache = new Bitmap(CreateBMPStream());
         }
-        catch (Exception e)
+        catch (Exception)
         {
           //I seem to get a fair number of GDI+ exceptions from the
           //unmanaged call. Don't really know why.

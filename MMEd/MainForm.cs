@@ -176,6 +176,13 @@ namespace MMEd
         string lExceptionWhen = "opening file";
         try
         {
+          int lPreviousSize = -1;
+
+          if (File.Exists(sfd.FileName))
+          {
+            lPreviousSize = File.ReadAllBytes(sfd.FileName).Length;
+          }
+
           using (FileStream fs = File.Create(sfd.FileName))
           {
             lExceptionWhen = "serialising the file";
@@ -188,6 +195,12 @@ namespace MMEd
               XmlSerializer xs = new XmlSerializer(typeof(Chunk));
               xs.Serialize(fs, RootChunk);
             }
+          }
+
+          if (lPreviousSize != -1 && lPreviousSize != File.ReadAllBytes(sfd.FileName).Length)
+          {
+            MessageBox.Show("WARNING: The size of your level has changed. Please check it's not too large, and check MMEd for bugs that have allowed the size to change.",
+              "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
           }
         }
         catch (Exception err)
@@ -336,5 +349,6 @@ namespace MMEd
     {
         mLocalSettings.m_size = Size;
     }
+
   }
 }

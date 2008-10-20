@@ -17,7 +17,16 @@ namespace MMEd.Viewers
   {
     #region Reindex Bump Action
 
-    public void ReindexBumpImages()
+    ///========================================================================
+    /// Method : ReindexImages
+    /// 
+    /// <summary>
+    /// 	Reindex images of the given type - remove duplicates and renumber
+    ///   to the top of the image array.
+    /// </summary>
+    /// <param name="xiImageType"></param>
+    ///========================================================================
+    public void ReindexImages(eTexMetaDataEntries xiImageType)
     {
       Level lLevel = mMainForm.RootChunk as Level;
       if (lLevel == null)
@@ -26,9 +35,27 @@ namespace MMEd.Viewers
         return;
       }
 
-      // count how many times each bump image is currently in use
-      int[] lUseCount = new int[lLevel.SHET.BumpImages.mChildren.Length];
-      const int lBumpIdx = (int)eTexMetaDataEntries.Bumpmap;
+      Chunk[] lChunkArray;
+      if (xiImageType == eTexMetaDataEntries.Bumpmap)
+      {
+        lChunkArray = lLevel.SHET.BumpImages.mChildren;
+      }
+      else if (xiImageType == eTexMetaDataEntries.Odds)
+      {
+        lChunkArray = lLevel.SHET.OddImages.mChildren;
+      }
+      else if (xiImageType == eTexMetaDataEntries.CameraPos)
+      {
+        lChunkArray = lLevel.SHET.CameraPositions.mChildren;
+      }
+      else
+      {
+        throw new Exception("Internal error: Cannot reindex images of type " + xiImageType.ToString());
+      }
+
+      // count how many times each image is currently in use
+      int[] lUseCount = new int[lChunkArray.Length];
+      int lTexMetaIndex = (int)xiImageType;
       foreach (FlatChunk flat in lLevel.SHET.Flats)
       {
         if (flat.TexMetaData != null)
@@ -37,27 +64,30 @@ namespace MMEd.Viewers
           {
             foreach (byte[] entry in row)
             {
-              lUseCount[entry[lBumpIdx]]++;
+              lUseCount[entry[lTexMetaIndex]]++;
             }
           }
         }
       }
 
-      Chunk[] lChunkArray = lLevel.SHET.BumpImages.mChildren;
-      BumpImageChunk[] lBumpArray = new BumpImageChunk[lChunkArray.Length];
-      Array.Copy(lChunkArray, lBumpArray, lChunkArray.Length);
-
-      //get a mapping from each equivalence class of BumpImageChunks (under a
-      //deep '==' operator on their data) to the lowest index in that class
-      SortedDictionary<BumpImageChunk, int> lBumpsToCanonicalId = new SortedDictionary<BumpImageChunk, int>(new BumpImageComparer());
-      for (int i=lBumpArray.Length-1; i>=0; i--)
+      //get a mapping from each equivalence class of chunks to the lowest index in that class
+      SortedDictionary<IReindexableChunk, int> lImagesToCanonicalId = new SortedDictionary<IReindexableChunk, int>(new ReindexableChunkComparer());
+      for (int i=lChunkArray.Length-1; i>=0; i--)
       {
-        lBumpsToCanonicalId[lBumpArray[i]] = i;
+        if (lUseCount[i] == 0)
+        {
+          // Ignore any unused images - otherwise we might try to remap used bumps
+          // to unused ones, which would cause errors when we remove all the unused
+          // bumps later on.
+          continue;
+        }
+
+        lImagesToCanonicalId[(IReindexableChunk)lChunkArray[i]] = i;
       }
 
       int[] lOldToNewIndexMap = new int[lUseCount.Length];
 
-      //determine where each bump should map to:
+      //determine where each image should map to:
       int lNextUnusedId = 0;
       for (int lOldIdx=0; lOldIdx<lOldToNewIndexMap.Length; lOldIdx++)
       {
@@ -65,7 +95,7 @@ namespace MMEd.Viewers
         {
           //we need to map this to somewhere.
           //can it be coalesced with other, identical bumps?
-          int lCanonicalId = (int)lBumpsToCanonicalId[lBumpArray[lOldIdx]];
+          int lCanonicalId = (int)lImagesToCanonicalId[(IReindexableChunk)lChunkArray[lOldIdx]];
           if (lCanonicalId < lOldIdx)
           {
             lOldToNewIndexMap[lOldIdx] = lOldToNewIndexMap[lCanonicalId];
@@ -86,9 +116,9 @@ namespace MMEd.Viewers
         }
       }
 
-      //take a copy of each canonical bump, so we don't lose any information
+      //take a copy of each canonical image, so we don't lose any information
       Dictionary<int,byte[]> lCanonicalImages = new Dictionary<int,byte[]>();
-      foreach (KeyValuePair<BumpImageChunk,int> lEntry in lBumpsToCanonicalId)
+      foreach (KeyValuePair<IReindexableChunk,int> lEntry in lImagesToCanonicalId)
       {
         lCanonicalImages.Add(lEntry.Value, (byte[])lEntry.Key.Data.Clone());
       }
@@ -103,13 +133,13 @@ namespace MMEd.Viewers
           if (lCanonicalImages.ContainsKey(lOldIdx))
           {
             lHighestUsed = lNew;
-            lBumpArray[lNew].Data = lCanonicalImages[lOldIdx];
+            ((IReindexableChunk)lChunkArray[lNew]).Data = lCanonicalImages[lOldIdx];
           }
         }
       }
-      for (int i=lHighestUsed+1; i<lBumpArray.Length; i++)
+      for (int i=lHighestUsed+1; i<lChunkArray.Length; i++)
       {
-        lBumpArray[i].Clear();
+        ((IReindexableChunk)lChunkArray[i]).Clear();
       }
 
       //now update all the bumps in the Flats
@@ -121,24 +151,125 @@ namespace MMEd.Viewers
           {
             foreach (byte[] entry in row)
             {
-              int lOldIdx = entry[lBumpIdx];
+              int lOldIdx = entry[lTexMetaIndex];
               int lNewIdx = lOldToNewIndexMap[lOldIdx];
-              if (lNewIdx < 0) throw new Exception("Internal error: this bump should be unused");
-              entry[lBumpIdx] = (byte)lNewIdx;
+              if (lNewIdx < 0) throw new Exception("Internal error: this image should be unused");
+              entry[lTexMetaIndex] = (byte)lNewIdx;
             }
           }
         }
       }
 
       MessageBox.Show(string.Format(
-        "Sucessfully re-indexed. There are {0} bump tiles in use, and {0} free",
+        "Successfully reindexed. There are {0} {2} tiles in use, and {1} free",
         lCanonicalImages.Count,
-        lBumpArray.Length - lCanonicalImages.Count));
+        lChunkArray.Length - lCanonicalImages.Count,
+        xiImageType.ToString().ToLower()));
     }
 
-    private class BumpImageComparer : Comparer<BumpImageChunk>
+    ///========================================================================
+    /// Method : CompactImages
+    /// 
+    /// <summary>
+    /// 	Compact images fo the given type - remove any unused images from the
+    ///   end of the array.
+    /// </summary>
+    /// <param name="xiImageType"></param>
+    /// <remarks>
+    ///   Note that no attempt is made to deduplicate - it is assumed that
+    ///   duplicates will be removed via ReindexImages if required.
+    /// </remarks>
+    ///========================================================================
+    public void CompactImages(eTexMetaDataEntries xiImageType)
     {
-      public override int Compare(BumpImageChunk a, BumpImageChunk b)
+      Level lLevel = mMainForm.RootChunk as Level;
+      if (lLevel == null)
+      {
+        MessageBox.Show("Must have a level open for this action");
+        return;
+      }
+
+      //=======================================================================
+      // Work out which array of images to work with
+      //=======================================================================
+      Chunk[] lChunkArray;
+      if (xiImageType == eTexMetaDataEntries.Bumpmap)
+      {
+        lChunkArray = lLevel.SHET.BumpImages.mChildren;
+      }
+      else if (xiImageType == eTexMetaDataEntries.Odds)
+      {
+        lChunkArray = lLevel.SHET.OddImages.mChildren;
+      }
+      else if (xiImageType == eTexMetaDataEntries.CameraPos)
+      {
+        lChunkArray = lLevel.SHET.CameraPositions.mChildren;
+      }
+      else
+      {
+        throw new Exception("Internal error: Cannot reindex images of type " + xiImageType.ToString());
+      }
+
+      //=======================================================================
+      // Find the highest numbered image that's in use - we'll remove all 
+      // higher-numbered images
+      //=======================================================================
+      int lMaxUsedIndex = -1;
+      int lTexMetaIndex = (int)xiImageType;
+
+      foreach (FlatChunk lFlat in lLevel.SHET.Flats)
+      {
+        if (lFlat.TexMetaData != null)
+        {
+          foreach (byte[][] lRow in lFlat.TexMetaData)
+          {
+            foreach (byte[] lEntry in lRow)
+            {
+              if (lMaxUsedIndex < lEntry[lTexMetaIndex])
+              {
+                lMaxUsedIndex = lEntry[lTexMetaIndex];
+              }
+            }
+          }
+        }
+      }
+
+      if (lMaxUsedIndex == -1)
+      {
+        MessageBox.Show(string.Format("No compaction required - there are no {0} tiles!",
+          xiImageType.ToString().ToLower()));
+        return;
+      }
+
+      //=======================================================================
+      // Create a new image array and adjust zero padding
+      //=======================================================================
+      Chunk[] lNewChunkArray = new Chunk[lMaxUsedIndex + 1];
+      Array.Copy(lChunkArray, lNewChunkArray, lMaxUsedIndex + 1);
+      
+      lLevel.SHET.TrailingZeroByteCount += (lChunkArray.Length - (lMaxUsedIndex + 1)) * ((IReindexableChunk)lChunkArray[0]).Data.Length;
+      
+      if (xiImageType == eTexMetaDataEntries.Bumpmap)
+      {
+        lLevel.SHET.BumpImages.mChildren = lNewChunkArray;
+      }
+      else if (xiImageType == eTexMetaDataEntries.Odds)
+      {
+        lLevel.SHET.OddImages.mChildren = lNewChunkArray;
+      }
+      else if (xiImageType == eTexMetaDataEntries.CameraPos)
+      {
+        lLevel.SHET.CameraPositions.mChildren = lNewChunkArray;
+      }
+
+      MessageBox.Show(string.Format("Successfully compacted. There are {0} {1} tiles remaining",
+        lMaxUsedIndex + 1,
+        xiImageType.ToString().ToLower()));
+    }
+
+    private class ReindexableChunkComparer : Comparer<IReindexableChunk>
+    {
+      public override int Compare(IReindexableChunk a, IReindexableChunk b)
       {
         return Util.ByteArrayComparer.CompareStatic(a.Data, b.Data);
       }
@@ -274,7 +405,10 @@ namespace MMEd.Viewers
               if (lTopLeftTile == null) throw new Exception("top left tile was null!");
               int lTileWidth = lTopLeftTile.ImageWidth;
               int lTileHeight = lTopLeftTile.ImageHeight;
-              if (lTileHeight != 64 || lTileWidth != 64) throw new Exception("Sorry, only 64x64 tiles are supported for this action.");
+              if (lTileHeight != 64 || lTileWidth != 64)
+              {
+                MessageBox.Show(string.Format("Warning: Skipping tile {0} because only 64x64 tiles are supported for this action.", lFlat.DeclaredName));
+              }
               Bitmap lBmp = new Bitmap(lFlat.Width * lTileWidth, lFlat.Height * lTileHeight);
               Graphics g = Graphics.FromImage(lBmp);
               g.Clear(Color.Black);
@@ -443,7 +577,7 @@ namespace MMEd.Viewers
     private ActionsViewer(MainForm xiMainForm)
       : base(xiMainForm) 
     {
-      mMainForm.ActionsTabReindexBumpButton.Click += new EventHandler(ActionsTabReindexBumpButton_Click);
+      mMainForm.ActionsTabOptimiseButton.Click += new EventHandler(ActionsTabOptimiseButton_Click);
       mMainForm.ActionsTabExportFlatImagesButton.Click += new EventHandler(ActionsTabExportFlatImagesButton_Click);
       mMainForm.ActionsTabImportFlatImagesButton.Click += new EventHandler(ActionsTabImportFlatImagesButton_Click);
       mMainForm.ActionsTabCloneFlatButton.Click += new EventHandler(ActionsTabCloneFlatButton_Click);
@@ -459,9 +593,42 @@ namespace MMEd.Viewers
       CloneFlat();
     }
 
-    void ActionsTabReindexBumpButton_Click(object sender, EventArgs e)
+    void ActionsTabOptimiseButton_Click(object sender, EventArgs e)
     {
-      ReindexBumpImages();
+      if (mMainForm.OptimiseBumpReindexCheckbox.Checked)
+      {
+        ReindexImages(eTexMetaDataEntries.Bumpmap);
+      }
+
+      if (mMainForm.OptimiseBumpCompactCheckbox.Checked)
+      {
+        CompactImages(eTexMetaDataEntries.Bumpmap);
+      }
+
+      if (mMainForm.OptimiseOddsReindexCheckbox.Checked)
+      {
+        ReindexImages(eTexMetaDataEntries.Odds);
+      }
+
+      if (mMainForm.OptimiseOddsCompactCheckbox.Checked)
+      {
+        CompactImages(eTexMetaDataEntries.Odds);
+      }
+
+      if (mMainForm.OptimiseCameraReindexCheckbox.Checked)
+      {
+        ReindexImages(eTexMetaDataEntries.CameraPos);
+      }
+
+      if (mMainForm.OptimiseCameraCompactCheckbox.Checked)
+      {
+        CompactImages(eTexMetaDataEntries.CameraPos);
+      }
+
+      //=======================================================================
+      // Refresh the tree view
+      //=======================================================================
+      mMainForm.RootChunk = mMainForm.RootChunk;
     }
 
     public override bool CanViewChunk(Chunk xiChunk)
@@ -482,7 +649,7 @@ namespace MMEd.Viewers
     {
       if (mSubject == xiChunk) return;
       mSubject = xiChunk;
-      mMainForm.ActionsTabReindexBumpButton.Enabled = (mSubject is Level);
+      mMainForm.ActionsTabOptimiseButton.Enabled = (mSubject is Level);
       mMainForm.ActionsTabExportFlatImagesButton.Enabled = (mSubject is Level);
       mMainForm.ActionsTabImportFlatImagesButton.Enabled = (mSubject is Level);
       mMainForm.ActionsTabCloneFlatButton.Enabled = (mSubject is FlatChunk);

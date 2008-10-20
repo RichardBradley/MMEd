@@ -133,7 +133,7 @@ namespace MMEd.Viewers
           mWireFrameCache = new List<ColoredPolygon>();
 
           IEnumerable<Entity> lScene
-            = mSubject.GetEntities(((Level)mMainForm.RootChunk), MMEd.Viewers.ThreeDee.eTextureMode.WireFrame, eTexMetaDataEntries.Zero);
+            = mSubject.GetEntities(((Level)mMainForm.RootChunk), MMEd.Viewers.ThreeDee.eTextureMode.WireFrame, eTexMetaDataEntries.Odds);
 
           //find the entity correspoding to mSubject
           Entity lSubjectsEntity = null;
@@ -358,7 +358,7 @@ namespace MMEd.Viewers
         return;
       }
 
-      byte lZeroValue = mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Zero];
+      byte lZeroValue = mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Odds];
       byte lTwoValue = mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Two];
       byte lFourValue = mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Four];
       byte lSevenValue = mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Seven];
@@ -769,10 +769,26 @@ namespace MMEd.Viewers
           mSubject.OriginPosition.Z);
         }
 
+        int lTexX = (int)Math.Floor(x);
+        int lTexY = (int)Math.Floor(y);
+        int lPxX = (e.X % mSubjectTileWidth) / (mSubjectTileWidth / 8);
+        int lPxY = (e.Y % mSubjectTileHeight) / (mSubjectTileHeight / 8);
+
+        byte lBumpIdx = mSubject.TexMetaData[lTexX][lTexY][(int)eTexMetaDataEntries.Bumpmap];
+        BumpImageChunk lBumpChunk = ((Level)mMainForm.RootChunk).GetBumpById(lBumpIdx);
+        string lBumpString = null;
+
+        if (lBumpChunk != null)
+        {
+          byte lBumpPixel = lBumpChunk.GetPixelType(lPxX, lPxY);
+          lBumpString = "Bump: " + BumpImageChunk.GetBumpTypeInfo(lBumpPixel).Name;
+        }
+
         mMainForm.GridViewerStatusLabel.Text = string.Format(
-          "Tex Coord: ({0:0}, {1:0}) Flat Coord: ({2:0}, {3:0}) {4}",
-          Math.Floor(x), Math.Floor(y), x * mSubject.ScaleX, y * mSubject.ScaleY,
-          lWorldCoord);
+          "Tex Coord: ({0:0}, {1:0}) Flat Coord: ({2:0}, {3:0}) {4} {5}",
+          lTexX, lTexY, x * mSubject.ScaleX, y * mSubject.ScaleY,
+          lWorldCoord,
+          lBumpString);
 
         //this seems a bit ott, but is needed for the red square highlight
         InvalidateGridDisplay();
@@ -921,7 +937,6 @@ namespace MMEd.Viewers
       switch (mBumpImageUsageCountArray[lBumpImageIdx])
       {
         case 0:
-
           throw new Exception("Interal error: unreachable statement!");
 
         case 1:
@@ -930,25 +945,60 @@ namespace MMEd.Viewers
           break;
 
         default: // i.e. > 1
-          //find the first bump image > 0 which isn't in use
-          for (int lNewBumpImageIdx = 1; lNewBumpImageIdx < mBumpImageUsageCountArray.Length; lNewBumpImageIdx++)
+          SHETChunk lShet = ((Level)mMainForm.RootChunk).SHET;
+          BumpImageChunk lNewBump = null;
+          int lNewBumpId = -1;
+
+          if (lShet.UnusedBumps.Count == 0)
           {
-            if (mBumpImageUsageCountArray[lNewBumpImageIdx] == 0)
+            //=================================================================
+            // Create a new bump
+            //=================================================================
+            lNewBumpId = lShet.BumpImages.mChildren.Length;
+            lNewBump = new BumpImageChunk(lNewBumpId);
+            int lSizeIncrease = lShet.AddBump(lNewBump);
+            lShet.TrailingZeroByteCount -= lSizeIncrease;
+
+            if (lShet.TrailingZeroByteCount < 0)
             {
-              BumpImageChunk newBump = ((Level)mMainForm.RootChunk).GetBumpById(lNewBumpImageIdx);
-              BumpImageChunk oldBump = ((Level)mMainForm.RootChunk).GetBumpById(lBumpImageIdx);
-              newBump.CopyFrom(oldBump);
-              newBump.SetPixelType(xiBumpPxX, xiBumpPxY, xiNewVal);
-              mSubject.TexMetaData[xiTexX][xiTexY][(int)eTexMetaDataEntries.Bumpmap]
-               = (byte)lNewBumpImageIdx;
-              mBumpImageUsageCountArray[lBumpImageIdx]--;
-              mBumpImageUsageCountArray[lNewBumpImageIdx]++;
-              return;
+              MessageBox.Show(string.Format(
+                "WARNING: You have just run out of space in your level file - you will need to free up {0} bytes before you can save your changes.",
+                -lShet.TrailingZeroByteCount));
             }
+
+            //=================================================================
+            // Update our usage count array to include the new bump
+            //=================================================================
+            int[] lNewBumpImageUsageCountArray = new int[lNewBumpId + 1];
+            Array.Copy(mBumpImageUsageCountArray, lNewBumpImageUsageCountArray, mBumpImageUsageCountArray.Length);
+            mBumpImageUsageCountArray = lNewBumpImageUsageCountArray;
           }
-          MessageBox.Show(@"The requested change cannot be performed:
-There are no free bump images which are not already in use!
-Try running ""Reindex bump"" on the level (in the Actions tab)");
+          else
+          {
+            //=================================================================
+            // Find the first unused bump and use that
+            //=================================================================
+            foreach (DictionaryEntry lEntry in lShet.UnusedOdds)
+            {
+              lNewBumpId = (int)lEntry.Key;
+              lNewBump = (BumpImageChunk)lEntry.Value;
+              break;
+            }
+
+            lShet.UnusedBumps.Remove(lNewBumpId);
+          }
+
+          //===================================================================
+          // Update the bump with the desired contents, and update the terrain
+          // square to use it
+          //===================================================================
+          BumpImageChunk lOldBump = ((Level)mMainForm.RootChunk).GetBumpById(lBumpImageIdx);
+          lNewBump.CopyFrom(lOldBump);
+          lNewBump.SetPixelType(xiBumpPxX, xiBumpPxY, xiNewVal);
+          mSubject.TexMetaData[xiTexX][xiTexY][(int)eTexMetaDataEntries.Bumpmap]
+           = (byte)lNewBumpId;
+          mBumpImageUsageCountArray[lBumpImageIdx]--;
+          mBumpImageUsageCountArray[lNewBumpId]++;
           break;
       }
     }
@@ -1072,7 +1122,15 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
           OddImageChunk lNewOdd = new OddImageChunk(
             lOddId,
             (byte)xiRespawnSetting.Direction);
-          lShet.AddOdd(lNewOdd);
+          int lSizeIncrease = lShet.AddOdd(lNewOdd);
+          lShet.TrailingZeroByteCount -= lSizeIncrease;
+
+          if (lShet.TrailingZeroByteCount < 0)
+          {
+            MessageBox.Show(string.Format(
+              "WARNING: You have just run out of space in your level file - you will need to free up {0} bytes before you can save your changes.",
+              -lShet.TrailingZeroByteCount));
+          }
         }
         else
         {
@@ -1093,7 +1151,7 @@ Try running ""Reindex bump"" on the level (in the Actions tab)");
       // reverses the directions...
       mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Four] =
        xiRespawnSetting.Orientation == eOrientation.North ? (byte)4 : (byte)xiRespawnSetting.Orientation;
-      mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Zero] = (byte)lOddId;
+      mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Odds] = (byte)lOddId;
       
       // Rotate back to north to set position (layer seven)
       xiRespawnSetting.RotateTo(eOrientation.North);
