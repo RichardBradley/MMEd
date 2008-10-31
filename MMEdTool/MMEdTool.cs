@@ -24,6 +24,9 @@ namespace MMEdTool
       const string USAGE = "usage: mmedtool <command>\n\ntry mmedtool help for more info";
       const string GET_ALL_XML_USAGE = "usage: mmedtool getallxml <path/to/MICRO> <outfile.xml>\n\nparses all the level files found in the given tree, and writes them to the given XML file";
       const string UNUSED_VRAM_USAGE = "usage: mmedtool vram <path/to/MICRO>\n\nwrites a few png files representing the VRAM";
+      const string FIND_CD_OFFSETS_USAGE = "usage: mmedtool findcdoffsets <path/to/cdimage.bin> <path/to/MICRO>\n\nsearches the CD image for all the level files found in the given tree, and outputs their offsets within the bin file";
+      const string FIND_COURSENAME_OFFSETS_USAGE = "usage: mmedtool findcoursenameoffsets <path/to/cdimage.bin>";
+
       if (args.Length == 0)
       {
         Console.Error.WriteLine(USAGE);
@@ -47,6 +50,7 @@ namespace MMEdTool
             }
             return VramUsage(lRootDir);
           }
+
         case "getallxml":
           {
             DirectoryInfo lRootDir; FileInfo lXmlOut;
@@ -64,10 +68,65 @@ namespace MMEdTool
             }
             return GetAllXml(lRootDir, lXmlOut);
           }
+
+        case "findcdoffsets":
+          {
+            FileInfo lCDImage;
+            DirectoryInfo lRootDir;
+            try
+            {
+              if (args.Length != 3)
+              {
+                throw new Exception("wrong number of args. expecting 3");
+              }
+              lCDImage = new FileInfo(args[1]);
+              lRootDir = new DirectoryInfo(args[2]);
+
+              if (!lCDImage.Exists)
+              {
+                throw new Exception(string.Format("CD Image {0} doesn't exist", lCDImage.FullName));
+              }
+              if (!lRootDir.Exists)
+              {
+                throw new Exception(string.Format("Directory {0} doesn't exist", lRootDir.FullName));
+              }
+            }
+            catch (Exception e)
+            {
+              Console.Error.WriteLine("Error: {0}\n\n{1}", e, FIND_CD_OFFSETS_USAGE);
+              return 1;
+            }
+            return FindCDOffsets(lCDImage, lRootDir);
+          }
+
+        case "findcoursenameoffsets":
+          {
+            FileInfo lCDImage;
+            try
+            {
+              if (args.Length != 2)
+              {
+                throw new Exception("wrong number of args. expecting 2");
+              }
+              lCDImage = new FileInfo(args[1]);
+
+              if (!lCDImage.Exists)
+              {
+                throw new Exception(string.Format("CD Image {0} doesn't exist", lCDImage.FullName));
+              }
+            }
+            catch (Exception e)
+            {
+              Console.Error.WriteLine("Error: {0}\n\n{1}", e, FIND_COURSENAME_OFFSETS_USAGE);
+              return 1;
+            }
+            return FindCourseNameOffsets(lCDImage);
+          }
+
         case "help":
           if (args.Length == 1)
           {
-            Console.Out.WriteLine("usage: mmedtool <command>\n\nwhere command is one of:\n  getallxml");
+            Console.Out.WriteLine("usage: mmedtool <command>\n\nwhere command is one of:\n  getallxml\n  vram\n  findcdoffsets");
             return 0;
           }
           else if (args.Length == 2)
@@ -80,6 +139,9 @@ namespace MMEdTool
               case "vram":
                 Console.Out.WriteLine(UNUSED_VRAM_USAGE);
                 return 0;
+              case "findcdoffsets":
+                Console.Out.WriteLine(FIND_CD_OFFSETS_USAGE);
+                return 0;
               default:
                 Console.Error.WriteLine("mmedtool: help: unrecognised command");
                 return 1;
@@ -90,11 +152,105 @@ namespace MMEdTool
             Console.Error.WriteLine("mmedtool: help: unrecognised command");
             return 1;
           }
+
         default:
           Console.Error.WriteLine(USAGE);
           return 1;
       }
     }
+
+    #region CD image processing stuff
+
+    ///========================================================================
+    /// Static Method : FindCourseNameOffsets
+    /// 
+    /// <summary>
+    /// 	Find the locations in the CD image of all the course names.
+    /// 
+    ///   This only finds course names that are coded into the MMCD class.
+    /// </summary>
+    /// <param name="xiCDImage"></param>
+    /// <returns></returns>
+    ///========================================================================
+    private static int FindCourseNameOffsets(FileInfo xiCDImage)
+    {
+      CDImage lCDImage = new CDImage(xiCDImage);
+
+      foreach (MMCD.Course lCourse in MMCD.Courses)
+      {
+        if (lCourse.CourseName == "")
+        {
+          continue;
+        }
+
+        byte[] lBytes = Encoding.ASCII.GetBytes(lCourse.CourseNameWithLineBreaks);
+
+        long lIndex = 0;
+        bool lFound = false;
+        while ((lIndex = lCDImage.Find(lBytes, lIndex)) > 0)
+        {
+          WriteLine("{0}: {1}", lCourse.FileName, lIndex++, lCourse.CourseName);
+          lFound = true;
+        }
+
+        if (!lFound)
+        {
+          WriteLine("{0}: Not found", lCourse.FileName, lCourse.CourseName);
+        }
+      }
+
+      return 0;
+    }
+
+    ///========================================================================
+    /// Static Method : FindCDOffsets
+    /// 
+    /// <summary>
+    /// 	Find the offsets in the CD image of all the courses in the given
+    ///   directory (and subdirectories).
+    /// </summary>
+    /// <param name="xiCDImage"></param>
+    /// <param name="xiRootDir"></param>
+    /// <returns></returns>
+    ///========================================================================
+    private static int FindCDOffsets(FileInfo xiCDImage, DirectoryInfo xiRootDir)
+    {
+      CDImage lCDImage = new CDImage(xiCDImage);
+
+      //=======================================================================
+      // Find all the levels
+      //=======================================================================
+      Regex lLevelNameRegex = new Regex("[A-Z]+\\\\[A-Z]+[0-9]\\.DAT$", RegexOptions.IgnoreCase);
+      foreach (FileInfo lFile in xiRootDir.GetFiles("*.DAT", SearchOption.AllDirectories))
+      {
+        //=====================================================================
+        // Read the entire level into memory
+        //=====================================================================
+        byte[] lLevelBytes = new byte[lFile.Length];
+        using (FileStream lFileStream = lFile.OpenRead())
+        {
+          lFileStream.Read(lLevelBytes, 0, lLevelBytes.Length);
+        }
+
+        //=====================================================================
+        // Find the level in the CD image and output
+        //=====================================================================
+        long lIndex = lCDImage.Find(lLevelBytes, 0);
+
+        if (lIndex > -1)
+        {
+          WriteLine("{0}: {1}", lFile.Name, lIndex);
+        }
+        else
+        {
+          WriteLine("{0}: Not found", lFile.Name);
+        }
+      }
+
+      return 0;
+    }
+
+    #endregion
 
     #region VRAM stuff
 

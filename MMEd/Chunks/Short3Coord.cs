@@ -65,5 +65,19 @@ namespace MMEd.Chunks
     {
       return string.Format("({0},{1},{2})", X, Y, Z);
     }
+
+    public override bool Equals(object obj)
+    {
+      return obj != null &&
+        obj is Short3Coord &&
+        X == ((Short3Coord)obj).X &&
+        Y == ((Short3Coord)obj).Y &&
+        Z == ((Short3Coord)obj).Z;
+    }
+
+    public override int GetHashCode()
+    {
+      return X + Y * 256 + Z * 65536;
+    }
   }
 }

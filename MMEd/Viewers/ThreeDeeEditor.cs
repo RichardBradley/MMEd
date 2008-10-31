@@ -389,9 +389,9 @@ namespace MMEd.Viewers
         return;
       }
 
-      if (mSubject != mMainForm.RootChunk)
+      if (mSubject != mMainForm.CurrentLevel)
       {
-        mSubject = mMainForm.RootChunk as Level;
+        mSubject = mMainForm.CurrentLevel;
         RebuildScene();
         ResetCamera();
       }

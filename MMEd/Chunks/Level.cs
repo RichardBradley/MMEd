@@ -297,6 +297,11 @@ namespace MMEd.Chunks
       get { return mName; }
     }
 
+    public void SetName(string xiName)
+    {
+      mName = xiName;
+    }
+
     public override void ReplaceChild(Chunk xiFrom, Chunk xiTo)
     {
       if (xiFrom == NamedImageGroups)

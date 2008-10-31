@@ -23,6 +23,19 @@ namespace MMEd.Chunks
       public byte To;
       public KeySection(byte xiFrom, byte xiTo) { From = xiFrom; To = xiTo; }
       public KeySection() { }
+
+      public override bool Equals(object obj)
+      {
+        return obj != null && 
+          obj is KeySection &&
+          (From == ((KeySection)obj).From) && 
+          (To == ((KeySection)obj).To);
+      }
+
+      public override int GetHashCode()
+      {
+        return From + To * 256;
+      }
     }
 
     public KeyWaypointsChunk() { }
@@ -56,13 +69,26 @@ namespace MMEd.Chunks
       }
     }
 
-
     public override string Name
     {
       get
       {
         return "Key Waypoints";
       }
+    }
+
+    public override List<string> GetDifferences(Chunk xiChunk)
+    {
+      KeyWaypointsChunk lOther = xiChunk as KeyWaypointsChunk;
+
+      if (!Utils.ArrayCompare(KeySections, lOther.KeySections))
+      {
+        List<string> lRet = base.GetDifferences(xiChunk);
+        lRet.Add("Changed key waypoints");
+        return lRet;
+      }
+
+      return base.GetDifferences(xiChunk);
     }
 
     public override void ReplaceChild(Chunk xiFrom, Chunk xiTo)

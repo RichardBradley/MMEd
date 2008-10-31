@@ -79,6 +79,18 @@ namespace MMEd.Chunks
       throw new Exception("The method or operation is not implemented.");
     }
 
+    public override List<string> GetDifferences(Chunk xiChunk)
+    {
+      if (ByteArrayComparer.CompareStatic(mData, ((OddImageChunk)xiChunk).mData) != 0)
+      {
+        List<string> lRet = base.GetDifferences(xiChunk);
+        lRet.Add("Changed odd #" + mIdx.ToString());
+        return lRet;
+      }
+
+      return base.GetDifferences(xiChunk);
+    }
+
     #region IImageProvider Members
 
     Bitmap mBitmapCache;

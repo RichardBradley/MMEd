@@ -28,7 +28,7 @@ namespace MMEd.Viewers
     ///========================================================================
     public void ReindexImages(eTexMetaDataEntries xiImageType)
     {
-      Level lLevel = mMainForm.RootChunk as Level;
+      Level lLevel = mMainForm.CurrentLevel;
       if (lLevel == null)
       {
         MessageBox.Show("Must have a level open for this action");
@@ -182,7 +182,7 @@ namespace MMEd.Viewers
     ///========================================================================
     public void CompactImages(eTexMetaDataEntries xiImageType)
     {
-      Level lLevel = mMainForm.RootChunk as Level;
+      Level lLevel = mMainForm.CurrentLevel;
       if (lLevel == null)
       {
         MessageBox.Show("Must have a level open for this action");
@@ -281,7 +281,7 @@ namespace MMEd.Viewers
 
     public void CloneFlat()
     {
-      Level lLevel = mMainForm.RootChunk as Level;
+      Level lLevel = mMainForm.CurrentLevel;
       if (lLevel == null)
       {
         MessageBox.Show("Must have a level open for this action");
@@ -633,8 +633,9 @@ namespace MMEd.Viewers
 
     public override bool CanViewChunk(Chunk xiChunk)
     {
-      //always leave this tab available, as it's fast to render
-      return true;
+      //always leave this tab available, as it's fast to render - unless this is 
+      //a Version chunk, in which case there's really nothing useful it can do
+      return !(xiChunk is MMEd.Chunks.Version);
     }
 
     // Create an instance of the viewer manager class

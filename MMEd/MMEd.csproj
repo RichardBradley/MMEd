@@ -48,6 +48,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\GLTK\lib\Tao.Platform.Windows.dll</HintPath>
     </Reference>
+    <Reference Include="xmldiffpatch, Version=1.0.8.28, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\xmldiffpatch.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Ad3ds\Face.cs" />
@@ -63,6 +67,7 @@
     <Compile Include="Chunk.cs" />
     <Compile Include="Chunks\BumpImageChunk.cs" />
     <Compile Include="Chunks\CameraPositionChunk.cs" />
+    <Compile Include="Chunks\Version.cs" />
     <Compile Include="Chunks\FileChunk.cs" />
     <Compile Include="Chunks\IReindexableChunk.cs" />
     <Compile Include="Chunks\OBJTChunk.cs" />
@@ -79,6 +84,13 @@
     <Compile Include="Chunks\TIMChunk.cs" />
     <Compile Include="Chunks\RawDataChunk.cs" />
     <Compile Include="Chunks\TypedRawDataChunk.cs" />
+    <Compile Include="Chunks\VersionList.cs" />
+    <Compile Include="Forms\NewForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\NewForm.Designer.cs">
+      <DependentUpon>NewForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="GlobalSettings.cs" />
     <Compile Include="LocalSettings.cs" />
     <Compile Include="MainForm.cs">
@@ -87,7 +99,15 @@
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\PublishForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\PublishForm.Designer.cs">
+      <DependentUpon>PublishForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Util\CDImage.cs" />
     <Compile Include="Util\EquivalenceCollection.cs" />
+    <Compile Include="Util\MMCD.cs" />
     <Compile Include="Util\OverlaySelector.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -96,9 +116,17 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Forms\NewForm.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>NewForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <SubType>Designer</SubType>
       <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\PublishForm.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>PublishForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Util\OverlaySelector.resx">
       <SubType>Designer</SubType>
@@ -153,6 +181,7 @@
     <Compile Include="Viewers\ActionsViewer.cs" />
     <Compile Include="Viewers\CameraViewer.cs" />
     <Compile Include="Viewers\FlatViewer.cs" />
+    <Compile Include="Viewers\HistoryViewer.cs" />
     <Compile Include="Viewers\MMEdEntity.cs" />
     <Compile Include="Viewers\MMEdScene.cs" />
     <Compile Include="Viewers\MMEdEditorView.cs">

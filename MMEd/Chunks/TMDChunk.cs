@@ -53,6 +53,25 @@ namespace MMEd.Chunks
     public TMDChunk() { }
     public TMDChunk(System.IO.Stream inStr, string xiName) { mName = xiName; Deserialise(inStr); }
 
+    public override List<string> GetDifferences(Chunk xiChunk)
+    {
+      TMDChunk lOther = xiChunk as TMDChunk;
+
+      if (Flags != lOther.Flags ||
+        ObjectCount != lOther.ObjectCount ||
+        !Utils.ArrayCompare(Faces, lOther.Faces) ||
+        !Utils.ArrayCompare(Vertices, lOther.Vertices) ||
+        !Utils.ArrayCompare(Normals, lOther.Normals) ||
+        ObjScale != lOther.ObjScale)
+      {
+        List<string> lRet = base.GetDifferences(xiChunk);
+        lRet.Add("Changed TMD #" + mIdx.ToString());
+        return lRet;
+      }
+
+      return base.GetDifferences(xiChunk);
+    }
+
     public override void Deserialise(System.IO.Stream inStr)
     {
       long lStartingOffset = inStr.Position;
@@ -444,6 +463,37 @@ namespace MMEd.Chunks
 
       //for unknown type
       public byte[] mData;
+
+      public override bool Equals(object obj)
+      {
+        Face lOther = obj as Face;
+
+        if (obj == null) return false;
+
+        if (mOLen != lOther.mOLen ||
+          mILen != lOther.mILen ||
+          mFlag != lOther.mFlag ||
+          mMode != lOther.mMode ||
+          !Utils.ArrayCompare(mColors, lOther.mColors) ||
+          !Utils.ArrayCompare(mNormalIds, lOther.mNormalIds) ||
+          !Utils.ArrayCompare(mVertexIds, lOther.mVertexIds) ||
+          mCBA != lOther.mCBA ||
+          mTexPageHiByte != lOther.mTexPageHiByte ||
+          mTexPage != lOther.mTexPage ||
+          !Utils.ArrayCompare(mTexCoords, lOther.mTexCoords) ||
+          !Utils.ArrayCompare(mData, lOther.mData))
+        {
+          return false;
+        }
+
+        return true;
+      }
+
+      public override int GetHashCode()
+      {
+        // This is not a good hashcode.
+        return (int)mOLen + (int)mILen + (int)mFlag + (int)mMode + (int)mCBA + (int)mTexPageHiByte + (int)mTexPage;
+      }
 
       public bool IsUnknownType()
       {

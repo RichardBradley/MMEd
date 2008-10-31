@@ -77,6 +77,33 @@ namespace MMEd.Chunks
     public TIMChunk() { }
     public TIMChunk(System.IO.Stream inStr, string xiName) { mName = xiName; Deserialise(inStr); }
 
+    public override List<string> GetDifferences(Chunk xiChunk)
+    {
+      TIMChunk lOther = xiChunk as TIMChunk;
+
+      if (BPP != lOther.BPP ||
+        ClutSize != lOther.ClutSize ||
+        PaletteOrgX != lOther.PaletteOrgX ||
+        PaletteOrgY != lOther.PaletteOrgY ||
+        ClutColors != lOther.ClutColors ||
+        ClutCount != lOther.ClutCount ||
+        !Utils.ArrayCompare(Palette, lOther.Palette) ||
+        ImageDataSize != lOther.ImageDataSize ||
+        ImageOrgX != lOther.ImageOrgX ||
+        ImageOrgY != lOther.ImageOrgY ||
+        ImageWidth != lOther.ImageWidth ||
+        ImageHeight != lOther.ImageHeight ||
+        !Utils.ArrayCompare(ImageData, lOther.ImageData) ||
+        !Utils.ArrayCompare(ZeroPadding, lOther.ZeroPadding))
+      {
+        List<string> lRet = base.GetDifferences(xiChunk);
+        lRet.Add("Changed TIM #" + mIdx.ToString());
+        return lRet;
+      }
+
+      return base.GetDifferences(xiChunk);
+    }
+
     public void Deserialise(System.IO.Stream inStr, int xiExpectedDataSize)
     {
       long lStartOffset = xiExpectedDataSize >= 0 ? inStr.Position : -1;

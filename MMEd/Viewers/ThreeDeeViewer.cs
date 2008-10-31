@@ -293,7 +293,7 @@ namespace MMEd.Viewers
     {
       mScene.Clear();
       if (mSubject != null)
-        mScene.AddRange(mSubject.GetEntities(mMainForm.RootChunk, TextureMode, SelectedMetadata));
+        mScene.AddRange(mSubject.GetEntities(mMainForm.CurrentLevel, TextureMode, SelectedMetadata));
     }
 
     public static GLTK.Point Short3CoordToPoint(Short3Coord xiVal)

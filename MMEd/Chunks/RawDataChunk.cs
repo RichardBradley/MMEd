@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using MMEd.Util;
 
 // Just a wrapper to organise the tree slightly better
 
@@ -36,6 +37,18 @@ namespace MMEd.Chunks
       {
         return GivenName;
       }
+    }
+
+    public override List<string> GetDifferences(Chunk xiChunk)
+    {
+      if (ByteArrayComparer.CompareStatic(mData, ((RawDataChunk)xiChunk).mData) != 0)
+      {
+        List<string> lRet = base.GetDifferences(xiChunk);
+        lRet.Add("Changed data named " + GivenName);
+        return lRet;
+      }
+
+      return base.GetDifferences(xiChunk);
     }
 
     public override void ReplaceChild(Chunk xiFrom, Chunk xiTo)

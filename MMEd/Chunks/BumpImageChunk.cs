@@ -222,6 +222,18 @@ namespace MMEd.Chunks
       }
     }
 
+    public override List<string> GetDifferences(Chunk xiChunk)
+    {
+      if (ByteArrayComparer.CompareStatic(mData, ((BumpImageChunk)xiChunk).mData) != 0)
+      {
+        List<string> lRet = base.GetDifferences(xiChunk);
+        lRet.Add("Changed bump #" + mIdx.ToString());
+        return lRet;
+      }
+
+      return base.GetDifferences(xiChunk);
+    }
+
     int mIdx;
     private byte[] mData;
     public const int SCALE = 16;

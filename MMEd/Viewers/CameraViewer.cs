@@ -153,7 +153,7 @@ namespace MMEd.Viewers
       mView = new GLTK.View(mScene, mCamera, mRenderer);
 
       mScene.Clear();
-      if (mMainForm.RootChunk is Chunks.Level)
+      if (mMainForm.CurrentLevel != null)
       {
         // Create a surface and fill it with a 10 x 10 grid of squares
         MMEdEntity lSurface = new MMEdEntity(mSubject);
@@ -181,10 +181,10 @@ namespace MMEd.Viewers
         mScene.AddRange(new MMEdEntity[] { lSurface });
 
         // Use a random object from the level for now.
-        Level lLevel = ((Level)mMainForm.RootChunk);
+        Level lLevel = mMainForm.CurrentLevel;
         TMDChunk lObject = lLevel.GetObjtById(1);
         mScene.AddRange(lObject.GetEntities(
-          mMainForm.RootChunk,
+          mMainForm.CurrentLevel,
           MMEd.Viewers.ThreeDee.eTextureMode.NormalTextures,
           eTexMetaDataEntries.Odds));
 

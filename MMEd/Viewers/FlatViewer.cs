@@ -36,7 +36,7 @@ namespace MMEd.Viewers
         return;
       }
 
-      Level lLevel = (Level)mMainForm.RootChunk;
+      Level lLevel = mMainForm.CurrentLevel;
 
       //=======================================================================
       // Warn about changing flags
@@ -218,7 +218,7 @@ namespace MMEd.Viewers
 
       if (mSubject != null)
       {
-        Level lLevel = ((Level)mMainForm.RootChunk);
+        Level lLevel = mMainForm.CurrentLevel;
 
         Panel.SuspendLayout();
         Panel.WeaponsTable.SuspendLayout();

@@ -107,7 +107,7 @@ namespace MMEd.Util
         {
           throw new ArgumentException("Encountered EOF while trying to read a null terminated string");
         }
-        else if (i == ' ' ||
+        else if (i == ' ' || i == '\r' || i == '\n' ||
             (i >= '!' && i <= '~'))
         {
           acc.Append((char)i);
@@ -121,7 +121,7 @@ namespace MMEd.Util
 
     public static void WriteASCIINullTermString(Stream strm, string s)
     {
-      byte[] ascii = Encoding.ASCII.GetBytes(s);
+      byte[] ascii = s == null ? new byte[0] : Encoding.ASCII.GetBytes(s);
       strm.Write(ascii, 0, ascii.Length);
       strm.WriteByte(0);
     }

@@ -32,7 +32,15 @@ namespace MMEd.Viewers
         TreeNode parentNode = selNode.Parent;
         if (parentNode == null)
         {
-          mMainForm.RootChunk = lReplacement;
+          if (mMainForm.RootChunk is VersionList)
+          {
+            ((VersionList)mMainForm.RootChunk).CurrentLevel = (Level)lReplacement;
+            mMainForm.RootChunk = mMainForm.RootChunk;
+          }
+          else
+          {
+            mMainForm.RootChunk = lReplacement;
+          }
         }
         else
         {
@@ -47,10 +55,10 @@ namespace MMEd.Viewers
       }
     }
 
-    // all chunk types can be viewed...
+    // all chunk types can be viewed except for VersionLists and Versions...
     public override bool CanViewChunk(Chunk xiChunk)
     {
-      return true;
+      return !(xiChunk is VersionList || xiChunk is MMEd.Chunks.Version);
     }
 
     // Create an instance of the viewer manager class
@@ -64,7 +72,7 @@ namespace MMEd.Viewers
     public override void SetSubject(Chunk xiChunk)
     {
       if (mSubject == xiChunk) return;
-      if (xiChunk == null)
+      if (xiChunk == null || !CanViewChunk(xiChunk))
       {
         mMainForm.XMLTextBox.Text = "";
       }

@@ -145,6 +145,22 @@ namespace MMEd.Chunks
       Utils.DrawArrow(g, p, xiMidpoint, Direction, lLineLength, false);
     }
 
+    public override List<string> GetDifferences(Chunk xiChunk)
+    {
+      CameraPosChunk lOther = xiChunk as CameraPosChunk;
+
+      if (mDirection != lOther.mDirection || mDistance != lOther.mDistance || mElevation != lOther.mElevation)
+      {
+        List<string> lRet = base.GetDifferences(xiChunk);
+        lRet.Add(string.Format("Changed camera pos ({0},{1},{2}) to ({3},{4},{5})",
+          mDirection, mDistance, mElevation,
+          lOther.mDirection, lOther.mDistance, lOther.mElevation));
+        return lRet;
+      }
+      
+      return base.GetDifferences(xiChunk);
+    }
+
     short mDirection;
     short mDistance;
     short mElevation;

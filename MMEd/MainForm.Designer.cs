@@ -32,12 +32,15 @@ namespace MMEd
           System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
           this.mMenuStrip = new System.Windows.Forms.MenuStrip();
           this.MnuFile = new System.Windows.Forms.ToolStripMenuItem();
-          this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+          this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+          this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
           this.MnuiFileOpenLevel = new System.Windows.Forms.ToolStripMenuItem();
-          this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
           this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-          this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-          this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+          this.saveToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+          this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+          this.publishToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+          this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+          this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
           this.MainSplitter = new System.Windows.Forms.SplitContainer();
           this.ChunkTreeView = new System.Windows.Forms.TreeView();
           this.ViewerTabControl = new System.Windows.Forms.TabControl();
@@ -57,6 +60,10 @@ namespace MMEd
           this.label9 = new System.Windows.Forms.Label();
           this.groupBox3 = new System.Windows.Forms.GroupBox();
           this.groupBox7 = new System.Windows.Forms.GroupBox();
+          this.label25 = new System.Windows.Forms.Label();
+          this.OptimiseCameraCompactCheckbox = new System.Windows.Forms.CheckBox();
+          this.OptimiseCameraReindexCheckbox = new System.Windows.Forms.CheckBox();
+          this.label1 = new System.Windows.Forms.Label();
           this.OptimiseOddsCompactCheckbox = new System.Windows.Forms.CheckBox();
           this.OptimiseOddsReindexCheckbox = new System.Windows.Forms.CheckBox();
           this.label24 = new System.Windows.Forms.Label();
@@ -139,11 +146,15 @@ namespace MMEd
           this.RightHandSplit = new System.Windows.Forms.SplitContainer();
           this.Viewer3DRenderingSurfaceTopRight = new GLTK.RenderingSurface();
           this.Viewer3DRenderingSurfaceBottomRight = new GLTK.RenderingSurface();
+          this.ViewTabHistory = new System.Windows.Forms.TabPage();
+          this.RevertButton = new System.Windows.Forms.Button();
+          this.VersionChangesTextBox = new System.Windows.Forms.TextBox();
+          this.label27 = new System.Windows.Forms.Label();
+          this.VersionCreatedLabel = new System.Windows.Forms.Label();
+          this.label26 = new System.Windows.Forms.Label();
           this.ToolTip = new System.Windows.Forms.ToolTip(this.components);
-          this.OptimiseCameraCompactCheckbox = new System.Windows.Forms.CheckBox();
-          this.OptimiseCameraReindexCheckbox = new System.Windows.Forms.CheckBox();
-          this.label1 = new System.Windows.Forms.Label();
-          this.label25 = new System.Windows.Forms.Label();
+          this.SaveFileDialog = new System.Windows.Forms.SaveFileDialog();
+          this.OpenFileDialog = new System.Windows.Forms.OpenFileDialog();
           this.FlatPanel = new MMEd.Util.FlatEditorPanel();
           this.GridViewSelPanelHolder = new MMEd.Util.SmoothScrollingPanel();
           this.GridViewSelPanel = new System.Windows.Forms.Panel();
@@ -201,6 +212,7 @@ namespace MMEd
           this.RightHandSplit.Panel1.SuspendLayout();
           this.RightHandSplit.Panel2.SuspendLayout();
           this.RightHandSplit.SuspendLayout();
+          this.ViewTabHistory.SuspendLayout();
           this.GridViewSelPanelHolder.SuspendLayout();
           this.smoothScrollingPanel1.SuspendLayout();
           this.GridDisplayPanelHolder.SuspendLayout();
@@ -214,78 +226,100 @@ namespace MMEd
             this.MnuFile});
           this.mMenuStrip.Location = new System.Drawing.Point(0, 0);
           this.mMenuStrip.Name = "mMenuStrip";
-          this.mMenuStrip.Size = new System.Drawing.Size(801, 24);
+          this.mMenuStrip.Size = new System.Drawing.Size(796, 24);
           this.mMenuStrip.TabIndex = 0;
           this.mMenuStrip.Text = "menuStrip1";
           // 
           // MnuFile
           // 
           this.MnuFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripMenuItem1,
+            this.newToolStripMenuItem,
+            this.openToolStripMenuItem,
             this.MnuiFileOpenLevel,
-            this.toolStripMenuItem3,
             this.toolStripSeparator1,
-            this.saveToolStripMenuItem,
-            this.toolStripMenuItem2});
+            this.saveToolStripMenuItem1,
+            this.saveAsToolStripMenuItem,
+            this.publishToolStripMenuItem,
+            this.toolStripSeparator2,
+            this.exitToolStripMenuItem});
           this.MnuFile.Name = "MnuFile";
           this.MnuFile.Size = new System.Drawing.Size(35, 20);
           this.MnuFile.Text = "&File";
           // 
-          // toolStripMenuItem1
+          // newToolStripMenuItem
           // 
-          this.toolStripMenuItem1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripMenuItem1.Image")));
-          this.toolStripMenuItem1.ImageTransparentColor = System.Drawing.Color.Magenta;
-          this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-          this.toolStripMenuItem1.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-          this.toolStripMenuItem1.Size = new System.Drawing.Size(224, 22);
-          this.toolStripMenuItem1.Text = "&Open Level Binary...";
-          this.toolStripMenuItem1.ToolTipText = "Opens an MMv3 level file, as extracted from the CD";
-          this.toolStripMenuItem1.Click += new System.EventHandler(this.OpenLevelBinaryClick);
+          this.newToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("newToolStripMenuItem.Image")));
+          this.newToolStripMenuItem.Name = "newToolStripMenuItem";
+          this.newToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
+          this.newToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
+          this.newToolStripMenuItem.Text = "&New...";
+          this.newToolStripMenuItem.ToolTipText = "Start making a new edit to an MMs level";
+          this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
+          // 
+          // openToolStripMenuItem
+          // 
+          this.openToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("openToolStripMenuItem.Image")));
+          this.openToolStripMenuItem.Name = "openToolStripMenuItem";
+          this.openToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
+          this.openToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
+          this.openToolStripMenuItem.Text = "&Open...";
+          this.openToolStripMenuItem.ToolTipText = "Open an existing MMs level, or a level extracted from the CD";
+          this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
           // 
           // MnuiFileOpenLevel
           // 
           this.MnuiFileOpenLevel.ImageTransparentColor = System.Drawing.Color.Magenta;
           this.MnuiFileOpenLevel.Name = "MnuiFileOpenLevel";
-          this.MnuiFileOpenLevel.Size = new System.Drawing.Size(224, 22);
-          this.MnuiFileOpenLevel.Text = "&Open Unknown Binary...";
+          this.MnuiFileOpenLevel.Size = new System.Drawing.Size(203, 22);
+          this.MnuiFileOpenLevel.Text = "Open Unknown &Binary...";
           this.MnuiFileOpenLevel.ToolTipText = "Opens any old binary file, and searches through it for recognisable MMv3 datastru" +
               "ctures";
           this.MnuiFileOpenLevel.Click += new System.EventHandler(this.OpenUnknownBinaryClick);
           // 
-          // toolStripMenuItem3
-          // 
-          this.toolStripMenuItem3.ImageTransparentColor = System.Drawing.Color.Magenta;
-          this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-          this.toolStripMenuItem3.Size = new System.Drawing.Size(224, 22);
-          this.toolStripMenuItem3.Text = "&Open XML...";
-          this.toolStripMenuItem3.ToolTipText = "Opens an XML file saved from this program";
-          this.toolStripMenuItem3.Click += new System.EventHandler(this.OpenXmlClick);
-          // 
           // toolStripSeparator1
           // 
           this.toolStripSeparator1.Name = "toolStripSeparator1";
-          this.toolStripSeparator1.Size = new System.Drawing.Size(221, 6);
+          this.toolStripSeparator1.Size = new System.Drawing.Size(200, 6);
           // 
-          // saveToolStripMenuItem
+          // saveToolStripMenuItem1
           // 
-          this.saveToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("saveToolStripMenuItem.Image")));
-          this.saveToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
-          this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-          this.saveToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-          this.saveToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
-          this.saveToolStripMenuItem.Text = "&Save As Binary...";
-          this.saveToolStripMenuItem.ToolTipText = "Saves this file in an MMv3 binary format";
-          this.saveToolStripMenuItem.Click += new System.EventHandler(this.SaveAsBinaryClick);
+          this.saveToolStripMenuItem1.Image = ((System.Drawing.Image)(resources.GetObject("saveToolStripMenuItem1.Image")));
+          this.saveToolStripMenuItem1.Name = "saveToolStripMenuItem1";
+          this.saveToolStripMenuItem1.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
+          this.saveToolStripMenuItem1.Size = new System.Drawing.Size(203, 22);
+          this.saveToolStripMenuItem1.Text = "&Save";
+          this.saveToolStripMenuItem1.ToolTipText = "Save the current level";
+          this.saveToolStripMenuItem1.Click += new System.EventHandler(this.saveToolStripMenuItem1_Click);
           // 
-          // toolStripMenuItem2
+          // saveAsToolStripMenuItem
           // 
-          this.toolStripMenuItem2.ImageTransparentColor = System.Drawing.Color.Magenta;
-          this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-          this.toolStripMenuItem2.Size = new System.Drawing.Size(224, 22);
-          this.toolStripMenuItem2.Text = "&Save As XML...";
-          this.toolStripMenuItem2.ToolTipText = "Saves this file as an XML tree\r\nCAUTION: the resulting file may not be openable\r\n" +
-              "by future versions of MMEd!";
-          this.toolStripMenuItem2.Click += new System.EventHandler(this.SaveAsXmlClick);
+          this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
+          this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
+          this.saveAsToolStripMenuItem.Text = "Save &As...";
+          this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
+          // 
+          // publishToolStripMenuItem
+          // 
+          this.publishToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("publishToolStripMenuItem.Image")));
+          this.publishToolStripMenuItem.Name = "publishToolStripMenuItem";
+          this.publishToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P)));
+          this.publishToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
+          this.publishToolStripMenuItem.Text = "&Publish";
+          this.publishToolStripMenuItem.ToolTipText = "Export the current level to binary format, and optionally update your CD image";
+          this.publishToolStripMenuItem.Click += new System.EventHandler(this.publishToolStripMenuItem_Click);
+          // 
+          // toolStripSeparator2
+          // 
+          this.toolStripSeparator2.Name = "toolStripSeparator2";
+          this.toolStripSeparator2.Size = new System.Drawing.Size(200, 6);
+          // 
+          // exitToolStripMenuItem
+          // 
+          this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+          this.exitToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
+          this.exitToolStripMenuItem.Text = "E&xit";
+          this.exitToolStripMenuItem.ToolTipText = "Exit MMed";
+          this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
           // 
           // MainSplitter
           // 
@@ -302,8 +336,8 @@ namespace MMEd
           // MainSplitter.Panel2
           // 
           this.MainSplitter.Panel2.Controls.Add(this.ViewerTabControl);
-          this.MainSplitter.Size = new System.Drawing.Size(801, 567);
-          this.MainSplitter.SplitterDistance = 150;
+          this.MainSplitter.Size = new System.Drawing.Size(796, 568);
+          this.MainSplitter.SplitterDistance = 149;
           this.MainSplitter.TabIndex = 2;
           // 
           // ChunkTreeView
@@ -311,7 +345,7 @@ namespace MMEd
           this.ChunkTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
           this.ChunkTreeView.Location = new System.Drawing.Point(0, 0);
           this.ChunkTreeView.Name = "ChunkTreeView";
-          this.ChunkTreeView.Size = new System.Drawing.Size(150, 567);
+          this.ChunkTreeView.Size = new System.Drawing.Size(149, 568);
           this.ChunkTreeView.TabIndex = 6;
           this.ChunkTreeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.ChunkTreeView_AfterSelect);
           // 
@@ -331,10 +365,11 @@ namespace MMEd
           this.ViewerTabControl.Controls.Add(this.ViewTabCamera);
           this.ViewerTabControl.Controls.Add(this.ViewTabVRAM);
           this.ViewerTabControl.Controls.Add(this.ViewTab3dEditor);
+          this.ViewerTabControl.Controls.Add(this.ViewTabHistory);
           this.ViewerTabControl.Location = new System.Drawing.Point(3, 3);
           this.ViewerTabControl.Name = "ViewerTabControl";
           this.ViewerTabControl.SelectedIndex = 0;
-          this.ViewerTabControl.Size = new System.Drawing.Size(644, 561);
+          this.ViewerTabControl.Size = new System.Drawing.Size(640, 562);
           this.ViewerTabControl.TabIndex = 0;
           this.ViewerTabControl.Selected += new System.Windows.Forms.TabControlEventHandler(this.ViewerTabControl_Selected);
           this.ViewerTabControl.SelectedIndexChanged += new System.EventHandler(this.ViewerTabControl_SelectedIndexChanged);
@@ -348,7 +383,7 @@ namespace MMEd
           this.ViewTabActions.Location = new System.Drawing.Point(4, 22);
           this.ViewTabActions.Name = "ViewTabActions";
           this.ViewTabActions.Padding = new System.Windows.Forms.Padding(3);
-          this.ViewTabActions.Size = new System.Drawing.Size(636, 535);
+          this.ViewTabActions.Size = new System.Drawing.Size(632, 536);
           this.ViewTabActions.TabIndex = 0;
           this.ViewTabActions.Text = "Actions";
           this.ViewTabActions.UseVisualStyleBackColor = true;
@@ -515,6 +550,44 @@ namespace MMEd
           this.groupBox7.TabStop = false;
           this.groupBox7.Text = "Optimisation Settings";
           // 
+          // label25
+          // 
+          this.label25.AutoSize = true;
+          this.label25.Location = new System.Drawing.Point(241, 66);
+          this.label25.Name = "label25";
+          this.label25.Size = new System.Drawing.Size(206, 13);
+          this.label25.TabIndex = 11;
+          this.label25.Text = "! Reindex corrupts multi-player camera pos";
+          // 
+          // OptimiseCameraCompactCheckbox
+          // 
+          this.OptimiseCameraCompactCheckbox.AutoSize = true;
+          this.OptimiseCameraCompactCheckbox.Location = new System.Drawing.Point(166, 66);
+          this.OptimiseCameraCompactCheckbox.Name = "OptimiseCameraCompactCheckbox";
+          this.OptimiseCameraCompactCheckbox.Size = new System.Drawing.Size(68, 17);
+          this.OptimiseCameraCompactCheckbox.TabIndex = 10;
+          this.OptimiseCameraCompactCheckbox.Text = "Compact";
+          this.OptimiseCameraCompactCheckbox.UseVisualStyleBackColor = true;
+          // 
+          // OptimiseCameraReindexCheckbox
+          // 
+          this.OptimiseCameraReindexCheckbox.AutoSize = true;
+          this.OptimiseCameraReindexCheckbox.Location = new System.Drawing.Point(74, 66);
+          this.OptimiseCameraReindexCheckbox.Name = "OptimiseCameraReindexCheckbox";
+          this.OptimiseCameraReindexCheckbox.Size = new System.Drawing.Size(65, 17);
+          this.OptimiseCameraReindexCheckbox.TabIndex = 9;
+          this.OptimiseCameraReindexCheckbox.Text = "Reindex";
+          this.OptimiseCameraReindexCheckbox.UseVisualStyleBackColor = true;
+          // 
+          // label1
+          // 
+          this.label1.AutoSize = true;
+          this.label1.Location = new System.Drawing.Point(7, 66);
+          this.label1.Name = "label1";
+          this.label1.Size = new System.Drawing.Size(67, 13);
+          this.label1.TabIndex = 8;
+          this.label1.Text = "Camera Pos:";
+          // 
           // OptimiseOddsCompactCheckbox
           // 
           this.OptimiseOddsCompactCheckbox.AutoSize = true;
@@ -627,7 +700,7 @@ namespace MMEd
           this.ViewTabXML.Location = new System.Drawing.Point(4, 22);
           this.ViewTabXML.Name = "ViewTabXML";
           this.ViewTabXML.Padding = new System.Windows.Forms.Padding(3);
-          this.ViewTabXML.Size = new System.Drawing.Size(636, 535);
+          this.ViewTabXML.Size = new System.Drawing.Size(632, 536);
           this.ViewTabXML.TabIndex = 1;
           this.ViewTabXML.Text = "XML";
           this.ViewTabXML.UseVisualStyleBackColor = true;
@@ -665,7 +738,7 @@ namespace MMEd
           this.ViewTabFlat.Location = new System.Drawing.Point(4, 22);
           this.ViewTabFlat.Name = "ViewTabFlat";
           this.ViewTabFlat.Padding = new System.Windows.Forms.Padding(3);
-          this.ViewTabFlat.Size = new System.Drawing.Size(636, 535);
+          this.ViewTabFlat.Size = new System.Drawing.Size(632, 536);
           this.ViewTabFlat.TabIndex = 1;
           this.ViewTabFlat.Text = "Flat";
           this.ViewTabFlat.UseVisualStyleBackColor = true;
@@ -686,7 +759,7 @@ namespace MMEd
           this.ViewTabImg.Location = new System.Drawing.Point(4, 22);
           this.ViewTabImg.Name = "ViewTabImg";
           this.ViewTabImg.Padding = new System.Windows.Forms.Padding(3);
-          this.ViewTabImg.Size = new System.Drawing.Size(636, 535);
+          this.ViewTabImg.Size = new System.Drawing.Size(632, 536);
           this.ViewTabImg.TabIndex = 2;
           this.ViewTabImg.Text = "Img";
           this.ViewTabImg.UseVisualStyleBackColor = true;
@@ -713,7 +786,7 @@ namespace MMEd
           this.ViewTabGrid.Location = new System.Drawing.Point(4, 22);
           this.ViewTabGrid.Name = "ViewTabGrid";
           this.ViewTabGrid.Padding = new System.Windows.Forms.Padding(3);
-          this.ViewTabGrid.Size = new System.Drawing.Size(636, 535);
+          this.ViewTabGrid.Size = new System.Drawing.Size(632, 536);
           this.ViewTabGrid.TabIndex = 3;
           this.ViewTabGrid.Text = "Grid";
           this.ViewTabGrid.UseVisualStyleBackColor = true;
@@ -734,9 +807,9 @@ namespace MMEd
           // 
           this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.GridViewerStatusLabel});
-          this.statusStrip1.Location = new System.Drawing.Point(3, 510);
+          this.statusStrip1.Location = new System.Drawing.Point(3, 511);
           this.statusStrip1.Name = "statusStrip1";
-          this.statusStrip1.Size = new System.Drawing.Size(630, 22);
+          this.statusStrip1.Size = new System.Drawing.Size(626, 22);
           this.statusStrip1.TabIndex = 3;
           this.statusStrip1.Text = "statusStrip1";
           // 
@@ -902,7 +975,7 @@ namespace MMEd
           this.ViewTab3D.Location = new System.Drawing.Point(4, 22);
           this.ViewTab3D.Name = "ViewTab3D";
           this.ViewTab3D.Padding = new System.Windows.Forms.Padding(3);
-          this.ViewTab3D.Size = new System.Drawing.Size(636, 535);
+          this.ViewTab3D.Size = new System.Drawing.Size(632, 536);
           this.ViewTab3D.TabIndex = 4;
           this.ViewTab3D.Text = "3D";
           this.ViewTab3D.UseVisualStyleBackColor = true;
@@ -932,7 +1005,7 @@ namespace MMEd
           this.ViewTabBump.Location = new System.Drawing.Point(4, 22);
           this.ViewTabBump.Name = "ViewTabBump";
           this.ViewTabBump.Padding = new System.Windows.Forms.Padding(3);
-          this.ViewTabBump.Size = new System.Drawing.Size(636, 535);
+          this.ViewTabBump.Size = new System.Drawing.Size(632, 536);
           this.ViewTabBump.TabIndex = 5;
           this.ViewTabBump.Text = "Bump";
           this.ViewTabBump.UseVisualStyleBackColor = true;
@@ -1040,7 +1113,7 @@ namespace MMEd
           this.ViewTabOdd.Location = new System.Drawing.Point(4, 22);
           this.ViewTabOdd.Name = "ViewTabOdd";
           this.ViewTabOdd.Padding = new System.Windows.Forms.Padding(3);
-          this.ViewTabOdd.Size = new System.Drawing.Size(636, 535);
+          this.ViewTabOdd.Size = new System.Drawing.Size(632, 536);
           this.ViewTabOdd.TabIndex = 5;
           this.ViewTabOdd.Text = "Odd";
           this.ViewTabOdd.UseVisualStyleBackColor = true;
@@ -1150,7 +1223,7 @@ namespace MMEd
           this.ViewTabCamera.Location = new System.Drawing.Point(4, 22);
           this.ViewTabCamera.Name = "ViewTabCamera";
           this.ViewTabCamera.Padding = new System.Windows.Forms.Padding(3);
-          this.ViewTabCamera.Size = new System.Drawing.Size(636, 535);
+          this.ViewTabCamera.Size = new System.Drawing.Size(632, 536);
           this.ViewTabCamera.TabIndex = 5;
           this.ViewTabCamera.Text = "Camera";
           this.ViewTabCamera.UseVisualStyleBackColor = true;
@@ -1252,15 +1325,15 @@ namespace MMEd
           this.ViewTabVRAM.Controls.Add(this.VRAMStatusStrip);
           this.ViewTabVRAM.Location = new System.Drawing.Point(4, 22);
           this.ViewTabVRAM.Name = "ViewTabVRAM";
-          this.ViewTabVRAM.Size = new System.Drawing.Size(636, 535);
+          this.ViewTabVRAM.Size = new System.Drawing.Size(632, 536);
           this.ViewTabVRAM.TabIndex = 6;
           this.ViewTabVRAM.Text = "VRAM";
           // 
           // VRAMStatusStrip
           // 
-          this.VRAMStatusStrip.Location = new System.Drawing.Point(0, 513);
+          this.VRAMStatusStrip.Location = new System.Drawing.Point(0, 514);
           this.VRAMStatusStrip.Name = "VRAMStatusStrip";
-          this.VRAMStatusStrip.Size = new System.Drawing.Size(636, 22);
+          this.VRAMStatusStrip.Size = new System.Drawing.Size(632, 22);
           this.VRAMStatusStrip.TabIndex = 1;
           this.VRAMStatusStrip.Text = "statusStrip1";
           // 
@@ -1271,7 +1344,7 @@ namespace MMEd
           this.ViewTab3dEditor.Location = new System.Drawing.Point(4, 22);
           this.ViewTab3dEditor.Name = "ViewTab3dEditor";
           this.ViewTab3dEditor.Padding = new System.Windows.Forms.Padding(3);
-          this.ViewTab3dEditor.Size = new System.Drawing.Size(636, 535);
+          this.ViewTab3dEditor.Size = new System.Drawing.Size(632, 536);
           this.ViewTab3dEditor.TabIndex = 7;
           this.ViewTab3dEditor.Text = "3D Editor";
           this.ViewTab3dEditor.UseVisualStyleBackColor = true;
@@ -1281,9 +1354,9 @@ namespace MMEd
           this.panel2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
                       | System.Windows.Forms.AnchorStyles.Right)));
           this.panel2.Controls.Add(this.ThreeDeeEditorStatusLabel);
-          this.panel2.Location = new System.Drawing.Point(1, 502);
+          this.panel2.Location = new System.Drawing.Point(1, 503);
           this.panel2.Name = "panel2";
-          this.panel2.Size = new System.Drawing.Size(631, 32);
+          this.panel2.Size = new System.Drawing.Size(627, 32);
           this.panel2.TabIndex = 1;
           // 
           // ThreeDeeEditorStatusLabel
@@ -1309,8 +1382,8 @@ namespace MMEd
           // LeftRightSplit.Panel2
           // 
           this.LeftRightSplit.Panel2.Controls.Add(this.RightHandSplit);
-          this.LeftRightSplit.Size = new System.Drawing.Size(630, 493);
-          this.LeftRightSplit.SplitterDistance = 276;
+          this.LeftRightSplit.Size = new System.Drawing.Size(626, 494);
+          this.LeftRightSplit.SplitterDistance = 284;
           this.LeftRightSplit.TabIndex = 0;
           // 
           // LeftHandSplit
@@ -1327,8 +1400,8 @@ namespace MMEd
           // LeftHandSplit.Panel2
           // 
           this.LeftHandSplit.Panel2.Controls.Add(this.Viewer3DRenderingSurfaceBottomLeft);
-          this.LeftHandSplit.Size = new System.Drawing.Size(276, 493);
-          this.LeftHandSplit.SplitterDistance = 221;
+          this.LeftHandSplit.Size = new System.Drawing.Size(284, 494);
+          this.LeftHandSplit.SplitterDistance = 226;
           this.LeftHandSplit.TabIndex = 0;
           // 
           // Viewer3DRenderingSurfaceTopLeft
@@ -1336,7 +1409,7 @@ namespace MMEd
           this.Viewer3DRenderingSurfaceTopLeft.Dock = System.Windows.Forms.DockStyle.Fill;
           this.Viewer3DRenderingSurfaceTopLeft.Location = new System.Drawing.Point(0, 0);
           this.Viewer3DRenderingSurfaceTopLeft.Name = "Viewer3DRenderingSurfaceTopLeft";
-          this.Viewer3DRenderingSurfaceTopLeft.Size = new System.Drawing.Size(276, 221);
+          this.Viewer3DRenderingSurfaceTopLeft.Size = new System.Drawing.Size(284, 226);
           this.Viewer3DRenderingSurfaceTopLeft.TabIndex = 0;
           this.Viewer3DRenderingSurfaceTopLeft.Text = "renderingSurface1";
           // 
@@ -1345,7 +1418,7 @@ namespace MMEd
           this.Viewer3DRenderingSurfaceBottomLeft.Dock = System.Windows.Forms.DockStyle.Fill;
           this.Viewer3DRenderingSurfaceBottomLeft.Location = new System.Drawing.Point(0, 0);
           this.Viewer3DRenderingSurfaceBottomLeft.Name = "Viewer3DRenderingSurfaceBottomLeft";
-          this.Viewer3DRenderingSurfaceBottomLeft.Size = new System.Drawing.Size(276, 268);
+          this.Viewer3DRenderingSurfaceBottomLeft.Size = new System.Drawing.Size(284, 264);
           this.Viewer3DRenderingSurfaceBottomLeft.TabIndex = 0;
           this.Viewer3DRenderingSurfaceBottomLeft.Text = "renderingSurface3";
           // 
@@ -1363,8 +1436,8 @@ namespace MMEd
           // RightHandSplit.Panel2
           // 
           this.RightHandSplit.Panel2.Controls.Add(this.Viewer3DRenderingSurfaceBottomRight);
-          this.RightHandSplit.Size = new System.Drawing.Size(350, 493);
-          this.RightHandSplit.SplitterDistance = 223;
+          this.RightHandSplit.Size = new System.Drawing.Size(338, 494);
+          this.RightHandSplit.SplitterDistance = 228;
           this.RightHandSplit.TabIndex = 0;
           // 
           // Viewer3DRenderingSurfaceTopRight
@@ -1372,7 +1445,7 @@ namespace MMEd
           this.Viewer3DRenderingSurfaceTopRight.Dock = System.Windows.Forms.DockStyle.Fill;
           this.Viewer3DRenderingSurfaceTopRight.Location = new System.Drawing.Point(0, 0);
           this.Viewer3DRenderingSurfaceTopRight.Name = "Viewer3DRenderingSurfaceTopRight";
-          this.Viewer3DRenderingSurfaceTopRight.Size = new System.Drawing.Size(350, 223);
+          this.Viewer3DRenderingSurfaceTopRight.Size = new System.Drawing.Size(338, 228);
           this.Viewer3DRenderingSurfaceTopRight.TabIndex = 0;
           this.Viewer3DRenderingSurfaceTopRight.Text = "renderingSurface2";
           // 
@@ -1381,47 +1454,78 @@ namespace MMEd
           this.Viewer3DRenderingSurfaceBottomRight.Dock = System.Windows.Forms.DockStyle.Fill;
           this.Viewer3DRenderingSurfaceBottomRight.Location = new System.Drawing.Point(0, 0);
           this.Viewer3DRenderingSurfaceBottomRight.Name = "Viewer3DRenderingSurfaceBottomRight";
-          this.Viewer3DRenderingSurfaceBottomRight.Size = new System.Drawing.Size(350, 266);
+          this.Viewer3DRenderingSurfaceBottomRight.Size = new System.Drawing.Size(338, 262);
           this.Viewer3DRenderingSurfaceBottomRight.TabIndex = 0;
           this.Viewer3DRenderingSurfaceBottomRight.Text = "renderingSurface4";
           // 
-          // OptimiseCameraCompactCheckbox
+          // ViewTabHistory
           // 
-          this.OptimiseCameraCompactCheckbox.AutoSize = true;
-          this.OptimiseCameraCompactCheckbox.Location = new System.Drawing.Point(166, 66);
-          this.OptimiseCameraCompactCheckbox.Name = "OptimiseCameraCompactCheckbox";
-          this.OptimiseCameraCompactCheckbox.Size = new System.Drawing.Size(68, 17);
-          this.OptimiseCameraCompactCheckbox.TabIndex = 10;
-          this.OptimiseCameraCompactCheckbox.Text = "Compact";
-          this.OptimiseCameraCompactCheckbox.UseVisualStyleBackColor = true;
+          this.ViewTabHistory.Controls.Add(this.RevertButton);
+          this.ViewTabHistory.Controls.Add(this.VersionChangesTextBox);
+          this.ViewTabHistory.Controls.Add(this.label27);
+          this.ViewTabHistory.Controls.Add(this.VersionCreatedLabel);
+          this.ViewTabHistory.Controls.Add(this.label26);
+          this.ViewTabHistory.Location = new System.Drawing.Point(4, 22);
+          this.ViewTabHistory.Name = "ViewTabHistory";
+          this.ViewTabHistory.Padding = new System.Windows.Forms.Padding(3);
+          this.ViewTabHistory.Size = new System.Drawing.Size(632, 536);
+          this.ViewTabHistory.TabIndex = 8;
+          this.ViewTabHistory.Text = "History";
+          this.ViewTabHistory.UseVisualStyleBackColor = true;
           // 
-          // OptimiseCameraReindexCheckbox
+          // RevertButton
           // 
-          this.OptimiseCameraReindexCheckbox.AutoSize = true;
-          this.OptimiseCameraReindexCheckbox.Location = new System.Drawing.Point(74, 66);
-          this.OptimiseCameraReindexCheckbox.Name = "OptimiseCameraReindexCheckbox";
-          this.OptimiseCameraReindexCheckbox.Size = new System.Drawing.Size(65, 17);
-          this.OptimiseCameraReindexCheckbox.TabIndex = 9;
-          this.OptimiseCameraReindexCheckbox.Text = "Reindex";
-          this.OptimiseCameraReindexCheckbox.UseVisualStyleBackColor = true;
+          this.RevertButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+          this.RevertButton.Location = new System.Drawing.Point(431, 507);
+          this.RevertButton.Name = "RevertButton";
+          this.RevertButton.Size = new System.Drawing.Size(193, 23);
+          this.RevertButton.TabIndex = 4;
+          this.RevertButton.Text = "Revert to this version";
+          this.RevertButton.UseVisualStyleBackColor = true;
           // 
-          // label1
+          // VersionChangesTextBox
           // 
-          this.label1.AutoSize = true;
-          this.label1.Location = new System.Drawing.Point(7, 66);
-          this.label1.Name = "label1";
-          this.label1.Size = new System.Drawing.Size(67, 13);
-          this.label1.TabIndex = 8;
-          this.label1.Text = "Camera Pos:";
+          this.VersionChangesTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                      | System.Windows.Forms.AnchorStyles.Left)
+                      | System.Windows.Forms.AnchorStyles.Right)));
+          this.VersionChangesTextBox.Location = new System.Drawing.Point(66, 24);
+          this.VersionChangesTextBox.Multiline = true;
+          this.VersionChangesTextBox.Name = "VersionChangesTextBox";
+          this.VersionChangesTextBox.ReadOnly = true;
+          this.VersionChangesTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+          this.VersionChangesTextBox.Size = new System.Drawing.Size(560, 477);
+          this.VersionChangesTextBox.TabIndex = 3;
           // 
-          // label25
+          // label27
           // 
-          this.label25.AutoSize = true;
-          this.label25.Location = new System.Drawing.Point(241, 66);
-          this.label25.Name = "label25";
-          this.label25.Size = new System.Drawing.Size(206, 13);
-          this.label25.TabIndex = 11;
-          this.label25.Text = "! Reindex corrupts multi-player camera pos";
+          this.label27.AutoSize = true;
+          this.label27.Location = new System.Drawing.Point(7, 24);
+          this.label27.Name = "label27";
+          this.label27.Size = new System.Drawing.Size(52, 13);
+          this.label27.TabIndex = 2;
+          this.label27.Text = "Changes:";
+          // 
+          // VersionCreatedLabel
+          // 
+          this.VersionCreatedLabel.AutoSize = true;
+          this.VersionCreatedLabel.Location = new System.Drawing.Point(98, 7);
+          this.VersionCreatedLabel.Name = "VersionCreatedLabel";
+          this.VersionCreatedLabel.Size = new System.Drawing.Size(16, 13);
+          this.VersionCreatedLabel.TabIndex = 1;
+          this.VersionCreatedLabel.Text = "---";
+          // 
+          // label26
+          // 
+          this.label26.AutoSize = true;
+          this.label26.Location = new System.Drawing.Point(8, 7);
+          this.label26.Name = "label26";
+          this.label26.Size = new System.Drawing.Size(84, 13);
+          this.label26.TabIndex = 0;
+          this.label26.Text = "Version created:";
+          // 
+          // OpenFileDialog
+          // 
+          this.OpenFileDialog.FileName = "openFileDialog1";
           // 
           // FlatPanel
           // 
@@ -1551,7 +1655,7 @@ namespace MMEd
           // 
           this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
           this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-          this.ClientSize = new System.Drawing.Size(801, 593);
+          this.ClientSize = new System.Drawing.Size(796, 594);
           this.Controls.Add(this.MainSplitter);
           this.Controls.Add(this.mMenuStrip);
           this.Name = "MainForm";
@@ -1620,6 +1724,8 @@ namespace MMEd
           this.RightHandSplit.Panel1.ResumeLayout(false);
           this.RightHandSplit.Panel2.ResumeLayout(false);
           this.RightHandSplit.ResumeLayout(false);
+          this.ViewTabHistory.ResumeLayout(false);
+          this.ViewTabHistory.PerformLayout();
           this.GridViewSelPanelHolder.ResumeLayout(false);
           this.smoothScrollingPanel1.ResumeLayout(false);
           this.GridDisplayPanelHolder.ResumeLayout(false);
@@ -1636,8 +1742,7 @@ namespace MMEd
         private System.Windows.Forms.ToolStripMenuItem MnuFile;
         private System.Windows.Forms.SplitContainer MainSplitter;
         public System.Windows.Forms.TreeView ChunkTreeView;
-        private System.Windows.Forms.ToolStripMenuItem MnuiFileOpenLevel;
-        private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
+      private System.Windows.Forms.ToolStripMenuItem MnuiFileOpenLevel;
         public System.Windows.Forms.MenuStrip mMenuStrip;
       public System.Windows.Forms.TabControl ViewerTabControl;
         public System.Windows.Forms.TabPage ViewTabXML;
@@ -1715,9 +1820,6 @@ namespace MMEd
       private System.Windows.Forms.GroupBox groupBox3;
       public System.Windows.Forms.TrackBar GridViewZoomSlider;
       private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-      private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
-      private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem3;
-      private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
       public System.Windows.Forms.TrackBar SliderDistance;
       public System.Windows.Forms.TextBox TextDistance;
       private System.Windows.Forms.Label label13;
@@ -1759,6 +1861,21 @@ namespace MMEd
       public System.Windows.Forms.CheckBox OptimiseCameraReindexCheckbox;
       private System.Windows.Forms.Label label1;
       private System.Windows.Forms.Label label25;
+      private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+      private System.Windows.Forms.ToolStripMenuItem publishToolStripMenuItem;
+      private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
+      private System.Windows.Forms.ToolStripMenuItem newToolStripMenuItem;
+      private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
+      private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem1;
+      private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
+      private System.Windows.Forms.Label label26;
+      internal System.Windows.Forms.Label VersionCreatedLabel;
+      internal System.Windows.Forms.TextBox VersionChangesTextBox;
+      private System.Windows.Forms.Label label27;
+      internal System.Windows.Forms.Button RevertButton;
+      private System.Windows.Forms.SaveFileDialog SaveFileDialog;
+      private System.Windows.Forms.OpenFileDialog OpenFileDialog;
+      internal System.Windows.Forms.TabPage ViewTabHistory;
     }
 }
 

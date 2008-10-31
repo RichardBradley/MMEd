@@ -36,7 +36,7 @@ namespace MMEd.Viewers
 
     public override bool CanViewChunk(Chunk xiChunk)
     {
-      return true;
+      return !(xiChunk is VersionList || xiChunk is MMEd.Chunks.Version);
     }
 
     // Create an instance of the viewer manager class

@@ -249,6 +249,10 @@ namespace MMEd.Util
 
     public static bool ArrayCompare(Array xiArray1, Array xiArray2)
     {
+      if (xiArray1 == null || xiArray2 == null)
+      {
+        return xiArray1 == xiArray2;
+      }
       if (xiArray1.Length != xiArray2.Length)
       {
         return false;

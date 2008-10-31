@@ -400,6 +400,34 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
       }
     }
 
+    public override List<string> GetDifferences(Chunk xiChunk)
+    {
+      FlatChunk lOther = xiChunk as FlatChunk;
+      if (DeclaredIdx != lOther.DeclaredIdx ||
+        DeclaredName != lOther.DeclaredName ||
+        !OriginPosition.Equals(lOther.OriginPosition) ||
+        !RotationVector.Equals(lOther.RotationVector) ||
+        Width != lOther.Width ||
+        Height != lOther.Height ||
+        ScaleX != lOther.ScaleX ||
+        ScaleY != lOther.ScaleY ||
+        FlgA != lOther.FlgA ||
+        FlgB != lOther.FlgB ||
+        FlgC != lOther.FlgC ||
+        FlgD != lOther.FlgD ||
+        FlgE != lOther.FlgE ||
+        !Utils.ArrayCompare(TerrainHeight, lOther.TerrainHeight) ||
+        !Utils.ArrayCompare(TextureIds, lOther.TextureIds) ||
+        !Utils.ArrayCompare(TexMetaData, lOther.TexMetaData))
+      {
+        List<string> lRet = base.GetDifferences(xiChunk);
+        lRet.Add("Changed flat #" + DeclaredIdx.ToString() + " (" + DeclaredName + ")");
+        return lRet;
+      }
+
+      return base.GetDifferences(xiChunk);
+    }
+
     ///========================================================================
     /// Property : ByteSize
     /// 
@@ -535,6 +563,25 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
       {
         get { return string.Format("Object - Type:{0}", this.ObjtType); }
       }
+
+      public override List<string> GetDifferences(Chunk xiChunk)
+      {
+        ObjectEntry lOther = xiChunk as ObjectEntry;
+
+        if (!mOriginPosition.Equals(lOther.mOriginPosition) ||
+          !mRotationVector.Equals(lOther.mRotationVector) ||
+          ObjtType != lOther.ObjtType ||
+          FlagUnknown != lOther.FlagUnknown ||
+          IsSolid != lOther.IsSolid ||
+          ShortUnknown != lOther.ShortUnknown)
+        {
+          List<string> lRet = base.GetDifferences(xiChunk);
+          lRet.Add(string.Format("Changed object of type {0}", ObjtType));
+          return lRet;
+        }
+
+        return base.GetDifferences(xiChunk);
+      }
     }
 
     public class WeaponEntry : Chunk, IPositionable, IEntityProvider
@@ -603,6 +650,22 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
       public override string Name
       {
         get { return string.Format("Weapon - {0}", this.WeaponType); }
+      }
+
+      public override List<string> GetDifferences(Chunk xiChunk)
+      {
+        WeaponEntry lOther = xiChunk as WeaponEntry;
+
+        if (!mPosition.Equals(lOther.mPosition) ||
+          WeaponType != lOther.WeaponType ||
+          ShortUnknown != lOther.ShortUnknown)
+        {
+          List<string> lRet = base.GetDifferences(xiChunk);
+          lRet.Add(string.Format("Changed weapon of type {0}", WeaponType));
+          return lRet;
+        }
+
+        return base.GetDifferences(xiChunk);
       }
     }
 

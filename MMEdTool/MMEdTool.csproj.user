@@ -13,4 +13,8 @@
     <FallbackCulture>en-US</FallbackCulture>
     <VerifyUploadedFiles>false</VerifyUploadedFiles>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <StartArguments>findcdoffsets pSX_1_8\cdimages\MMv3Mod.bin MICRO</StartArguments>
+    <StartWorkingDirectory>C:\Documents and Settings\Matthew\My Documents\My Projects\MMEd</StartWorkingDirectory>
+  </PropertyGroup>
 </Project>

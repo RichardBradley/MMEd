@@ -40,5 +40,42 @@ namespace MMEd.Util
       if (a.Length > b.Length) return 1;
       return 0;
     }
+
+    ///========================================================================
+    ///  Static Method : Find
+    /// 
+    /// <summary>
+    /// 	Returns the first position after xiOffset that the byte array 
+    ///   xiSearch is found within the byte array xiSource.
+    /// </summary>
+    /// <param name="xiSource"></param>
+    /// <param name="xiSearch"></param>
+    /// <param name="xiOffset"></param>
+    /// <returns>Offset within xiSource, or -1 for no match</returns>
+    ///========================================================================
+    public static int Find(byte[] xiSource, byte[] xiSearch, int xiOffset)
+    {
+      for (int ii = xiOffset; ii < xiSource.Length - xiSearch.Length; ii++)
+      {
+        bool lMatch = true;
+
+        for (int jj = 0; jj < xiSearch.Length; jj++)
+        {
+          if (xiSource[ii + jj] != xiSearch[jj])
+          {
+            lMatch = false;
+            break;
+          }
+        }
+
+        if (lMatch)
+        {
+          return ii;
+        }
+      }
+
+      return -1;
+    }
+
   }
 }
