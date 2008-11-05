@@ -53,8 +53,10 @@ namespace MMEd.Chunks
     {
       Version lDiffFrom = GetLastVersion();
       bool lStoreAsDiff = (Versions.Count % 5 != 0);
+      long lExpectedSize = CDFilename == null ? -1L : MMCD.Courses.Find(new Predicate<MMCD.Course>(
+        delegate(MMCD.Course xiCourse) { return xiCourse.FileName == CDFilename; })).CDLength;
 
-      Version lNewVersion = new Version(xiNewLevel, lDiffFrom, lStoreAsDiff);
+      Version lNewVersion = new Version(xiNewLevel, lDiffFrom, lStoreAsDiff, lExpectedSize);
       Versions.Add(lNewVersion);
       CurrentLevel = xiNewLevel;
     }

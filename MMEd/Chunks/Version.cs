@@ -6,6 +6,7 @@ using System.Xml.Serialization;
 using Microsoft.XmlDiffPatch;
 using System.Xml;
 using MMEd.Util;
+using System.Windows.Forms;
 
 namespace MMEd.Chunks
 {
@@ -36,20 +37,50 @@ namespace MMEd.Chunks
     /// <param name="xiLevel"></param>
     /// <param name="xiPreviousVersion"></param>
     /// <param name="xiStoreAsDiff"></param>
+    /// <param name="xiExpectedSize"></param>
     ///========================================================================
-    internal Version(Level xiLevel, Version xiPreviousVersion, bool xiStoreAsDiff)
+    internal Version(Level xiLevel, Version xiPreviousVersion, bool xiStoreAsDiff, long xiExpectedSize)
     {
       CreationDate = DateTime.Now;
 
       //=======================================================================
       // Serialise the level
       //=======================================================================
-      using (MemoryStream lLevelStream = new MemoryStream())
+      while (true)
       {
-        xiLevel.Serialise(lLevelStream);
-        lLevelStream.Seek(0, SeekOrigin.Begin);
-        SerialisedLevel = new byte[lLevelStream.Length];
-        lLevelStream.Read(SerialisedLevel, 0, SerialisedLevel.Length);
+        using (MemoryStream lLevelStream = new MemoryStream())
+        {
+          xiLevel.Serialise(lLevelStream);
+          lLevelStream.Seek(0, SeekOrigin.Begin);
+          SerialisedLevel = new byte[lLevelStream.Length];
+          lLevelStream.Read(SerialisedLevel, 0, SerialisedLevel.Length);
+        }
+
+        if (xiExpectedSize > 0 && SerialisedLevel.Length != xiExpectedSize)
+        {
+          long lSizeAdjustment = SerialisedLevel.Length - xiExpectedSize;
+
+          if (lSizeAdjustment > 0 && xiLevel.SHET.TrailingZeroByteCount < lSizeAdjustment)
+          {
+            MessageBox.Show(string.Format(@"WARNING: The level is too large to fit in the expected size of file. Please remove some content from the level. Your level can be saved, but attempts to play the course will fail.
+
+Expected size: {0} bytes
+Actual size: {1} bytes
+Spare space: {2} bytes
+Space required: {3} bytes",
+                         xiExpectedSize,
+                         SerialisedLevel.Length,
+                         xiLevel.SHET.TrailingZeroByteCount,
+                         lSizeAdjustment - xiLevel.SHET.TrailingZeroByteCount), "MMEd", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+          }
+          else if (MessageBox.Show("WARNING: The level is not of the expected size for this course. Do you want to adjust the file size to match? This can be done without corrupting the level.", "MMEd", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+          {
+            xiLevel.SHET.TrailingZeroByteCount -= (int)lSizeAdjustment;
+            continue;
+          }
+        }
+
+        break;
       }
 
       //=======================================================================
@@ -408,7 +439,10 @@ namespace MMEd.Chunks
           lOffset += lDiff.mData.Length;
         }
 
-        Array.Copy(xiA, lOffset, lRet, lOffset, lRet.Length - lOffset);
+        if (lRet.Length != lOffset)
+        {
+          Array.Copy(xiA, lOffset, lRet, lOffset, lRet.Length - lOffset);
+        }
 
         return lRet;
       }

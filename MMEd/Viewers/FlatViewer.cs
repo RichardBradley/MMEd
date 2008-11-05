@@ -24,10 +24,82 @@ namespace MMEd.Viewers
       : base(xiMainForm)
     {
       mMainForm.FlatViewerCommitBtn.Click += new System.EventHandler(this.CommitButton_Click);
+      mMainForm.FlatViewerCloneButton.Click += new EventHandler(CloneButton_Click);
+      mMainForm.FlatViewerDeleteButton.Click += new EventHandler(DeleteButton_Click);
       Panel.AddWeaponLink.Click += new EventHandler(AddWeaponLink_Click);
       Panel.AddObjectLink.Click += new EventHandler(AddObjectLink_Click);
     }
 
+    void DeleteButton_Click(object sender, EventArgs e)
+    {
+      if (mSubject == null)
+      {
+        MessageBox.Show("Can't do that -- mSubject is null!");
+        return;
+      }
+
+      if (MessageBox.Show("Are you sure you want to delete this flat?", "Delete Flat", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+      {
+        return;
+      }
+
+      int lSizeDecrease = mMainForm.CurrentLevel.SHET.DeleteFlat(mSubject);
+      mMainForm.CurrentLevel.SHET.TrailingZeroByteCount += lSizeDecrease;
+
+      //=======================================================================
+      // Refresh the tree view
+      //=======================================================================
+      mMainForm.RootChunk = mMainForm.RootChunk;
+
+      MessageBox.Show("Flat deleted successfully.");
+    }
+
+    void CloneButton_Click(object sender, EventArgs e)
+    {
+      if (mSubject == null)
+      {
+        MessageBox.Show("Can't do that -- mSubject is null!");
+        return;
+      }
+
+      //=======================================================================
+      // Serialise the current Flat to XML, then deserialise - simple method
+      // of creating a deep clone of the Flat.
+      //=======================================================================
+      XmlSerializer lSerializer = new XmlSerializer(mSubject.GetType());
+      StringWriter lStringWriter = new StringWriter();
+      lSerializer.Serialize(lStringWriter, mSubject);
+      StringReader lStringReader = new StringReader(lStringWriter.ToString());
+      FlatChunk lDest = (FlatChunk)lSerializer.Deserialize(lStringReader);
+
+      //=======================================================================
+      // Add the new Flat to the SHET
+      //=======================================================================
+      lDest.DeclaredName = "NewFlat1";
+      Level lLevel = mMainForm.CurrentLevel;
+      short lMaxIdx = 0;
+      foreach (FlatChunk lExistingFlat in lLevel.SHET.Flats)
+      {
+        if (lExistingFlat.DeclaredIdx > lMaxIdx)
+        {
+          lMaxIdx = lExistingFlat.DeclaredIdx;
+        }
+      }
+      lDest.DeclaredIdx = (short)(1 + lMaxIdx);
+      int lSizeIncrease = lLevel.SHET.AddFlat(lDest);
+      lLevel.SHET.TrailingZeroByteCount -= lSizeIncrease;
+
+      //=======================================================================
+      // Refresh the tree view
+      //=======================================================================
+      mMainForm.RootChunk = mMainForm.RootChunk;
+
+      MessageBox.Show("Flat cloned successfully. " +
+        (lLevel.SHET.TrailingZeroByteCount < 0 ?
+        string.Format("Note that you have run out of space in your level file - you will need to free up {0} bytes before you can save your changes.", -lLevel.SHET.TrailingZeroByteCount) :
+        ""));
+    }
+    
     public void CommitButton_Click(object xiSender, EventArgs xiArgs)
     {
       if (mSubject == null)
@@ -103,11 +175,30 @@ namespace MMEd.Viewers
       //=======================================================================
       short lNewWidth = short.Parse(Panel.WidthTextBox.Text);
       short lNewHeight = short.Parse(Panel.HeightTextBox.Text);
+      FlatChunk.eResizeOptions lResizeOptions = FlatChunk.eResizeOptions.Default;
       int lSizeIncrease;
+
+      if (mSubject.Width != lNewWidth)
+      {
+        if (MessageBox.Show("You are changing the width of the flat. Do you want to fix the left-hand side of the flat? (Alternative is right-hand side)",
+          "MMEd", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+        {
+          lResizeOptions |= FlatChunk.eResizeOptions.KeepRight;
+        }
+      }
+
+      if (mSubject.Height != lNewHeight)
+      {
+        if (MessageBox.Show("You are changing the height of the flat. Do you want to fix the top side of the flat? (Alternative is bottom side)",
+          "MMEd", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+        {
+          lResizeOptions |= FlatChunk.eResizeOptions.KeepBottom;
+        }
+      }
 
       if (mSubject.Width != lNewWidth || mSubject.Height != lNewHeight || mSubject.FlgA != Panel.FlagACheckBox.Checked)
       {
-        lSizeIncrease = mSubject.Resize(Panel.FlagACheckBox.Checked, lNewWidth, lNewHeight);
+        lSizeIncrease = mSubject.Resize(Panel.FlagACheckBox.Checked, lNewWidth, lNewHeight, lResizeOptions);
         lLevel.SHET.TrailingZeroByteCount -= lSizeIncrease;
       }
 

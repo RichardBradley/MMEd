@@ -153,8 +153,8 @@ namespace MMEd.Chunks
       {
         List<string> lRet = base.GetDifferences(xiChunk);
         lRet.Add(string.Format("Changed camera pos ({0},{1},{2}) to ({3},{4},{5})",
-          mDirection, mDistance, mElevation,
-          lOther.mDirection, lOther.mDistance, lOther.mElevation));
+          lOther.mDirection, lOther.mDistance, lOther.mElevation,
+          mDirection, mDistance, mElevation));
         return lRet;
       }
       

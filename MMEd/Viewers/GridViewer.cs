@@ -785,9 +785,10 @@ namespace MMEd.Viewers
         }
 
         mMainForm.GridViewerStatusLabel.Text = string.Format(
-          "Tex Coord: ({0:0}, {1:0}) Flat Coord: ({2:0}, {3:0}) {4} {5}",
+          "Tex Coord: ({0:0}, {1:0}) Flat Coord: ({2:0}, {3:0}) {4} Tex:{5} {6}",
           lTexX, lTexY, x * mSubject.ScaleX, y * mSubject.ScaleY,
           lWorldCoord,
+          mSubject.TextureIds[lTexX][lTexY],
           lBumpString);
 
         //this seems a bit ott, but is needed for the red square highlight

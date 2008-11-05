@@ -277,59 +277,6 @@ namespace MMEd.Viewers
 
     #endregion 
 
-    #region Clone Flat Action
-
-    public void CloneFlat()
-    {
-      Level lLevel = mMainForm.CurrentLevel;
-      if (lLevel == null)
-      {
-        MessageBox.Show("Must have a level open for this action");
-        return;
-      }
-
-      FlatChunk lSource = mSubject as FlatChunk;
-      if (lSource == null) return;
-
-      //=======================================================================
-      // Serialise the current Flat to XML, then deserialise - simple method
-      // of creating a deep clone of the Flat.
-      //=======================================================================
-      XmlSerializer lSerializer = new XmlSerializer(lSource.GetType());
-      StringWriter lStringWriter = new StringWriter();
-      lSerializer.Serialize(lStringWriter, lSource);
-      StringReader lStringReader = new StringReader(lStringWriter.ToString());
-      FlatChunk lDest = (FlatChunk)lSerializer.Deserialize(lStringReader);
-
-      //=======================================================================
-      // Add the new Flat to the SHET
-      //=======================================================================
-      lDest.DeclaredName = "NewFlat1";
-      short lMaxIdx = 0;
-      foreach (FlatChunk lExistingFlat in lLevel.SHET.Flats)
-      {
-        if (lExistingFlat.DeclaredIdx > lMaxIdx)
-        {
-          lMaxIdx = lExistingFlat.DeclaredIdx;
-        }
-      }
-      lDest.DeclaredIdx = (short)(1 + lMaxIdx);
-      int lSizeIncrease = lLevel.SHET.AddFlat(lDest);
-      lLevel.SHET.TrailingZeroByteCount -= lSizeIncrease;
-
-      //=======================================================================
-      // Refresh the tree view
-      //=======================================================================
-      mMainForm.RootChunk = mMainForm.RootChunk;
-
-      MessageBox.Show("Flat cloned successfully. " +
-        (lLevel.SHET.TrailingZeroByteCount < 0 ? 
-        string.Format("Note that you have run out of space in your level file - you will need to free up {0} bytes before you can save your changes.", -lLevel.SHET.TrailingZeroByteCount) : 
-        ""));
-    }
-
-    #endregion
-
     #region Export TIM Action
 
     void ActionsTabExportTIMButton_Click(object sender, EventArgs e)
@@ -417,9 +364,9 @@ namespace MMEd.Viewers
                 for (int y = 0; y < lFlat.Height; y++)
                 {
                   g.DrawImageUnscaled(
-                lLevel.GetTileById(lFlat.TextureIds[x][y]).ToBitmap(),
-                x * lTileWidth,
-                y * lTileHeight);
+                    lLevel.GetTileById(lFlat.TextureIds[x][y]).ToBitmap(),
+                    x * lTileWidth,
+                    y * lTileHeight);
                 }
               }
 
@@ -580,17 +527,11 @@ namespace MMEd.Viewers
       mMainForm.ActionsTabOptimiseButton.Click += new EventHandler(ActionsTabOptimiseButton_Click);
       mMainForm.ActionsTabExportFlatImagesButton.Click += new EventHandler(ActionsTabExportFlatImagesButton_Click);
       mMainForm.ActionsTabImportFlatImagesButton.Click += new EventHandler(ActionsTabImportFlatImagesButton_Click);
-      mMainForm.ActionsTabCloneFlatButton.Click += new EventHandler(ActionsTabCloneFlatButton_Click);
       mMainForm.ActionsTabExportTIMButton.Click += new EventHandler(ActionsTabExportTIMButton_Click);
       mMainForm.ActionsTabImportTIMButton.Click += new EventHandler(ActionsTabImportTIMButton_Click);
       mMainForm.ActionsTabExportTMDButton.Click += new EventHandler(ActionsTabExportTMDButton_Click);
       mMainForm.ActionsTabImportTMDButton.Click += new EventHandler(ActionsTabImportTMDButton_Click);
       SetSubject(null);
-    }
-
-    void ActionsTabCloneFlatButton_Click(object sender, EventArgs e)
-    {
-      CloneFlat();
     }
 
     void ActionsTabOptimiseButton_Click(object sender, EventArgs e)
@@ -653,7 +594,6 @@ namespace MMEd.Viewers
       mMainForm.ActionsTabOptimiseButton.Enabled = (mSubject is Level);
       mMainForm.ActionsTabExportFlatImagesButton.Enabled = (mSubject is Level);
       mMainForm.ActionsTabImportFlatImagesButton.Enabled = (mSubject is Level);
-      mMainForm.ActionsTabCloneFlatButton.Enabled = (mSubject is FlatChunk);
       mMainForm.ActionsTabImportTIMButton.Enabled = (mSubject is TIMChunk);
       mMainForm.ActionsTabExportTIMButton.Enabled = (mSubject is TIMChunk);
       mMainForm.ActionsTabImportTMDButton.Enabled = (mSubject is TMDChunk);

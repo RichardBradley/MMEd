@@ -94,13 +94,14 @@ namespace MMEd
       foreach (Type lChunkType in lMyChildren.Keys)
       {
         List<Chunk> lMine = lMyChildren[lChunkType];
-        List<Chunk> lOld = lOldChildren[lChunkType];
 
-        if (lOld == null)
+        if (!lOldChildren.ContainsKey(lChunkType))
         {
           lDifferences.Add(string.Format("  Added {0} {1}(s)", lMine.Count, lChunkType));
           continue;
         }
+
+        List<Chunk> lOld = lOldChildren[lChunkType];
 
         for (int ii = 0; ii < Math.Min(lMine.Count, lOld.Count); ii++)
         {

@@ -130,6 +130,25 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
     public byte[] TrailingData;
 
     ///========================================================================
+    /// Property : eResizeOptions
+    /// 
+    /// <summary>
+    /// 	Options for the Resize operation:
+    /// 
+    ///     KeepRight: Keep the right-hand edge fixed in position. Alternative 
+    ///               is to keep the left-hand edge fixed.
+    ///     KeepBottom: Keep the bottom edge fixed in position. Alternative is 
+    ///               to keep the top edge fixed.
+    /// </summary>
+    ///========================================================================
+    public enum eResizeOptions
+    {
+      Default = 0x0000,
+      KeepRight = 0x0001,
+      KeepBottom = 0x0002
+    }
+
+    ///========================================================================
     ///  Method : Resize
     /// 
     /// <summary>
@@ -138,18 +157,33 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
     /// <param name="xiNewFlgA"></param>
     /// <param name="xiNewWidth"></param>
     /// <param name="xiNewHeight"></param>
+    /// <param name="xiOptions"></param>
     /// <returns>
     ///   The increase in file size, in bytes
     /// </returns>
     ///========================================================================
-    public int Resize(bool xiNewFlgA, short xiNewWidth, short xiNewHeight)
+    public int Resize(bool xiNewFlgA, short xiNewWidth, short xiNewHeight, eResizeOptions xiOptions)
     {
       int lExtraSquares = (xiNewWidth * xiNewHeight) - (Width * Height);
       int lExtraMeta = (xiNewFlgA ? (xiNewWidth * xiNewHeight) : 0) - (FlgA ? (Width * Height) : 0);
+      int lExtraWidth = xiNewWidth - Width;
+      int lExtraHeight = xiNewHeight - Height;
+
+      bool lKeepRight = (xiOptions & eResizeOptions.KeepRight) == eResizeOptions.KeepRight;
+      bool lKeepBottom = (xiOptions & eResizeOptions.KeepBottom) == eResizeOptions.KeepBottom;
 
       short[][] lOldTextureIds = TextureIds;
       short[][] lOldTerrainHeight = TerrainHeight;
       Byte[][][] lOldTexMetaData = TexMetaData;
+
+      if (lOldTerrainHeight.Length != lOldTextureIds.Length)
+      {
+        throw new Exception("Error: TerrainHeight and TextureIds arrays were of different length!");
+      }
+      if (FlgA && lOldTexMetaData.Length != lOldTextureIds.Length)
+      {
+        throw new Exception("Error: TexMetaData and TextureIds arrays were of different length!");
+      }
 
       Width = xiNewWidth;
       Height = xiNewHeight;
@@ -164,13 +198,34 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
         TerrainHeight[x] = new short[Height];
         if (xiNewFlgA) TexMetaData[x] = new Byte[Height][];
 
+        int lCopyX = lKeepRight ? x - lExtraWidth : x;
+        if (lCopyX >= lOldTextureIds.Length || lCopyX < 0)
+        {
+          lCopyX = lKeepRight ? lOldTextureIds.Length - 1 : 0;
+        }
+
+        if (lOldTerrainHeight[lCopyX].Length != lOldTextureIds[lCopyX].Length)
+        {
+          throw new Exception("Error: TerrainHeight and TextureIds arrays were of different length!");
+        }
+        if (FlgA && lOldTexMetaData[lCopyX].Length != lOldTextureIds[lCopyX].Length)
+        {
+          throw new Exception("Error: TexMetaData and TextureIds arrays were of different length!");
+        }
+
         for (int y = 0; y < Height; y++)
         {
-          TextureIds[x][y] = (x < lOldTextureIds.Length && y < lOldTextureIds[x].Length) ? lOldTextureIds[x][y] : lOldTextureIds[0][0];
-          TerrainHeight[x][y] = (x < lOldTerrainHeight.Length && y < lOldTerrainHeight[x].Length) ? lOldTerrainHeight[x][y] : lOldTerrainHeight[0][0];
+          int lCopyY = lKeepBottom ? y - lExtraHeight : y;
+          if (lCopyY >= lOldTextureIds[lCopyX].Length || lCopyY < 0)
+          {
+            lCopyY = lKeepBottom ? lOldTextureIds[lCopyX].Length - 1 : 0;
+          }
+          
+          TextureIds[x][y] = lOldTextureIds[lCopyX][lCopyY];
+          TerrainHeight[x][y] = lOldTerrainHeight[lCopyX][lCopyY];
           if (xiNewFlgA && FlgA)
           {
-            TexMetaData[x][y] = (x < lOldTexMetaData.Length && y < lOldTexMetaData[x].Length) ? lOldTexMetaData[x][y] : lOldTexMetaData[0][0];
+            TexMetaData[x][y] = lOldTexMetaData[lCopyX][lCopyY];
           }
           else if (xiNewFlgA)
           {

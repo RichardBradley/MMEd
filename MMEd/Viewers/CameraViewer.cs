@@ -45,7 +45,7 @@ namespace MMEd.Viewers
 
       if (!(xiChunk is CameraPosChunk))
       {
-        throw new InvalidOperationException("Tried to view chunk of type {0} in CameraViewer");
+        throw new InvalidOperationException(string.Format("Tried to view chunk of type {0} in CameraViewer", xiChunk.GetType()));
       }
 
       mMainForm.CameraRenderingSurface.Visible = true;

@@ -55,9 +55,6 @@ namespace MMEd
           this.label11 = new System.Windows.Forms.Label();
           this.ActionsTabExportTIMButton = new System.Windows.Forms.Button();
           this.label10 = new System.Windows.Forms.Label();
-          this.groupBox4 = new System.Windows.Forms.GroupBox();
-          this.ActionsTabCloneFlatButton = new System.Windows.Forms.Button();
-          this.label9 = new System.Windows.Forms.Label();
           this.groupBox3 = new System.Windows.Forms.GroupBox();
           this.groupBox7 = new System.Windows.Forms.GroupBox();
           this.label25 = new System.Windows.Forms.Label();
@@ -101,7 +98,6 @@ namespace MMEd
           this.GridViewViewModeCombo = new System.Windows.Forms.ComboBox();
           this.GridViewMetaTypeCombo = new System.Windows.Forms.ComboBox();
           this.ViewTab3D = new System.Windows.Forms.TabPage();
-          this.Viewer3DRenderingSurface = new GLTK.RenderingSurface();
           this.ViewTabBump = new System.Windows.Forms.TabPage();
           this.label18 = new System.Windows.Forms.Label();
           this.label17 = new System.Windows.Forms.Label();
@@ -123,7 +119,6 @@ namespace MMEd
           this.OddCombo = new System.Windows.Forms.ComboBox();
           this.OddEditPictureBox = new System.Windows.Forms.PictureBox();
           this.ViewTabCamera = new System.Windows.Forms.TabPage();
-          this.CameraRenderingSurface = new GLTK.RenderingSurface();
           this.PanelCameraImage = new System.Windows.Forms.Panel();
           this.SliderElevation = new System.Windows.Forms.TrackBar();
           this.TextElevation = new System.Windows.Forms.TextBox();
@@ -141,11 +136,7 @@ namespace MMEd
           this.ThreeDeeEditorStatusLabel = new System.Windows.Forms.Label();
           this.LeftRightSplit = new System.Windows.Forms.SplitContainer();
           this.LeftHandSplit = new System.Windows.Forms.SplitContainer();
-          this.Viewer3DRenderingSurfaceTopLeft = new GLTK.RenderingSurface();
-          this.Viewer3DRenderingSurfaceBottomLeft = new GLTK.RenderingSurface();
           this.RightHandSplit = new System.Windows.Forms.SplitContainer();
-          this.Viewer3DRenderingSurfaceTopRight = new GLTK.RenderingSurface();
-          this.Viewer3DRenderingSurfaceBottomRight = new GLTK.RenderingSurface();
           this.ViewTabHistory = new System.Windows.Forms.TabPage();
           this.RevertButton = new System.Windows.Forms.Button();
           this.VersionChangesTextBox = new System.Windows.Forms.TextBox();
@@ -155,6 +146,12 @@ namespace MMEd
           this.ToolTip = new System.Windows.Forms.ToolTip(this.components);
           this.SaveFileDialog = new System.Windows.Forms.SaveFileDialog();
           this.OpenFileDialog = new System.Windows.Forms.OpenFileDialog();
+          this.Viewer3DRenderingSurface = new GLTK.RenderingSurface();
+          this.CameraRenderingSurface = new GLTK.RenderingSurface();
+          this.Viewer3DRenderingSurfaceTopLeft = new GLTK.RenderingSurface();
+          this.Viewer3DRenderingSurfaceBottomLeft = new GLTK.RenderingSurface();
+          this.Viewer3DRenderingSurfaceTopRight = new GLTK.RenderingSurface();
+          this.Viewer3DRenderingSurfaceBottomRight = new GLTK.RenderingSurface();
           this.FlatPanel = new MMEd.Util.FlatEditorPanel();
           this.GridViewSelPanelHolder = new MMEd.Util.SmoothScrollingPanel();
           this.GridViewSelPanel = new System.Windows.Forms.Panel();
@@ -167,6 +164,8 @@ namespace MMEd
           this.GridDisplayPanel = new MMEd.Util.UserPaintDoubleBufferedPanel();
           this.VRAMScrollPanel = new MMEd.Util.SmoothScrollingPanel();
           this.VRAMPictureBox = new System.Windows.Forms.PictureBox();
+          this.FlatViewerCloneButton = new System.Windows.Forms.Button();
+          this.FlatViewerDeleteButton = new System.Windows.Forms.Button();
           this.mMenuStrip.SuspendLayout();
           this.MainSplitter.Panel1.SuspendLayout();
           this.MainSplitter.Panel2.SuspendLayout();
@@ -175,7 +174,6 @@ namespace MMEd
           this.ViewTabActions.SuspendLayout();
           this.groupBox6.SuspendLayout();
           this.groupBox5.SuspendLayout();
-          this.groupBox4.SuspendLayout();
           this.groupBox3.SuspendLayout();
           this.groupBox7.SuspendLayout();
           this.ViewTabXML.SuspendLayout();
@@ -378,7 +376,6 @@ namespace MMEd
           // 
           this.ViewTabActions.Controls.Add(this.groupBox6);
           this.ViewTabActions.Controls.Add(this.groupBox5);
-          this.ViewTabActions.Controls.Add(this.groupBox4);
           this.ViewTabActions.Controls.Add(this.groupBox3);
           this.ViewTabActions.Location = new System.Drawing.Point(4, 22);
           this.ViewTabActions.Name = "ViewTabActions";
@@ -394,7 +391,7 @@ namespace MMEd
           this.groupBox6.Controls.Add(this.label19);
           this.groupBox6.Controls.Add(this.ActionsTabImportTMDButton);
           this.groupBox6.Controls.Add(this.ActionsTabExportTMDButton);
-          this.groupBox6.Location = new System.Drawing.Point(1, 401);
+          this.groupBox6.Location = new System.Drawing.Point(1, 340);
           this.groupBox6.Name = "groupBox6";
           this.groupBox6.Size = new System.Drawing.Size(626, 83);
           this.groupBox6.TabIndex = 7;
@@ -443,7 +440,7 @@ namespace MMEd
           this.groupBox5.Controls.Add(this.label11);
           this.groupBox5.Controls.Add(this.ActionsTabExportTIMButton);
           this.groupBox5.Controls.Add(this.label10);
-          this.groupBox5.Location = new System.Drawing.Point(1, 284);
+          this.groupBox5.Location = new System.Drawing.Point(1, 223);
           this.groupBox5.Name = "groupBox5";
           this.groupBox5.Size = new System.Drawing.Size(627, 111);
           this.groupBox5.TabIndex = 6;
@@ -486,35 +483,6 @@ namespace MMEd
           this.label10.Size = new System.Drawing.Size(250, 13);
           this.label10.TabIndex = 3;
           this.label10.Text = "Save the selected TIM image to a paletted BMP file";
-          // 
-          // groupBox4
-          // 
-          this.groupBox4.Controls.Add(this.ActionsTabCloneFlatButton);
-          this.groupBox4.Controls.Add(this.label9);
-          this.groupBox4.Location = new System.Drawing.Point(1, 223);
-          this.groupBox4.Name = "groupBox4";
-          this.groupBox4.Size = new System.Drawing.Size(627, 55);
-          this.groupBox4.TabIndex = 5;
-          this.groupBox4.TabStop = false;
-          this.groupBox4.Text = "Flats";
-          // 
-          // ActionsTabCloneFlatButton
-          // 
-          this.ActionsTabCloneFlatButton.Location = new System.Drawing.Point(9, 19);
-          this.ActionsTabCloneFlatButton.Name = "ActionsTabCloneFlatButton";
-          this.ActionsTabCloneFlatButton.Size = new System.Drawing.Size(142, 23);
-          this.ActionsTabCloneFlatButton.TabIndex = 2;
-          this.ActionsTabCloneFlatButton.Text = "Clone flat";
-          this.ActionsTabCloneFlatButton.UseVisualStyleBackColor = true;
-          // 
-          // label9
-          // 
-          this.label9.AutoSize = true;
-          this.label9.Location = new System.Drawing.Point(157, 19);
-          this.label9.Name = "label9";
-          this.label9.Size = new System.Drawing.Size(209, 13);
-          this.label9.TabIndex = 3;
-          this.label9.Text = "Clone the selected Flat and all its contents.";
           // 
           // groupBox3
           // 
@@ -733,6 +701,8 @@ namespace MMEd
           // 
           // ViewTabFlat
           // 
+          this.ViewTabFlat.Controls.Add(this.FlatViewerDeleteButton);
+          this.ViewTabFlat.Controls.Add(this.FlatViewerCloneButton);
           this.ViewTabFlat.Controls.Add(this.FlatViewerCommitBtn);
           this.ViewTabFlat.Controls.Add(this.FlatPanel);
           this.ViewTabFlat.Location = new System.Drawing.Point(4, 22);
@@ -746,7 +716,7 @@ namespace MMEd
           // FlatViewerCommitBtn
           // 
           this.FlatViewerCommitBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-          this.FlatViewerCommitBtn.Location = new System.Drawing.Point(558, 477);
+          this.FlatViewerCommitBtn.Location = new System.Drawing.Point(549, 499);
           this.FlatViewerCommitBtn.Name = "FlatViewerCommitBtn";
           this.FlatViewerCommitBtn.Size = new System.Drawing.Size(75, 31);
           this.FlatViewerCommitBtn.TabIndex = 1;
@@ -979,17 +949,6 @@ namespace MMEd
           this.ViewTab3D.TabIndex = 4;
           this.ViewTab3D.Text = "3D";
           this.ViewTab3D.UseVisualStyleBackColor = true;
-          // 
-          // Viewer3DRenderingSurface
-          // 
-          this.Viewer3DRenderingSurface.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                      | System.Windows.Forms.AnchorStyles.Left)
-                      | System.Windows.Forms.AnchorStyles.Right)));
-          this.Viewer3DRenderingSurface.Location = new System.Drawing.Point(-4, 0);
-          this.Viewer3DRenderingSurface.Name = "Viewer3DRenderingSurface";
-          this.Viewer3DRenderingSurface.Size = new System.Drawing.Size(640, 512);
-          this.Viewer3DRenderingSurface.TabIndex = 0;
-          this.Viewer3DRenderingSurface.Text = "renderingSurface1";
           // 
           // ViewTabBump
           // 
@@ -1228,14 +1187,6 @@ namespace MMEd
           this.ViewTabCamera.Text = "Camera";
           this.ViewTabCamera.UseVisualStyleBackColor = true;
           // 
-          // CameraRenderingSurface
-          // 
-          this.CameraRenderingSurface.Location = new System.Drawing.Point(6, 181);
-          this.CameraRenderingSurface.Name = "CameraRenderingSurface";
-          this.CameraRenderingSurface.Size = new System.Drawing.Size(446, 300);
-          this.CameraRenderingSurface.TabIndex = 13;
-          this.CameraRenderingSurface.Text = "renderingSurface1";
-          // 
           // PanelCameraImage
           // 
           this.PanelCameraImage.Location = new System.Drawing.Point(324, 19);
@@ -1404,24 +1355,6 @@ namespace MMEd
           this.LeftHandSplit.SplitterDistance = 226;
           this.LeftHandSplit.TabIndex = 0;
           // 
-          // Viewer3DRenderingSurfaceTopLeft
-          // 
-          this.Viewer3DRenderingSurfaceTopLeft.Dock = System.Windows.Forms.DockStyle.Fill;
-          this.Viewer3DRenderingSurfaceTopLeft.Location = new System.Drawing.Point(0, 0);
-          this.Viewer3DRenderingSurfaceTopLeft.Name = "Viewer3DRenderingSurfaceTopLeft";
-          this.Viewer3DRenderingSurfaceTopLeft.Size = new System.Drawing.Size(284, 226);
-          this.Viewer3DRenderingSurfaceTopLeft.TabIndex = 0;
-          this.Viewer3DRenderingSurfaceTopLeft.Text = "renderingSurface1";
-          // 
-          // Viewer3DRenderingSurfaceBottomLeft
-          // 
-          this.Viewer3DRenderingSurfaceBottomLeft.Dock = System.Windows.Forms.DockStyle.Fill;
-          this.Viewer3DRenderingSurfaceBottomLeft.Location = new System.Drawing.Point(0, 0);
-          this.Viewer3DRenderingSurfaceBottomLeft.Name = "Viewer3DRenderingSurfaceBottomLeft";
-          this.Viewer3DRenderingSurfaceBottomLeft.Size = new System.Drawing.Size(284, 264);
-          this.Viewer3DRenderingSurfaceBottomLeft.TabIndex = 0;
-          this.Viewer3DRenderingSurfaceBottomLeft.Text = "renderingSurface3";
-          // 
           // RightHandSplit
           // 
           this.RightHandSplit.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -1439,24 +1372,6 @@ namespace MMEd
           this.RightHandSplit.Size = new System.Drawing.Size(338, 494);
           this.RightHandSplit.SplitterDistance = 228;
           this.RightHandSplit.TabIndex = 0;
-          // 
-          // Viewer3DRenderingSurfaceTopRight
-          // 
-          this.Viewer3DRenderingSurfaceTopRight.Dock = System.Windows.Forms.DockStyle.Fill;
-          this.Viewer3DRenderingSurfaceTopRight.Location = new System.Drawing.Point(0, 0);
-          this.Viewer3DRenderingSurfaceTopRight.Name = "Viewer3DRenderingSurfaceTopRight";
-          this.Viewer3DRenderingSurfaceTopRight.Size = new System.Drawing.Size(338, 228);
-          this.Viewer3DRenderingSurfaceTopRight.TabIndex = 0;
-          this.Viewer3DRenderingSurfaceTopRight.Text = "renderingSurface2";
-          // 
-          // Viewer3DRenderingSurfaceBottomRight
-          // 
-          this.Viewer3DRenderingSurfaceBottomRight.Dock = System.Windows.Forms.DockStyle.Fill;
-          this.Viewer3DRenderingSurfaceBottomRight.Location = new System.Drawing.Point(0, 0);
-          this.Viewer3DRenderingSurfaceBottomRight.Name = "Viewer3DRenderingSurfaceBottomRight";
-          this.Viewer3DRenderingSurfaceBottomRight.Size = new System.Drawing.Size(338, 262);
-          this.Viewer3DRenderingSurfaceBottomRight.TabIndex = 0;
-          this.Viewer3DRenderingSurfaceBottomRight.Text = "renderingSurface4";
           // 
           // ViewTabHistory
           // 
@@ -1527,6 +1442,61 @@ namespace MMEd
           // 
           this.OpenFileDialog.FileName = "openFileDialog1";
           // 
+          // Viewer3DRenderingSurface
+          // 
+          this.Viewer3DRenderingSurface.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                      | System.Windows.Forms.AnchorStyles.Left)
+                      | System.Windows.Forms.AnchorStyles.Right)));
+          this.Viewer3DRenderingSurface.Location = new System.Drawing.Point(-4, 0);
+          this.Viewer3DRenderingSurface.Name = "Viewer3DRenderingSurface";
+          this.Viewer3DRenderingSurface.Size = new System.Drawing.Size(640, 512);
+          this.Viewer3DRenderingSurface.TabIndex = 0;
+          this.Viewer3DRenderingSurface.Text = "renderingSurface1";
+          // 
+          // CameraRenderingSurface
+          // 
+          this.CameraRenderingSurface.Location = new System.Drawing.Point(6, 181);
+          this.CameraRenderingSurface.Name = "CameraRenderingSurface";
+          this.CameraRenderingSurface.Size = new System.Drawing.Size(446, 300);
+          this.CameraRenderingSurface.TabIndex = 13;
+          this.CameraRenderingSurface.Text = "renderingSurface1";
+          // 
+          // Viewer3DRenderingSurfaceTopLeft
+          // 
+          this.Viewer3DRenderingSurfaceTopLeft.Dock = System.Windows.Forms.DockStyle.Fill;
+          this.Viewer3DRenderingSurfaceTopLeft.Location = new System.Drawing.Point(0, 0);
+          this.Viewer3DRenderingSurfaceTopLeft.Name = "Viewer3DRenderingSurfaceTopLeft";
+          this.Viewer3DRenderingSurfaceTopLeft.Size = new System.Drawing.Size(284, 226);
+          this.Viewer3DRenderingSurfaceTopLeft.TabIndex = 0;
+          this.Viewer3DRenderingSurfaceTopLeft.Text = "renderingSurface1";
+          // 
+          // Viewer3DRenderingSurfaceBottomLeft
+          // 
+          this.Viewer3DRenderingSurfaceBottomLeft.Dock = System.Windows.Forms.DockStyle.Fill;
+          this.Viewer3DRenderingSurfaceBottomLeft.Location = new System.Drawing.Point(0, 0);
+          this.Viewer3DRenderingSurfaceBottomLeft.Name = "Viewer3DRenderingSurfaceBottomLeft";
+          this.Viewer3DRenderingSurfaceBottomLeft.Size = new System.Drawing.Size(284, 264);
+          this.Viewer3DRenderingSurfaceBottomLeft.TabIndex = 0;
+          this.Viewer3DRenderingSurfaceBottomLeft.Text = "renderingSurface3";
+          // 
+          // Viewer3DRenderingSurfaceTopRight
+          // 
+          this.Viewer3DRenderingSurfaceTopRight.Dock = System.Windows.Forms.DockStyle.Fill;
+          this.Viewer3DRenderingSurfaceTopRight.Location = new System.Drawing.Point(0, 0);
+          this.Viewer3DRenderingSurfaceTopRight.Name = "Viewer3DRenderingSurfaceTopRight";
+          this.Viewer3DRenderingSurfaceTopRight.Size = new System.Drawing.Size(338, 228);
+          this.Viewer3DRenderingSurfaceTopRight.TabIndex = 0;
+          this.Viewer3DRenderingSurfaceTopRight.Text = "renderingSurface2";
+          // 
+          // Viewer3DRenderingSurfaceBottomRight
+          // 
+          this.Viewer3DRenderingSurfaceBottomRight.Dock = System.Windows.Forms.DockStyle.Fill;
+          this.Viewer3DRenderingSurfaceBottomRight.Location = new System.Drawing.Point(0, 0);
+          this.Viewer3DRenderingSurfaceBottomRight.Name = "Viewer3DRenderingSurfaceBottomRight";
+          this.Viewer3DRenderingSurfaceBottomRight.Size = new System.Drawing.Size(338, 262);
+          this.Viewer3DRenderingSurfaceBottomRight.TabIndex = 0;
+          this.Viewer3DRenderingSurfaceBottomRight.Text = "renderingSurface4";
+          // 
           // FlatPanel
           // 
           this.FlatPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
@@ -1535,7 +1505,7 @@ namespace MMEd
           this.FlatPanel.AutoScroll = true;
           this.FlatPanel.Location = new System.Drawing.Point(0, 0);
           this.FlatPanel.Name = "FlatPanel";
-          this.FlatPanel.Size = new System.Drawing.Size(637, 471);
+          this.FlatPanel.Size = new System.Drawing.Size(637, 493);
           this.FlatPanel.TabIndex = 0;
           // 
           // GridViewSelPanelHolder
@@ -1651,6 +1621,26 @@ namespace MMEd
           this.VRAMPictureBox.TabIndex = 1;
           this.VRAMPictureBox.TabStop = false;
           // 
+          // FlatViewerCloneButton
+          // 
+          this.FlatViewerCloneButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+          this.FlatViewerCloneButton.Location = new System.Drawing.Point(6, 499);
+          this.FlatViewerCloneButton.Name = "FlatViewerCloneButton";
+          this.FlatViewerCloneButton.Size = new System.Drawing.Size(75, 31);
+          this.FlatViewerCloneButton.TabIndex = 2;
+          this.FlatViewerCloneButton.Text = "Clone Flat";
+          this.FlatViewerCloneButton.UseVisualStyleBackColor = true;
+          // 
+          // FlatViewerDeleteButton
+          // 
+          this.FlatViewerDeleteButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+          this.FlatViewerDeleteButton.Location = new System.Drawing.Point(87, 499);
+          this.FlatViewerDeleteButton.Name = "FlatViewerDeleteButton";
+          this.FlatViewerDeleteButton.Size = new System.Drawing.Size(75, 31);
+          this.FlatViewerDeleteButton.TabIndex = 3;
+          this.FlatViewerDeleteButton.Text = "Delete Flat";
+          this.FlatViewerDeleteButton.UseVisualStyleBackColor = true;
+          // 
           // MainForm
           // 
           this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1673,8 +1663,6 @@ namespace MMEd
           this.groupBox6.PerformLayout();
           this.groupBox5.ResumeLayout(false);
           this.groupBox5.PerformLayout();
-          this.groupBox4.ResumeLayout(false);
-          this.groupBox4.PerformLayout();
           this.groupBox3.ResumeLayout(false);
           this.groupBox3.PerformLayout();
           this.groupBox7.ResumeLayout(false);
@@ -1807,8 +1795,6 @@ namespace MMEd
       private System.Windows.Forms.Panel panel2;
       internal System.Windows.Forms.Label ThreeDeeEditorStatusLabel;
       public System.Windows.Forms.ToolTip ToolTip;
-      private System.Windows.Forms.Label label9;
-      public System.Windows.Forms.Button ActionsTabCloneFlatButton;
       public System.Windows.Forms.TabPage ViewTabActions;
       public System.Windows.Forms.CheckBox GridViewShowObjectsCheck;
       private System.Windows.Forms.GroupBox groupBox5;
@@ -1816,7 +1802,6 @@ namespace MMEd
       private System.Windows.Forms.Label label11;
       public System.Windows.Forms.Button ActionsTabExportTIMButton;
       private System.Windows.Forms.Label label10;
-      private System.Windows.Forms.GroupBox groupBox4;
       private System.Windows.Forms.GroupBox groupBox3;
       public System.Windows.Forms.TrackBar GridViewZoomSlider;
       private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
@@ -1876,6 +1861,8 @@ namespace MMEd
       private System.Windows.Forms.SaveFileDialog SaveFileDialog;
       private System.Windows.Forms.OpenFileDialog OpenFileDialog;
       internal System.Windows.Forms.TabPage ViewTabHistory;
+      public System.Windows.Forms.Button FlatViewerDeleteButton;
+      public System.Windows.Forms.Button FlatViewerCloneButton;
     }
 }
 

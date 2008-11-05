@@ -217,6 +217,32 @@ Each entry has three components, which are height, pitch and yaw, in some order"
     }
 
     ///========================================================================
+    /// Method : DeleteFlat
+    /// 
+    /// <summary>
+    /// 	Delete a Flat, returning the size of the deleted Flat in bytes
+    /// </summary>
+    /// <param name="xiFlat"></param>
+    /// <returns></returns>
+    ///========================================================================
+    public int DeleteFlat(FlatChunk xiFlat)
+    {
+      FlatChunk[] lNewFlats = new FlatChunk[Flats.Length - 1];
+      int lIndex = 0;
+
+      foreach (FlatChunk lFlat in Flats)
+      {
+        if (lFlat != xiFlat)
+        {
+          lNewFlats[lIndex++] = lFlat;
+        }
+      }
+
+      Flats = lNewFlats;
+      return xiFlat.ByteSize;
+    }
+
+    ///========================================================================
     /// Method : AddOdd
     /// 
     /// <summary>
@@ -540,5 +566,6 @@ Each entry has three components, which are height, pitch and yaw, in some order"
     private Hashtable mKeySectionsByWaypoint = null;
 
     #endregion
+
   }
 }
