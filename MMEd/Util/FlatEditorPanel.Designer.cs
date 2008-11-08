@@ -33,6 +33,7 @@ namespace MMEd.Util
       this.label3 = new System.Windows.Forms.Label();
       this.label4 = new System.Windows.Forms.Label();
       this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+      this.label26 = new System.Windows.Forms.Label();
       this.label7 = new System.Windows.Forms.Label();
       this.NameTextBox = new System.Windows.Forms.TextBox();
       this.label6 = new System.Windows.Forms.Label();
@@ -48,13 +49,14 @@ namespace MMEd.Util
       this.HeightTextBox = new System.Windows.Forms.TextBox();
       this.ScaleXTextBox = new System.Windows.Forms.TextBox();
       this.ScaleYTextBox = new System.Windows.Forms.TextBox();
-      this.FlagACheckBox = new System.Windows.Forms.CheckBox();
+      this.HasMetaDataCheckBox = new System.Windows.Forms.CheckBox();
       this.FlagBCheckBox = new System.Windows.Forms.CheckBox();
       this.FlagCCheckBox = new System.Windows.Forms.CheckBox();
-      this.FlagDCheckBox = new System.Windows.Forms.CheckBox();
+      this.VisibleCheckBox = new System.Windows.Forms.CheckBox();
       this.FlagECheckBox = new System.Windows.Forms.CheckBox();
       this.label8 = new System.Windows.Forms.Label();
       this.NextNTextBox = new System.Windows.Forms.TextBox();
+      this.ByteSizeLabel = new System.Windows.Forms.Label();
       this.groupBox1 = new System.Windows.Forms.GroupBox();
       this.groupBox2 = new System.Windows.Forms.GroupBox();
       this.AddWeaponLink = new System.Windows.Forms.LinkLabel();
@@ -81,8 +83,6 @@ namespace MMEd.Util
       this.label17 = new System.Windows.Forms.Label();
       this.label23 = new System.Windows.Forms.Label();
       this.label25 = new System.Windows.Forms.Label();
-      this.label26 = new System.Windows.Forms.Label();
-      this.ByteSizeLabel = new System.Windows.Forms.Label();
       this.tableLayoutPanel1.SuspendLayout();
       this.groupBox1.SuspendLayout();
       this.groupBox2.SuspendLayout();
@@ -108,7 +108,7 @@ namespace MMEd.Util
       this.label2.Location = new System.Drawing.Point(3, 26);
       this.label2.Name = "label2";
       this.label2.Size = new System.Drawing.Size(38, 13);
-      this.label2.TabIndex = 1;
+      this.label2.TabIndex = 2;
       this.label2.Text = "Name:";
       // 
       // label3
@@ -117,7 +117,7 @@ namespace MMEd.Util
       this.label3.Location = new System.Drawing.Point(3, 52);
       this.label3.Name = "label3";
       this.label3.Size = new System.Drawing.Size(37, 13);
-      this.label3.TabIndex = 2;
+      this.label3.TabIndex = 4;
       this.label3.Text = "Origin:";
       // 
       // label4
@@ -126,7 +126,7 @@ namespace MMEd.Util
       this.label4.Location = new System.Drawing.Point(3, 78);
       this.label4.Name = "label4";
       this.label4.Size = new System.Drawing.Size(50, 13);
-      this.label4.TabIndex = 3;
+      this.label4.TabIndex = 8;
       this.label4.Text = "Rotation:";
       // 
       // tableLayoutPanel1
@@ -158,14 +158,14 @@ namespace MMEd.Util
       this.tableLayoutPanel1.Controls.Add(this.HeightTextBox, 2, 4);
       this.tableLayoutPanel1.Controls.Add(this.ScaleXTextBox, 1, 5);
       this.tableLayoutPanel1.Controls.Add(this.ScaleYTextBox, 2, 5);
-      this.tableLayoutPanel1.Controls.Add(this.FlagACheckBox, 1, 6);
-      this.tableLayoutPanel1.Controls.Add(this.FlagBCheckBox, 2, 6);
-      this.tableLayoutPanel1.Controls.Add(this.FlagCCheckBox, 3, 6);
-      this.tableLayoutPanel1.Controls.Add(this.FlagDCheckBox, 4, 6);
-      this.tableLayoutPanel1.Controls.Add(this.FlagECheckBox, 5, 6);
       this.tableLayoutPanel1.Controls.Add(this.label8, 0, 7);
       this.tableLayoutPanel1.Controls.Add(this.NextNTextBox, 1, 7);
       this.tableLayoutPanel1.Controls.Add(this.ByteSizeLabel, 1, 8);
+      this.tableLayoutPanel1.Controls.Add(this.FlagBCheckBox, 1, 6);
+      this.tableLayoutPanel1.Controls.Add(this.FlagCCheckBox, 2, 6);
+      this.tableLayoutPanel1.Controls.Add(this.FlagECheckBox, 3, 6);
+      this.tableLayoutPanel1.Controls.Add(this.HasMetaDataCheckBox, 5, 6);
+      this.tableLayoutPanel1.Controls.Add(this.VisibleCheckBox, 4, 6);
       this.tableLayoutPanel1.Location = new System.Drawing.Point(6, 19);
       this.tableLayoutPanel1.Name = "tableLayoutPanel1";
       this.tableLayoutPanel1.RowCount = 9;
@@ -178,8 +178,17 @@ namespace MMEd.Util
       this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
       this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
       this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-      this.tableLayoutPanel1.Size = new System.Drawing.Size(280, 234);
+      this.tableLayoutPanel1.Size = new System.Drawing.Size(369, 226);
       this.tableLayoutPanel1.TabIndex = 4;
+      // 
+      // label26
+      // 
+      this.label26.AutoSize = true;
+      this.label26.Location = new System.Drawing.Point(3, 205);
+      this.label26.Name = "label26";
+      this.label26.Size = new System.Drawing.Size(36, 13);
+      this.label26.TabIndex = 26;
+      this.label26.Text = "Bytes:";
       // 
       // label7
       // 
@@ -197,7 +206,7 @@ namespace MMEd.Util
       this.NameTextBox.MaxLength = 8;
       this.NameTextBox.Name = "NameTextBox";
       this.NameTextBox.Size = new System.Drawing.Size(177, 20);
-      this.NameTextBox.TabIndex = 7;
+      this.NameTextBox.TabIndex = 3;
       // 
       // label6
       // 
@@ -205,7 +214,7 @@ namespace MMEd.Util
       this.label6.Location = new System.Drawing.Point(3, 130);
       this.label6.Name = "label6";
       this.label6.Size = new System.Drawing.Size(37, 13);
-      this.label6.TabIndex = 5;
+      this.label6.TabIndex = 15;
       this.label6.Text = "Scale:";
       // 
       // label5
@@ -214,7 +223,7 @@ namespace MMEd.Util
       this.label5.Location = new System.Drawing.Point(3, 104);
       this.label5.Name = "label5";
       this.label5.Size = new System.Drawing.Size(30, 13);
-      this.label5.TabIndex = 5;
+      this.label5.TabIndex = 12;
       this.label5.Text = "Size:";
       // 
       // IdTextBox
@@ -223,64 +232,63 @@ namespace MMEd.Util
       this.IdTextBox.Name = "IdTextBox";
       this.IdTextBox.ReadOnly = true;
       this.IdTextBox.Size = new System.Drawing.Size(42, 20);
-      this.IdTextBox.TabIndex = 6;
+      this.IdTextBox.TabIndex = 1;
       // 
       // RotationXTextBox
       // 
       this.RotationXTextBox.Location = new System.Drawing.Point(59, 81);
       this.RotationXTextBox.Name = "RotationXTextBox";
       this.RotationXTextBox.Size = new System.Drawing.Size(42, 20);
-      this.RotationXTextBox.TabIndex = 8;
-      this.RotationXTextBox.TextChanged += new System.EventHandler(this.textBox3_TextChanged);
+      this.RotationXTextBox.TabIndex = 9;
       // 
       // OriginXTextBox
       // 
       this.OriginXTextBox.Location = new System.Drawing.Point(59, 55);
       this.OriginXTextBox.Name = "OriginXTextBox";
       this.OriginXTextBox.Size = new System.Drawing.Size(42, 20);
-      this.OriginXTextBox.TabIndex = 9;
+      this.OriginXTextBox.TabIndex = 5;
       // 
       // OriginYTextBox
       // 
       this.OriginYTextBox.Location = new System.Drawing.Point(107, 55);
       this.OriginYTextBox.Name = "OriginYTextBox";
       this.OriginYTextBox.Size = new System.Drawing.Size(42, 20);
-      this.OriginYTextBox.TabIndex = 10;
+      this.OriginYTextBox.TabIndex = 6;
       // 
       // OriginZTextBox
       // 
       this.OriginZTextBox.Location = new System.Drawing.Point(155, 55);
       this.OriginZTextBox.Name = "OriginZTextBox";
       this.OriginZTextBox.Size = new System.Drawing.Size(42, 20);
-      this.OriginZTextBox.TabIndex = 11;
+      this.OriginZTextBox.TabIndex = 7;
       // 
       // RotationYTextBox
       // 
       this.RotationYTextBox.Location = new System.Drawing.Point(107, 81);
       this.RotationYTextBox.Name = "RotationYTextBox";
       this.RotationYTextBox.Size = new System.Drawing.Size(42, 20);
-      this.RotationYTextBox.TabIndex = 12;
+      this.RotationYTextBox.TabIndex = 10;
       // 
       // RotationZTextBox
       // 
       this.RotationZTextBox.Location = new System.Drawing.Point(155, 81);
       this.RotationZTextBox.Name = "RotationZTextBox";
       this.RotationZTextBox.Size = new System.Drawing.Size(42, 20);
-      this.RotationZTextBox.TabIndex = 13;
+      this.RotationZTextBox.TabIndex = 11;
       // 
       // WidthTextBox
       // 
       this.WidthTextBox.Location = new System.Drawing.Point(59, 107);
       this.WidthTextBox.Name = "WidthTextBox";
       this.WidthTextBox.Size = new System.Drawing.Size(42, 20);
-      this.WidthTextBox.TabIndex = 14;
+      this.WidthTextBox.TabIndex = 13;
       // 
       // HeightTextBox
       // 
       this.HeightTextBox.Location = new System.Drawing.Point(107, 107);
       this.HeightTextBox.Name = "HeightTextBox";
       this.HeightTextBox.Size = new System.Drawing.Size(42, 20);
-      this.HeightTextBox.TabIndex = 15;
+      this.HeightTextBox.TabIndex = 14;
       // 
       // ScaleXTextBox
       // 
@@ -296,53 +304,53 @@ namespace MMEd.Util
       this.ScaleYTextBox.Size = new System.Drawing.Size(42, 20);
       this.ScaleYTextBox.TabIndex = 17;
       // 
-      // FlagACheckBox
+      // HasMetaDataCheckBox
       // 
-      this.FlagACheckBox.AutoSize = true;
-      this.FlagACheckBox.Location = new System.Drawing.Point(59, 159);
-      this.FlagACheckBox.Name = "FlagACheckBox";
-      this.FlagACheckBox.Size = new System.Drawing.Size(33, 17);
-      this.FlagACheckBox.TabIndex = 19;
-      this.FlagACheckBox.Text = "A";
-      this.FlagACheckBox.UseVisualStyleBackColor = true;
+      this.HasMetaDataCheckBox.AutoSize = true;
+      this.HasMetaDataCheckBox.Location = new System.Drawing.Point(265, 159);
+      this.HasMetaDataCheckBox.Name = "HasMetaDataCheckBox";
+      this.HasMetaDataCheckBox.Size = new System.Drawing.Size(95, 17);
+      this.HasMetaDataCheckBox.TabIndex = 23;
+      this.HasMetaDataCheckBox.Text = "Has MetaData";
+      this.HasMetaDataCheckBox.UseVisualStyleBackColor = true;
       // 
       // FlagBCheckBox
       // 
       this.FlagBCheckBox.AutoSize = true;
-      this.FlagBCheckBox.Location = new System.Drawing.Point(107, 159);
+      this.FlagBCheckBox.Location = new System.Drawing.Point(59, 159);
       this.FlagBCheckBox.Name = "FlagBCheckBox";
       this.FlagBCheckBox.Size = new System.Drawing.Size(33, 17);
-      this.FlagBCheckBox.TabIndex = 20;
+      this.FlagBCheckBox.TabIndex = 19;
       this.FlagBCheckBox.Text = "B";
       this.FlagBCheckBox.UseVisualStyleBackColor = true;
       // 
       // FlagCCheckBox
       // 
       this.FlagCCheckBox.AutoSize = true;
-      this.FlagCCheckBox.Location = new System.Drawing.Point(155, 159);
+      this.FlagCCheckBox.Location = new System.Drawing.Point(107, 159);
       this.FlagCCheckBox.Name = "FlagCCheckBox";
       this.FlagCCheckBox.Size = new System.Drawing.Size(33, 17);
-      this.FlagCCheckBox.TabIndex = 21;
+      this.FlagCCheckBox.TabIndex = 20;
       this.FlagCCheckBox.Text = "C";
       this.FlagCCheckBox.UseVisualStyleBackColor = true;
       // 
-      // FlagDCheckBox
+      // VisibleCheckBox
       // 
-      this.FlagDCheckBox.AutoSize = true;
-      this.FlagDCheckBox.Location = new System.Drawing.Point(203, 159);
-      this.FlagDCheckBox.Name = "FlagDCheckBox";
-      this.FlagDCheckBox.Size = new System.Drawing.Size(34, 17);
-      this.FlagDCheckBox.TabIndex = 22;
-      this.FlagDCheckBox.Text = "D";
-      this.FlagDCheckBox.UseVisualStyleBackColor = true;
+      this.VisibleCheckBox.AutoSize = true;
+      this.VisibleCheckBox.Location = new System.Drawing.Point(203, 159);
+      this.VisibleCheckBox.Name = "VisibleCheckBox";
+      this.VisibleCheckBox.Size = new System.Drawing.Size(56, 17);
+      this.VisibleCheckBox.TabIndex = 22;
+      this.VisibleCheckBox.Text = "Visible";
+      this.VisibleCheckBox.UseVisualStyleBackColor = true;
       // 
       // FlagECheckBox
       // 
       this.FlagECheckBox.AutoSize = true;
-      this.FlagECheckBox.Location = new System.Drawing.Point(243, 159);
+      this.FlagECheckBox.Location = new System.Drawing.Point(155, 159);
       this.FlagECheckBox.Name = "FlagECheckBox";
       this.FlagECheckBox.Size = new System.Drawing.Size(33, 17);
-      this.FlagECheckBox.TabIndex = 23;
+      this.FlagECheckBox.TabIndex = 21;
       this.FlagECheckBox.Text = "E";
       this.FlagECheckBox.UseVisualStyleBackColor = true;
       // 
@@ -364,12 +372,21 @@ namespace MMEd.Util
       this.NextNTextBox.Size = new System.Drawing.Size(138, 20);
       this.NextNTextBox.TabIndex = 25;
       // 
+      // ByteSizeLabel
+      // 
+      this.ByteSizeLabel.AutoSize = true;
+      this.tableLayoutPanel1.SetColumnSpan(this.ByteSizeLabel, 5);
+      this.ByteSizeLabel.Location = new System.Drawing.Point(59, 205);
+      this.ByteSizeLabel.Name = "ByteSizeLabel";
+      this.ByteSizeLabel.Size = new System.Drawing.Size(0, 13);
+      this.ByteSizeLabel.TabIndex = 27;
+      // 
       // groupBox1
       // 
       this.groupBox1.Controls.Add(this.tableLayoutPanel1);
       this.groupBox1.Location = new System.Drawing.Point(3, 3);
       this.groupBox1.Name = "groupBox1";
-      this.groupBox1.Size = new System.Drawing.Size(295, 259);
+      this.groupBox1.Size = new System.Drawing.Size(389, 259);
       this.groupBox1.TabIndex = 5;
       this.groupBox1.TabStop = false;
       this.groupBox1.Text = "Flat Properties";
@@ -393,7 +410,7 @@ namespace MMEd.Util
       this.AddWeaponLink.Location = new System.Drawing.Point(3, 125);
       this.AddWeaponLink.Name = "AddWeaponLink";
       this.AddWeaponLink.Size = new System.Drawing.Size(95, 13);
-      this.AddWeaponLink.TabIndex = 1;
+      this.AddWeaponLink.TabIndex = 0;
       this.AddWeaponLink.TabStop = true;
       this.AddWeaponLink.Text = "Add New Weapon";
       // 
@@ -512,7 +529,7 @@ namespace MMEd.Util
       this.AddObjectLink.Location = new System.Drawing.Point(6, 168);
       this.AddObjectLink.Name = "AddObjectLink";
       this.AddObjectLink.Size = new System.Drawing.Size(85, 13);
-      this.AddObjectLink.TabIndex = 1;
+      this.AddObjectLink.TabIndex = 0;
       this.AddObjectLink.TabStop = true;
       this.AddObjectLink.Text = "Add New Object";
       // 
@@ -569,7 +586,7 @@ namespace MMEd.Util
       this.label21.Location = new System.Drawing.Point(44, 0);
       this.label21.Name = "label21";
       this.label21.Size = new System.Drawing.Size(15, 13);
-      this.label21.TabIndex = 7;
+      this.label21.TabIndex = 1;
       this.label21.Text = "X";
       // 
       // label18
@@ -609,7 +626,7 @@ namespace MMEd.Util
       this.label19.Location = new System.Drawing.Point(107, 0);
       this.label19.Name = "label19";
       this.label19.Size = new System.Drawing.Size(19, 13);
-      this.label19.TabIndex = 5;
+      this.label19.TabIndex = 3;
       this.label19.Text = "rX";
       // 
       // label15
@@ -619,7 +636,7 @@ namespace MMEd.Util
       this.label15.Location = new System.Drawing.Point(132, 0);
       this.label15.Name = "label15";
       this.label15.Size = new System.Drawing.Size(19, 13);
-      this.label15.TabIndex = 3;
+      this.label15.TabIndex = 4;
       this.label15.Text = "rY";
       // 
       // label14
@@ -629,7 +646,7 @@ namespace MMEd.Util
       this.label14.Location = new System.Drawing.Point(157, 0);
       this.label14.Name = "label14";
       this.label14.Size = new System.Drawing.Size(19, 13);
-      this.label14.TabIndex = 4;
+      this.label14.TabIndex = 5;
       this.label14.Text = "rZ";
       // 
       // label22
@@ -639,7 +656,7 @@ namespace MMEd.Util
       this.label22.Location = new System.Drawing.Point(182, 0);
       this.label22.Name = "label22";
       this.label22.Size = new System.Drawing.Size(35, 13);
-      this.label22.TabIndex = 8;
+      this.label22.TabIndex = 6;
       this.label22.Text = "Solid";
       // 
       // label17
@@ -649,7 +666,7 @@ namespace MMEd.Util
       this.label17.Location = new System.Drawing.Point(223, 0);
       this.label17.Name = "label17";
       this.label17.Size = new System.Drawing.Size(30, 13);
-      this.label17.TabIndex = 1;
+      this.label17.TabIndex = 7;
       this.label17.Text = "Unk";
       // 
       // label23
@@ -659,7 +676,7 @@ namespace MMEd.Util
       this.label23.Location = new System.Drawing.Point(259, 0);
       this.label23.Name = "label23";
       this.label23.Size = new System.Drawing.Size(30, 13);
-      this.label23.TabIndex = 9;
+      this.label23.TabIndex = 8;
       this.label23.Text = "Unk";
       // 
       // label25
@@ -668,25 +685,7 @@ namespace MMEd.Util
       this.label25.Location = new System.Drawing.Point(295, 0);
       this.label25.Name = "label25";
       this.label25.Size = new System.Drawing.Size(0, 13);
-      this.label25.TabIndex = 10;
-      // 
-      // label26
-      // 
-      this.label26.AutoSize = true;
-      this.label26.Location = new System.Drawing.Point(3, 205);
-      this.label26.Name = "label26";
-      this.label26.Size = new System.Drawing.Size(36, 13);
-      this.label26.TabIndex = 26;
-      this.label26.Text = "Bytes:";
-      // 
-      // ByteSizeLabel
-      // 
-      this.ByteSizeLabel.AutoSize = true;
-      this.tableLayoutPanel1.SetColumnSpan(this.ByteSizeLabel, 5);
-      this.ByteSizeLabel.Location = new System.Drawing.Point(59, 205);
-      this.ByteSizeLabel.Name = "ByteSizeLabel";
-      this.ByteSizeLabel.Size = new System.Drawing.Size(0, 13);
-      this.ByteSizeLabel.TabIndex = 27;
+      this.label25.TabIndex = 9;
       // 
       // FlatEditorPanel
       // 
@@ -738,10 +737,10 @@ namespace MMEd.Util
     internal System.Windows.Forms.TextBox NameTextBox;
     internal System.Windows.Forms.TextBox IdTextBox;
     private System.Windows.Forms.Label label7;
-    internal System.Windows.Forms.CheckBox FlagACheckBox;
+    internal System.Windows.Forms.CheckBox HasMetaDataCheckBox;
     internal System.Windows.Forms.CheckBox FlagBCheckBox;
     internal System.Windows.Forms.CheckBox FlagCCheckBox;
-    internal System.Windows.Forms.CheckBox FlagDCheckBox;
+    internal System.Windows.Forms.CheckBox VisibleCheckBox;
     internal System.Windows.Forms.CheckBox FlagECheckBox;
     private System.Windows.Forms.Label label8;
     internal System.Windows.Forms.TextBox NextNTextBox;

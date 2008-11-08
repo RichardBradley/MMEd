@@ -63,7 +63,7 @@ namespace MMEd.Viewers
       mOptionsMenu.DropDownItems.Add(lSelMetaCtrl.CreateToolStripComboBox());
       mOptionsMenu.DropDownItems.Add(new ToolStripSeparator());
       //
-      mOptionsMenu.DropDownItems.Add(new ToolStripMenuItem("Hide all Flats without FlgD", null, new EventHandler(this.HideAllFlatsWithoutFlgDClicked)));
+      mOptionsMenu.DropDownItems.Add(new ToolStripMenuItem("Hide all invisible Flats", null, new EventHandler(this.HideAllFlatsWithoutFlgDClicked)));
       //
       if (DEBUG_ALLOW_LOAD_SAVE_SCENE)
       {
@@ -202,7 +202,7 @@ namespace MMEd.Viewers
       }
       foreach (FlatChunk f in ((Level)mSubject).SHET.Flats)
       {
-        f.TreeNode.Checked = !f.FlgD;
+        f.TreeNode.Checked = !f.Visible;
       }
       ChunkTreeView_NodeMouseClick(null, null);
     }

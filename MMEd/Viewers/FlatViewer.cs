@@ -113,14 +113,21 @@ namespace MMEd.Viewers
       //=======================================================================
       // Warn about changing flags
       //=======================================================================
-      if (mSubject.FlgA != Panel.FlagACheckBox.Checked ||
-        mSubject.FlgB != Panel.FlagBCheckBox.Checked ||
+      if (mSubject.HasMetaData != Panel.HasMetaDataCheckBox.Checked && !Panel.HasMetaDataCheckBox.Checked)
+      {
+        if (MessageBox.Show("You are about to remove all metadata from this flat, eg bump settings. Are you sure?", 
+          "Removing Meta Data", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+        {
+          return;
+        }
+      }
+
+      if (mSubject.FlgB != Panel.FlagBCheckBox.Checked ||
         mSubject.FlgC != Panel.FlagCCheckBox.Checked ||
-        mSubject.FlgD != Panel.FlagDCheckBox.Checked ||
         mSubject.FlgE != Panel.FlagECheckBox.Checked)
       {
         if (MessageBox.Show("Changing flags may (or may not) be rather a dangerous thing to do. " +
-          (mSubject.FlgA != Panel.FlagACheckBox.Checked && !Panel.FlagACheckBox.Checked ? "In particular, unsetting Flag A will delete all you tex meta data e.g. bump settings. " : "") +
+          (mSubject.HasMetaData != Panel.HasMetaDataCheckBox.Checked && !Panel.HasMetaDataCheckBox.Checked ? "In particular, unsetting Flag A will delete all you tex meta data e.g. bump settings. " : "") +
           "Are you sure you want to do this?", "Changing Flat Flags",
           MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
         {
@@ -164,14 +171,13 @@ namespace MMEd.Viewers
       mSubject.RotationVector.Z = short.Parse(Panel.RotationZTextBox.Text);
       mSubject.ScaleX = short.Parse(Panel.ScaleXTextBox.Text);
       mSubject.ScaleY = short.Parse(Panel.ScaleYTextBox.Text);
-      mSubject.FlgA = Panel.FlagACheckBox.Checked;
       mSubject.FlgB = Panel.FlagBCheckBox.Checked;
       mSubject.FlgC = Panel.FlagCCheckBox.Checked;
-      mSubject.FlgD = Panel.FlagDCheckBox.Checked;
+      mSubject.Visible = Panel.VisibleCheckBox.Checked;
       mSubject.FlgE = Panel.FlagECheckBox.Checked;
 
       //=======================================================================
-      // Change width, height and Flag A, if appropriate
+      // Change width, height and HasMetaData if appropriate
       //=======================================================================
       short lNewWidth = short.Parse(Panel.WidthTextBox.Text);
       short lNewHeight = short.Parse(Panel.HeightTextBox.Text);
@@ -196,9 +202,9 @@ namespace MMEd.Viewers
         }
       }
 
-      if (mSubject.Width != lNewWidth || mSubject.Height != lNewHeight || mSubject.FlgA != Panel.FlagACheckBox.Checked)
+      if (mSubject.Width != lNewWidth || mSubject.Height != lNewHeight || mSubject.HasMetaData != Panel.HasMetaDataCheckBox.Checked)
       {
-        lSizeIncrease = mSubject.Resize(Panel.FlagACheckBox.Checked, lNewWidth, lNewHeight, lResizeOptions);
+        lSizeIncrease = mSubject.Resize(Panel.HasMetaDataCheckBox.Checked, lNewWidth, lNewHeight, lResizeOptions);
         lLevel.SHET.TrailingZeroByteCount -= lSizeIncrease;
       }
 
@@ -303,8 +309,6 @@ namespace MMEd.Viewers
 
     public override void SetSubject(Chunk xiChunk)
     {
-      if (mSubject == xiChunk) return;
-
       mSubject = xiChunk as FlatChunk;
 
       if (mSubject != null)
@@ -330,10 +334,10 @@ namespace MMEd.Viewers
         Panel.HeightTextBox.Text = mSubject.Height.ToString();
         Panel.ScaleXTextBox.Text = mSubject.ScaleX.ToString();
         Panel.ScaleYTextBox.Text = mSubject.ScaleY.ToString();
-        Panel.FlagACheckBox.Checked = mSubject.FlgA;
+        Panel.HasMetaDataCheckBox.Checked = mSubject.HasMetaData;
         Panel.FlagBCheckBox.Checked = mSubject.FlgB;
         Panel.FlagCCheckBox.Checked = mSubject.FlgC;
-        Panel.FlagDCheckBox.Checked = mSubject.FlgD;
+        Panel.VisibleCheckBox.Checked = mSubject.Visible;
         Panel.FlagECheckBox.Checked = mSubject.FlgE;
         Panel.NextNTextBox.Text = ArrayToString(mSubject.NextN);
         Panel.ByteSizeLabel.Text = string.Format("{0} bytes ({1} bytes free)", mSubject.ByteSize, lLevel.SHET.TrailingZeroByteCount);

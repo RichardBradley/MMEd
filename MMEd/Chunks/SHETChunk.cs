@@ -6,10 +6,13 @@ using System.ComponentModel;
 using System.Collections;
 using System.Xml.Serialization;
 using MMEd.Util;
+using System.Windows.Forms;
+using MMEd.Viewers.ThreeDee;
+using GLTK;
 
 namespace MMEd.Chunks
 {
-  public class SHETChunk : Chunk
+  public class SHETChunk : Chunk, IEntityProvider
   {
     [Description("Found in the header. Some kind of filename.")]
     public string HeaderString1;
@@ -451,6 +454,8 @@ Each entry has three components, which are height, pitch and yaw, in some order"
       KeyWaypointsChunk.KeySection lFollowingSection = 
         GetKeySectionByWaypoint((byte)(xiWaypoint + 1));//qqTLP What if it hits the limit (not here but when inserting)?
 
+      int lPreviousByteSize = KeyWaypoints.ByteSize;
+
       if (lPreviousSection == null && lFollowingSection == null)
       {
         KeyWaypointsChunk.KeySection lNewSection = 
@@ -481,6 +486,13 @@ Each entry has three components, which are height, pitch and yaw, in some order"
           lSections.ToArray(typeof(KeyWaypointsChunk.KeySection));
       }
 
+      TrailingZeroByteCount += lPreviousByteSize - KeyWaypoints.ByteSize;
+
+      if (TrailingZeroByteCount < 0)
+      {
+        MessageBox.Show("You have run out of space in your level file! Please reduce the size of the file before saving.", "MMEd", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+      }
+
       mKeySectionsByWaypoint = null;
     }
 
@@ -498,6 +510,8 @@ Each entry has three components, which are height, pitch and yaw, in some order"
         GetKeySectionByWaypoint((byte)(xiWaypoint - 1));
       KeyWaypointsChunk.KeySection lFollowingSection =
         GetKeySectionByWaypoint((byte)(xiWaypoint + 1));
+
+      int lPreviousByteSize = KeyWaypoints.ByteSize;
 
       if (lPreviousSection == null && lFollowingSection == null)
       {
@@ -527,6 +541,13 @@ Each entry has three components, which are height, pitch and yaw, in some order"
         lNewSectionArray[KeyWaypoints.KeySections.Length] = lNewSection;
         KeyWaypoints.KeySections = lNewSectionArray;
         lPreviousSection.To = (byte)(xiWaypoint - 1);
+      }
+
+      TrailingZeroByteCount += lPreviousByteSize - KeyWaypoints.ByteSize;
+
+      if (TrailingZeroByteCount < 0)
+      {
+        MessageBox.Show("You have run out of space in your level file! Please reduce the size of the file before saving.", "MMEd", MessageBoxButtons.OK, MessageBoxIcon.Stop);
       }
 
       mKeySectionsByWaypoint = null;
@@ -567,5 +588,26 @@ Each entry has three components, which are height, pitch and yaw, in some order"
 
     #endregion
 
+
+    #region IEntityProvider Members
+
+    public IEnumerable<GLTK.Entity> GetEntities(Chunk xiRootChunk, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata)
+    {
+      if (!(xiRootChunk is Level))
+      {
+        throw new Exception("xiRootChunk must be Level for SHETChunk.GetEntities");
+      }
+
+      List<Entity> lAcc = new List<Entity>();
+
+      foreach (FlatChunk fl in Flats)
+      {
+        lAcc.AddRange(fl.GetEntities((Level)xiRootChunk, xiTextureMode, xiSelectedMetadata));
+      }
+
+      return lAcc;
+    }
+
+    #endregion
   }
 }

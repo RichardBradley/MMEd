@@ -84,7 +84,7 @@ namespace MMEd.Viewers
                     y * mSubjectTileHeight,
                     mSubjectTileWidth,
                     mSubjectTileHeight);
-                OddImageChunk oic = mMainForm.CurrentLevel.GetOddById(mSubject.TexMetaData[x][y][(int)SelectedMeta]);
+                OddImageChunk oic = mSubject.HasMetaData ? mMainForm.CurrentLevel.GetOddById(mSubject.TexMetaData[x][y][(int)SelectedMeta]) : null;
 
                 // If we don't have an odd to draw here, bic is null
                 // and nothing is drawn - just leave the base texture as-is.
@@ -103,7 +103,7 @@ namespace MMEd.Viewers
                     y * mSubjectTileHeight,
                     mSubjectTileWidth,
                     mSubjectTileHeight);
-                BumpImageChunk bic = mMainForm.CurrentLevel.GetBumpById(mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.Bumpmap]);
+                BumpImageChunk bic = mSubject.HasMetaData ? mMainForm.CurrentLevel.GetBumpById(mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.Bumpmap]) : null;
 
                 if (bic != null)
                 {
@@ -114,8 +114,11 @@ namespace MMEd.Viewers
               case eViewMode.EditMetadata:
               case eViewMode.FillMetadata:
                 //draw the selected metadata on as text
-                string text = string.Format("{0}", mSubject.TexMetaData[x][y][(int)SelectedMeta]);
-                Utils.DrawString(e.Graphics, text, GetMidpoint(x, y));
+                if (mSubject.HasMetaData)
+                {
+                  string text = string.Format("{0}", mSubject.TexMetaData[x][y][(int)SelectedMeta]);
+                  Utils.DrawString(e.Graphics, text, GetMidpoint(x, y));
+                }
                 break;
             }
           }
@@ -342,6 +345,11 @@ namespace MMEd.Viewers
 
     private void DrawCameraOverlay(Graphics g, Pen p, int x, int y)
     {
+      if (!mSubject.HasMetaData)
+      {
+        return;
+      }
+
       CameraPosChunk lCamera =
         mMainForm.CurrentLevel.GetCameraById(mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.CameraPos]);
       lCamera.Draw(g, p, GetMidpoint(x, y), mSubjectTileWidth);
@@ -349,6 +357,11 @@ namespace MMEd.Viewers
 
     private void DrawRespawnOverlay(Graphics g, Pen p, int x, int y)
     {
+      if (!mSubject.HasMetaData)
+      {
+        return;
+      }
+
       byte lWaypointValue = mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Waypoint];
 
       // If the waypoint value is 0 then the respawn value doesn't matter - 
@@ -400,6 +413,11 @@ namespace MMEd.Viewers
 
     private void DrawWaypointsOverlay(Graphics g, int x, int y)
     {
+      if (!mSubject.HasMetaData)
+      {
+        return;
+      }
+
       byte lWaypoint = mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Waypoint];
 
       if (lWaypoint == 0)
@@ -735,7 +753,11 @@ namespace MMEd.Viewers
           mKeyOrMouseToSelPicBoxDict[key].Location = new Point(IMG_X_OFF, i * (64 + PADDING));
         }
       }
-      ViewMode = eViewMode.ViewOnly;
+      //=======================================================================
+      // Reset the ViewMode. This will ensure that the currently selected
+      // mode is valid for the new subject.
+      //=======================================================================
+      ViewMode = ViewMode;
     }
 
     public override System.Windows.Forms.TabPage Tab
@@ -1210,7 +1232,8 @@ namespace MMEd.Viewers
           || value == eViewMode.EditWaypoints
           || value == eViewMode.EditMetadata
           || value == eViewMode.FillMetadata
-          || value == eViewMode.ViewBump))
+          || value == eViewMode.ViewBump
+          || value == eViewMode.ViewOdds))
         {
           value = eViewMode.ViewOnly; //reject change!
         }

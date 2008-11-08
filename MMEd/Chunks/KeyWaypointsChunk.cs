@@ -77,6 +77,14 @@ namespace MMEd.Chunks
       }
     }
 
+    public int ByteSize
+    {
+      get
+      {
+        return KeySections.Length * 2;
+      }
+    }
+
     public override List<string> GetDifferences(Chunk xiChunk)
     {
       KeyWaypointsChunk lOther = xiChunk as KeyWaypointsChunk;

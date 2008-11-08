@@ -62,7 +62,8 @@ namespace MMEd.Viewers
       mOptionsMenu.DropDownItems.Add(lSelMetaCtrl.CreateToolStripComboBox());
       mOptionsMenu.DropDownItems.Add(new ToolStripSeparator());
       //
-      mOptionsMenu.DropDownItems.Add(new ToolStripMenuItem("Hide all Flats without FlgD", null, new EventHandler(this.HideAllFlatsWithoutFlgDClicked)));
+      mOptionsMenu.DropDownItems.Add(new ToolStripMenuItem("Hide all invisible Flats", null, new EventHandler(this.HideAllInvisibleFlats)));
+      mOptionsMenu.DropDownItems.Add(new ToolStripMenuItem("Refresh View", null, new EventHandler(this.RefreshView)));
       mMainForm.mMenuStrip.Items.Add(mOptionsMenu);
 
       ResetCamera();
@@ -346,11 +347,11 @@ namespace MMEd.Viewers
       mMainForm.Viewer3DRenderingSurfaceBottomRight.Release();
     }
 
-    public void HideAllFlatsWithoutFlgDClicked(object xiSender, EventArgs xiArgs)
+    public void HideAllInvisibleFlats(object xiSender, EventArgs xiArgs)
     {
       foreach (FlatChunk f in mSubject.SHET.Flats)
       {
-        f.TreeNode.Checked = !f.FlgD;
+        f.TreeNode.Checked = !f.Visible;
       }
       ChunkTreeView_NodeMouseClick(null, null);
     }
@@ -418,6 +419,11 @@ namespace MMEd.Viewers
       MMEdEditorView lBR = mViews[mMainForm.Viewer3DRenderingSurfaceBottomRight];
       lBR.Camera.Position = new GLTK.Point(0, -5000, 0);
       lBR.Camera.LookAt(new GLTK.Point(0, 0, 0), GLTK.Vector.ZAxis);
+    }
+
+    private void RefreshView(object xiSender, System.EventArgs xiArgs)
+    {
+      RebuildScene();
     }
 
     private void RebuildScene()

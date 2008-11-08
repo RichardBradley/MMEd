@@ -98,7 +98,7 @@ the Flat. Negative is ""up""")]
     public short[][] TerrainHeight;
 
     [Description("Short Flag: determines whether the Flat is solid and has a metadata array")]
-    public bool FlgA;
+    public bool HasMetaData;
 
     [Description("Short Flag: unk")]
     public bool FlgB;
@@ -108,16 +108,16 @@ the Flat. Negative is ""up""")]
 
     [Description(@"Short Flag: seems to control whether the Flat is visible. 
         May be dependent on A. Sometimes ignored")]
-    public bool FlgD;
+    public bool Visible;
 
     [Description("Short Flag: many ramps have this set to true")]
     public bool FlgE;
 
-    [Description("No idea. Length is determined by flagA")]
+    [Description("No idea. Length is determined by HasMetaData")]
     public byte[] NextN;
 
     [Description(@"One metadata entry for each tex square.
-See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with FlgA have this")]
+See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with HasMetaData have this")]
     public byte[][][] TexMetaData;
 
     [Description("The objects on this Flat")]
@@ -154,7 +154,7 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
     /// <summary>
     /// 	Resize the FlatChunk
     /// </summary>
-    /// <param name="xiNewFlgA"></param>
+    /// <param name="xiNewHasMetaData"></param>
     /// <param name="xiNewWidth"></param>
     /// <param name="xiNewHeight"></param>
     /// <param name="xiOptions"></param>
@@ -162,10 +162,10 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
     ///   The increase in file size, in bytes
     /// </returns>
     ///========================================================================
-    public int Resize(bool xiNewFlgA, short xiNewWidth, short xiNewHeight, eResizeOptions xiOptions)
+    public int Resize(bool xiNewHasMetaData, short xiNewWidth, short xiNewHeight, eResizeOptions xiOptions)
     {
       int lExtraSquares = (xiNewWidth * xiNewHeight) - (Width * Height);
-      int lExtraMeta = (xiNewFlgA ? (xiNewWidth * xiNewHeight) : 0) - (FlgA ? (Width * Height) : 0);
+      int lExtraMeta = (xiNewHasMetaData ? (xiNewWidth * xiNewHeight) : 0) - (HasMetaData ? (Width * Height) : 0);
       int lExtraWidth = xiNewWidth - Width;
       int lExtraHeight = xiNewHeight - Height;
 
@@ -180,7 +180,7 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
       {
         throw new Exception("Error: TerrainHeight and TextureIds arrays were of different length!");
       }
-      if (FlgA && lOldTexMetaData.Length != lOldTextureIds.Length)
+      if (HasMetaData && lOldTexMetaData.Length != lOldTextureIds.Length)
       {
         throw new Exception("Error: TexMetaData and TextureIds arrays were of different length!");
       }
@@ -190,13 +190,13 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
 
       TextureIds = new short[Width][];
       TerrainHeight = new short[Width][];
-      TexMetaData = xiNewFlgA ? new Byte[Width][][] : null;
+      TexMetaData = xiNewHasMetaData ? new Byte[Width][][] : null;
 
       for (int x = 0; x < Width; x++)
       {
         TextureIds[x] = new short[Height];
         TerrainHeight[x] = new short[Height];
-        if (xiNewFlgA) TexMetaData[x] = new Byte[Height][];
+        if (xiNewHasMetaData) TexMetaData[x] = new Byte[Height][];
 
         int lCopyX = lKeepRight ? x - lExtraWidth : x;
         if (lCopyX >= lOldTextureIds.Length || lCopyX < 0)
@@ -208,7 +208,7 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
         {
           throw new Exception("Error: TerrainHeight and TextureIds arrays were of different length!");
         }
-        if (FlgA && lOldTexMetaData[lCopyX].Length != lOldTextureIds[lCopyX].Length)
+        if (HasMetaData && lOldTexMetaData[lCopyX].Length != lOldTextureIds[lCopyX].Length)
         {
           throw new Exception("Error: TexMetaData and TextureIds arrays were of different length!");
         }
@@ -223,18 +223,18 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
           
           TextureIds[x][y] = lOldTextureIds[lCopyX][lCopyY];
           TerrainHeight[x][y] = lOldTerrainHeight[lCopyX][lCopyY];
-          if (xiNewFlgA && FlgA)
+          if (xiNewHasMetaData && HasMetaData)
           {
             TexMetaData[x][y] = lOldTexMetaData[lCopyX][lCopyY];
           }
-          else if (xiNewFlgA)
+          else if (xiNewHasMetaData)
           {
             TexMetaData[x][y] = new Byte[8]; // Initialise to all zero since we've got nothing better to do
           }
         }
       }
 
-      FlgA = xiNewFlgA;
+      HasMetaData = xiNewHasMetaData;
       return lExtraSquares * 4 + lExtraMeta * 8;
     }
 
@@ -251,7 +251,7 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
     {
       int lSizeIncrease = (xiNewWeapons.Count - (Weapons == null ? 0 : Weapons.Length)) * 12;
 
-      if (xiNewWeapons.Count > 0 || FlgA)
+      if (xiNewWeapons.Count > 0 || HasMetaData)
       {
         Weapons = new WeaponEntry[xiNewWeapons.Count];
         xiNewWeapons.CopyTo(Weapons, 0);
@@ -277,7 +277,7 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
     {
       int lSizeIncrease = (xiNewObjects.Count - (Objects == null ? 0 : Objects.Length)) * 22;
 
-      if (xiNewObjects.Count > 0 || FlgA)
+      if (xiNewObjects.Count > 0 || HasMetaData)
       {
         Objects = new ObjectEntry[xiNewObjects.Count];
         xiNewObjects.CopyTo(Objects, 0);
@@ -321,17 +321,17 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
       }
 
       //General flags
-      FlgA = StreamUtils.ReadShortFlag(bin);
+      HasMetaData = StreamUtils.ReadShortFlag(bin);
       FlgB = StreamUtils.ReadShortFlag(bin);
       FlgC = StreamUtils.ReadShortFlag(bin);
-      FlgD = StreamUtils.ReadShortFlag(bin);
+      Visible = StreamUtils.ReadShortFlag(bin);
       FlgE = StreamUtils.ReadByteFlag(bin);  //qq that looks wrong to me, but it works!
 
       //what do these mean?
-      NextN = bin.ReadBytes(FlgA ? 2 : 6);
+      NextN = bin.ReadBytes(HasMetaData ? 2 : 6);
 
-      //unless (FlgA), we're done...
-      if (FlgA)
+      //unless (HasMetaData), we're done...
+      if (HasMetaData)
       {
         //load the tex metadata
         TexMetaData = new Byte[Width][][];
@@ -404,17 +404,17 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
       }
 
       //General flags
-      StreamUtils.WriteShortFlag(bout, FlgA);
+      StreamUtils.WriteShortFlag(bout, HasMetaData);
       StreamUtils.WriteShortFlag(bout, FlgB);
       StreamUtils.WriteShortFlag(bout, FlgC);
-      StreamUtils.WriteShortFlag(bout, FlgD);
+      StreamUtils.WriteShortFlag(bout, Visible);
       StreamUtils.WriteByteFlag(bout, FlgE); //N.B. byte here. See Deserialise.
 
       //what do these mean?
       bout.Write(NextN);
 
-      //unless (FlgA), we're done...
-      if (FlgA)
+      //unless (HasMetaData), we're done...
+      if (HasMetaData)
       {
         //load the tex metadata
         for (int x = 0; x < Width; x++)
@@ -466,10 +466,10 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
         Height != lOther.Height ||
         ScaleX != lOther.ScaleX ||
         ScaleY != lOther.ScaleY ||
-        FlgA != lOther.FlgA ||
+        HasMetaData != lOther.HasMetaData ||
         FlgB != lOther.FlgB ||
         FlgC != lOther.FlgC ||
-        FlgD != lOther.FlgD ||
+        Visible != lOther.Visible ||
         FlgE != lOther.FlgE ||
         !Utils.ArrayCompare(TerrainHeight, lOther.TerrainHeight) ||
         !Utils.ArrayCompare(TextureIds, lOther.TextureIds) ||
@@ -502,10 +502,10 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
           8 + // RotationVector
           8 + // Width, Height, ScaleX, ScaleY
           4 * Width * Height + // Texture IDs, Terrain Height
-          9 + // FlgA, ..., FlgE
+          9 + // HasMetaData, ..., FlgE
           NextN.Length;
         
-        if (FlgA)
+        if (HasMetaData)
         {
           lSize += 
             8 * Width * Height + // TexMetaData
