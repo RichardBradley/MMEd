@@ -38,6 +38,16 @@ namespace MMEd.Viewers
       //set the transparency
       mMainForm.GridViewTransparencySlider.ValueChanged += new EventHandler(this.TransparencyLevelChange);
       TransparencyLevelChange(null, null);
+
+      //set the zoom
+      mMainForm.GridViewZoomSlider.ValueChanged += new EventHandler(this.ZoomLevelChange);
+      ZoomLevelChange(null, null);
+    }
+
+    void ZoomLevelChange(object sender, EventArgs e)
+    {
+      mZoom = mMainForm.GridViewZoomSlider.Value / 20.0f;
+      UpdateZoom();
     }
 
     private void GridDisplayPanel_Paint(object sender, PaintEventArgs e)
@@ -55,35 +65,39 @@ namespace MMEd.Viewers
         lNumberFont = new Font(FontFamily.GenericMonospace, 10);
         lNumberFGBrush = new SolidBrush(Color.Black);
         lNumberBGBrush = new SolidBrush(Color.White);
-        lNumberOffX = mSubjectTileWidth / 2;
-        lNumberOffY = mSubjectTileHeight / 2;
+        lNumberOffX = mSubjectTileScaledWidth / 2;
+        lNumberOffY = mSubjectTileScaledHeight / 2;
       }
 
       // main drawing loop; iterate over tex squares:
-      for (int x = (e.ClipRectangle.Left / mSubjectTileWidth);
-          x < (e.ClipRectangle.Right / mSubjectTileWidth) + 1
+      for (int x = (e.ClipRectangle.Left / mSubjectTileScaledWidth);
+          x < (e.ClipRectangle.Right / mSubjectTileScaledWidth) + 1
           && x < mSubject.Width; x++)
       {
-        for (int y = (e.ClipRectangle.Top / mSubjectTileHeight);
-            y < (e.ClipRectangle.Bottom / mSubjectTileHeight) + 1
+        for (int y = (e.ClipRectangle.Top / mSubjectTileScaledHeight);
+            y < (e.ClipRectangle.Bottom / mSubjectTileScaledHeight) + 1
             && y < mSubject.Height; y++)
         {
           try
           {
             // Draw the main texture for the square (all views)
-            e.Graphics.DrawImageUnscaled(
-                mMainForm.CurrentLevel.GetTileById(mSubject.TextureIds[x][y]).ToBitmap(),
-                x * mSubjectTileWidth,
-                y * mSubjectTileHeight);
+            Bitmap lTileBitmap = mMainForm.CurrentLevel.GetTileById(mSubject.TextureIds[x][y]).ToBitmap();
+
+            e.Graphics.DrawImage(
+                lTileBitmap,
+                x * mSubjectTileScaledWidth,
+                y * mSubjectTileScaledHeight,
+                mSubjectTileScaledWidth,
+                mSubjectTileScaledHeight);
 
             switch (ViewMode)
             {
               case eViewMode.ViewOdds:
                 Rectangle lOddDest = new Rectangle(
-                    x * mSubjectTileWidth,
-                    y * mSubjectTileHeight,
-                    mSubjectTileWidth,
-                    mSubjectTileHeight);
+                    x * mSubjectTileScaledWidth,
+                    y * mSubjectTileScaledHeight,
+                    mSubjectTileScaledWidth,
+                    mSubjectTileScaledHeight);
                 OddImageChunk oic = mSubject.HasMetaData ? mMainForm.CurrentLevel.GetOddById(mSubject.TexMetaData[x][y][(int)SelectedMeta]) : null;
 
                 // If we don't have an odd to draw here, bic is null
@@ -99,10 +113,10 @@ namespace MMEd.Viewers
               case eViewMode.EditBumpPixels:
                 // Draw the bump map on top as a transparent image.
                 Rectangle lBumpDest = new Rectangle(
-                    x * mSubjectTileWidth,
-                    y * mSubjectTileHeight,
-                    mSubjectTileWidth,
-                    mSubjectTileHeight);
+                    x * mSubjectTileScaledWidth,
+                    y * mSubjectTileScaledHeight,
+                    mSubjectTileScaledWidth,
+                    mSubjectTileScaledHeight);
                 BumpImageChunk bic = mSubject.HasMetaData ? mMainForm.CurrentLevel.GetBumpById(mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.Bumpmap]) : null;
 
                 if (bic != null)
@@ -160,7 +174,7 @@ namespace MMEd.Viewers
           //    These are the coords which appear on the status bar as "Flat Coord"
           // 4) Paint coords. This is the coord space in which the flat is painted onto the grid, which has
           //    the tex squares at integer coords from (0,0) 
-          //    to (mSubject.Width+*mSubjectTileWidth, mSubject.Height*mSubjectTileHeight)
+          //    to (mSubject.Width*mSubjectTileScaledWidth, mSubject.Height*mSubjectTileScaledHeight)
           //
           // The objects are defined in World coords (1), and the GLTK display matrix for the flat is (2) -> (1)
           // So we can go from (1) -> (2) -> (4) without needing to bother with (3)
@@ -168,7 +182,7 @@ namespace MMEd.Viewers
           Matrix lMapWorldCoordsToSimpleFlatCoords = lSubjectsEntity.Transform.Inverse();
 
           Matrix lMapWorldCoordsToPaintCoords = lMapWorldCoordsToSimpleFlatCoords
-            * Matrix.ScalingMatrix(mSubjectTileWidth, mSubjectTileHeight, 1);
+            * Matrix.ScalingMatrix(mSubjectTileScaledWidth, mSubjectTileScaledHeight, 1);
 
           //iterate over the objects in the scene, and transform them into Flat co-ords
           //then draw the faces in wireframe
@@ -229,12 +243,12 @@ namespace MMEd.Viewers
       }
 
       // Draw overlays
-      for (int x = (e.ClipRectangle.Left / mSubjectTileWidth);
-          x < (e.ClipRectangle.Right / mSubjectTileWidth) + 1
+      for (int x = (e.ClipRectangle.Left / mSubjectTileScaledWidth);
+          x < (e.ClipRectangle.Right / mSubjectTileScaledWidth) + 1
           && x < mSubject.Width; x++)
       {
-        for (int y = (e.ClipRectangle.Top / mSubjectTileHeight);
-            y < (e.ClipRectangle.Bottom / mSubjectTileHeight) + 1
+        for (int y = (e.ClipRectangle.Top / mSubjectTileScaledHeight);
+            y < (e.ClipRectangle.Bottom / mSubjectTileScaledHeight) + 1
             && y < mSubject.Height; y++)
         {
           try
@@ -278,20 +292,23 @@ namespace MMEd.Viewers
         case eViewMode.EditCameras:
         case eViewMode.EditWaypoints:
           lHighlightRect = new Rectangle(
-            lMousePos.X / mSubjectTileWidth * mSubjectTileWidth,
-            lMousePos.Y / mSubjectTileHeight * mSubjectTileHeight,
-            mSubjectTileWidth,
-            mSubjectTileHeight);
+            lMousePos.X / mSubjectTileScaledWidth * mSubjectTileScaledWidth,
+            lMousePos.Y / mSubjectTileScaledHeight * mSubjectTileScaledHeight,
+            mSubjectTileScaledWidth,
+            mSubjectTileScaledHeight);
           break;
         case eViewMode.EditBumpPixels:
         case eViewMode.EditRespawns:
-          int lBumpPixWidth = mSubjectTileWidth / 8;
-          int lBumpPixHeight = mSubjectTileHeight / 8;
+          int lTexX = (int)Math.Floor(lMousePos.X / (double)mSubjectTileScaledWidth);
+          int lTexY = (int)Math.Floor(lMousePos.Y / (double)mSubjectTileScaledHeight);
+          int lPxX = (int)((lMousePos.X % mSubjectTileScaledWidth) / ((double)mSubjectTileScaledWidth / 8.0));
+          int lPxY = (int)((lMousePos.Y % mSubjectTileScaledHeight) / ((double)mSubjectTileScaledHeight / 8.0));
+
           lHighlightRect = new Rectangle(
-            lMousePos.X / lBumpPixWidth * lBumpPixWidth,
-            lMousePos.Y / lBumpPixHeight * lBumpPixHeight,
-            mSubjectTileWidth / 8,
-            mSubjectTileHeight / 8);
+            (int)((lTexX + (lPxX / 8.0)) * mSubjectTileScaledWidth),
+            (int)((lTexY + (lPxY / 8.0)) * mSubjectTileScaledHeight),
+            (int)(mSubjectTileScaledWidth / 8.0),
+            (int)(mSubjectTileScaledHeight / 8.0));
           break;
       }
 
@@ -308,28 +325,28 @@ namespace MMEd.Viewers
 
     private Point GetMidpoint(int x, int y)
     {
-      return new Point((x * mSubjectTileWidth + (mSubjectTileWidth / 2)),
-        (y * mSubjectTileHeight + (mSubjectTileHeight / 2)));
+      return new Point((x * mSubjectTileScaledWidth + (mSubjectTileScaledWidth / 2)),
+        (y * mSubjectTileScaledHeight + (mSubjectTileScaledHeight / 2)));
     }
 
     private Point GetCornerPoint(int x, int y)
     {
-      return new Point((x * mSubjectTileWidth),
-        (y * mSubjectTileHeight));
+      return new Point((x * mSubjectTileScaledWidth),
+        (y * mSubjectTileScaledHeight));
     }
 
     private Point GetPointInTile(int x, int y, int xiXOffset, int xiYOffset)
     {
       // Offset to the correct place in the tile, splitting it into an 8x8 grid.
-      int xOffset = xiXOffset * (mSubjectTileWidth / 8);
-      int yOffset = xiYOffset * (mSubjectTileHeight / 8);
+      int xOffset = xiXOffset * (mSubjectTileScaledWidth / 8);
+      int yOffset = xiYOffset * (mSubjectTileScaledHeight / 8);
 
       // Since each of the points in the 8x8 grid may be larger than one pixel,
       // also adjust it to the centre of that point.
-      int xAdjust = (mSubjectTileWidth / 16);
-      int yAdjust = (mSubjectTileHeight / 16);
-      return new Point((x * mSubjectTileWidth + xOffset + xAdjust),
-        (y * mSubjectTileHeight + yOffset + yAdjust));
+      int xAdjust = (mSubjectTileScaledWidth / 16);
+      int yAdjust = (mSubjectTileScaledHeight / 16);
+      return new Point((x * mSubjectTileScaledWidth + xOffset + xAdjust),
+        (y * mSubjectTileScaledHeight + yOffset + yAdjust));
     }
 
     private void DrawGridOverlay(Graphics g, Pen p, int x, int y)
@@ -339,8 +356,8 @@ namespace MMEd.Viewers
         p,
         lTopLeft.X,
         lTopLeft.Y,
-        mSubjectTileWidth - 1,
-        mSubjectTileHeight - 1);
+        mSubjectTileScaledWidth - 1,
+        mSubjectTileScaledHeight - 1);
     }
 
     private void DrawCameraOverlay(Graphics g, Pen p, int x, int y)
@@ -352,7 +369,7 @@ namespace MMEd.Viewers
 
       CameraPosChunk lCamera =
         mMainForm.CurrentLevel.GetCameraById(mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.CameraPos]);
-      lCamera.Draw(g, p, GetMidpoint(x, y), mSubjectTileWidth);
+      lCamera.Draw(g, p, GetMidpoint(x, y), mSubjectTileScaledWidth);
     }
 
     private void DrawRespawnOverlay(Graphics g, Pen p, int x, int y)
@@ -376,11 +393,11 @@ namespace MMEd.Viewers
       byte lFourValue = mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Four];
       byte lSevenValue = mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Seven];
       Point lMidpoint = GetMidpoint(x, y);
-      int lLineLength = (int)(mSubjectTileWidth * 0.4);
+      int lLineLength = (int)(mSubjectTileScaledWidth * 0.4);
 
       if (Array.IndexOf(sNoRespawnValues, lTwoValue) >= 0)
       {
-        Utils.DrawCross(g, p, lMidpoint, (int)(mSubjectTileWidth * 0.4));
+        Utils.DrawCross(g, p, lMidpoint, (int)(mSubjectTileScaledWidth * 0.4));
       }
       else
       {
@@ -427,7 +444,7 @@ namespace MMEd.Viewers
 
       if (lWaypoint == mCurrentWaypoint)
       {
-        Utils.DrawCircle(g, new Pen(Color.Green, 3), GetMidpoint(x, y), (int)(mSubjectTileWidth * 0.3));
+        Utils.DrawCircle(g, new Pen(Color.Green, 3), GetMidpoint(x, y), (int)(mSubjectTileScaledWidth * 0.3));
       }
 
       KeyWaypointsChunk.KeySection lKeySection =
@@ -436,9 +453,9 @@ namespace MMEd.Viewers
       Point lTopRight = GetCornerPoint(x, y);
       Point lBottomLeft = GetCornerPoint(x, y);
       Point lBottomRight = GetCornerPoint(x, y);
-      lTopRight.Offset(new Point(mSubjectTileWidth, 0));
-      lBottomLeft.Offset(new Point(0, mSubjectTileHeight));
-      lBottomRight.Offset(new Point(mSubjectTileWidth, mSubjectTileHeight));
+      lTopRight.Offset(new Point(mSubjectTileScaledWidth, 0));
+      lBottomLeft.Offset(new Point(0, mSubjectTileScaledHeight));
+      lBottomRight.Offset(new Point(mSubjectTileScaledWidth, mSubjectTileScaledHeight));
 
       DrawWaypointOverlayLine(
         g,
@@ -700,8 +717,11 @@ namespace MMEd.Viewers
     }
 
     private FlatChunk mSubject = null;
-    int mSubjectTileWidth;
-    int mSubjectTileHeight;
+    int mSubjectTileNativeWidth;
+    int mSubjectTileNativeHeight;
+    int mSubjectTileScaledWidth;
+    int mSubjectTileScaledHeight;
+    float mZoom = 1;
 
     public override void SetSubject(Chunk xiChunk)
     {
@@ -722,11 +742,9 @@ namespace MMEd.Viewers
         //find the width and height of the tex components
         short topLeftTexIdx = mSubject.TextureIds[0][0];
         TIMChunk firstTim = mMainForm.CurrentLevel.GetTileById(topLeftTexIdx);
-        mSubjectTileHeight = firstTim.ImageHeight;
-        mSubjectTileWidth = firstTim.ImageWidth;
-
-        mMainForm.GridDisplayPanel.Width = mSubjectTileWidth * mSubject.Width;
-        mMainForm.GridDisplayPanel.Height = mSubjectTileHeight * mSubject.Height;
+        mSubjectTileNativeHeight = firstTim.ImageHeight;
+        mSubjectTileNativeWidth = firstTim.ImageWidth;
+        UpdateZoom();
 
         //init the selected image display boxes
         const int PADDING = 5, IMG_X_OFF = 32;
@@ -760,6 +778,20 @@ namespace MMEd.Viewers
       ViewMode = ViewMode;
     }
 
+    private void UpdateZoom()
+    {
+      if (mSubject == null)
+      {
+        return;
+      }
+
+      mWireFrameCache = null;
+      mSubjectTileScaledWidth = (int)(mSubjectTileNativeWidth * mZoom);
+      mSubjectTileScaledHeight = (int)(mSubjectTileNativeHeight * mZoom);
+      mMainForm.GridDisplayPanel.Width = (int)(mSubjectTileScaledWidth * mSubject.Width);
+      mMainForm.GridDisplayPanel.Height = (int)(mSubjectTileScaledHeight * mSubject.Height);
+    }
+
     public override System.Windows.Forms.TabPage Tab
     {
       get { return mMainForm.ViewTabGrid; }
@@ -775,12 +807,19 @@ namespace MMEd.Viewers
       mMainForm.GridDisplayPanel.Invalidate();
     }
 
+    void GridDisplayMouseWheel(object sender, MouseEventArgs e)
+    {
+      mZoom += e.Delta / 1000f;
+      UpdateZoom();
+      InvalidateGridDisplay();
+    }
+
     private void GridDisplayMouseMove(object sender, MouseEventArgs e)
     {
       if (mSubject != null)
       {
-        double x = e.X / (double)mSubjectTileWidth;
-        double y = e.Y / (double)mSubjectTileHeight;
+        double x = e.X / (double)mSubjectTileScaledWidth;
+        double y = e.Y / (double)mSubjectTileScaledHeight;
 
         string lWorldCoord = "World Coord: Only available for non-rotated sheets";
         if (mSubject.RotationVector.Norm() == 0)
@@ -793,8 +832,8 @@ namespace MMEd.Viewers
 
         int lTexX = (int)Math.Floor(x);
         int lTexY = (int)Math.Floor(y);
-        int lPxX = (e.X % mSubjectTileWidth) / (mSubjectTileWidth / 8);
-        int lPxY = (e.Y % mSubjectTileHeight) / (mSubjectTileHeight / 8);
+        int lPxX = (int)((e.X % mSubjectTileScaledWidth) / ((double)mSubjectTileScaledWidth / 8.0));
+        int lPxY = (int)((e.Y % mSubjectTileScaledHeight) / ((double)mSubjectTileScaledHeight / 8.0));
 
         byte lBumpIdx = mSubject.TexMetaData == null ? (byte)0 : mSubject.TexMetaData[lTexX][lTexY][(int)eTexMetaDataEntries.Bumpmap];
         BumpImageChunk lBumpChunk = mMainForm.CurrentLevel.GetBumpById(lBumpIdx);
@@ -827,10 +866,10 @@ namespace MMEd.Viewers
     {
       if (mSubject != null)
       {
-        int x = e.X / mSubjectTileWidth;
-        int y = e.Y / mSubjectTileHeight;
-        int lPxX = (e.X % mSubjectTileWidth) / (mSubjectTileWidth / 8);
-        int lPxY = (e.Y % mSubjectTileHeight) / (mSubjectTileHeight / 8);
+        int x = e.X / mSubjectTileScaledWidth;
+        int y = e.Y / mSubjectTileScaledHeight;
+        int lPxX = (e.X % mSubjectTileScaledWidth) / (mSubjectTileScaledWidth / 8);
+        int lPxY = (e.Y % mSubjectTileScaledHeight) / (mSubjectTileScaledHeight / 8);
 
         switch (ViewMode)
         {
@@ -1073,10 +1112,10 @@ namespace MMEd.Viewers
           else if (c == mMainForm.GridDisplayPanel)
           {
             Point p = mMainForm.GridDisplayPanel.PointToClient(lMousePt);
-            int x = p.X / mSubjectTileWidth;
-            int y = p.Y / mSubjectTileHeight;
-            int lPxX = (p.X % mSubjectTileWidth) / (mSubjectTileWidth / 8);
-            int lPxY = (p.Y % mSubjectTileHeight) / (mSubjectTileHeight / 8);
+            int x = p.X / mSubjectTileScaledWidth;
+            int y = p.Y / mSubjectTileScaledHeight;
+            int lPxX = (p.X % mSubjectTileScaledWidth) / (mSubjectTileScaledWidth / 8);
+            int lPxY = (p.Y % mSubjectTileScaledHeight) / (mSubjectTileScaledHeight / 8);
             PictureBox lSel = mKeyOrMouseToSelPicBoxDict[e.KeyChar];
             if (ViewMode == eViewMode.EditTextures)
             {
@@ -1275,8 +1314,8 @@ namespace MMEd.Viewers
             {
               TIMChunk c = mMainForm.CurrentLevel.GetTileById(i);
               if (c != null) im = c.ToImage();
-              if (im.Width != this.mSubjectTileWidth
-               || im.Height != this.mSubjectTileHeight)
+              if (im.Width != this.mSubjectTileNativeWidth
+               || im.Height != this.mSubjectTileNativeHeight)
               {
                 im = null;
               }
@@ -1426,13 +1465,13 @@ namespace MMEd.Viewers
 
       if (i == 0)
       {
-        Utils.DrawCross(g, p, lMidpoint, (int)(mSubjectTileWidth * 0.8));
+        Utils.DrawCross(g, p, lMidpoint, (int)(mSubjectTileScaledWidth * 0.8));
         return lRet;
       }
       else if (i <= FlatChunk.LAYERZERO_HIGHESTDIRECTION + 1)
       {
         g.DrawRectangle(p, 0, 0, 63, 63);
-        Utils.DrawArrow(g, p, lMidpoint, 4096 - ((i - 1) * 256), (int)(mSubjectTileWidth * 0.4), true);
+        Utils.DrawArrow(g, p, lMidpoint, 4096 - ((i - 1) * 256), (int)(mSubjectTileScaledWidth * 0.4), true);
         return lRet;
       }
       else
