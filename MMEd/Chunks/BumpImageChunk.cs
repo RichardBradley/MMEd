@@ -157,9 +157,9 @@ namespace MMEd.Chunks
       mBumpTypes[0x21] = new BumpTypeInfo("enterTeleport", 0xff8800, "Screen jumps to somewhere over y=10000; some funny stuff with camera angles happens; cars suddenly reappear at world coord approx (920, 1600)");
       mBumpTypes[0x22] = new BumpTypeInfo("lilyPadEdge", 0x66FF66, "Land/water boundary, can be jumped");
       mBumpTypes[0x23] = new BumpTypeInfo("sand", 0xc9b549);
-      mBumpTypes[0x24] = new BumpTypeInfo("jumpWhoosh4", 0xffc400, "You jump a bit and go 'Wheee!'");
+      mBumpTypes[0x24] = new BumpTypeInfo("jumpWheee", 0xffc400, "You jump a bit and go 'Wheee!'");
       mBumpTypes[0x25] = new BumpTypeInfo("teleport6", 0xffff00, "Teleport to world coord approx (7060, 11450) facing towards (0?, 0?)");
-      mBumpTypes[0x26] = new BumpTypeInfo("jumpWhoosh5", 0xffb400, "You jump a bit and go 'Wheee!'");
+      mBumpTypes[0x26] = new BumpTypeInfo("jumpWheee2", 0xffb400, "You jump a bit and go 'Wheee!'");
       mBumpTypes[0x27] = new BumpTypeInfo("splash2", 0x4455ff, "A big \"splash\" - death trap");
       mBumpTypes[0x28] = new BumpTypeInfo("teleport1", 0xffaa00, "Teleport to world coord approx (175, 7000) facing towards (10000, 0)");
       mBumpTypes[0x29] = new BumpTypeInfo("teleport2", 0xffdd00, "Teleport to world coord approx (115, 2645) facing towards (10000, 0)");

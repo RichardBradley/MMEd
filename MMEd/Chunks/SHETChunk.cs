@@ -423,18 +423,50 @@ Each entry has three components, which are height, pitch and yaw, in some order"
       return (KeyWaypointsChunk.KeySection)KeySectionsByWaypoint[xiWaypoint];
     }
 
-    public void AdjustKeySections(int xiFrom, int xiChangeBy)
+    public void AdjustKeySections(int xiFrom, int xiChangeBy, int xiWrap)
     {
       foreach (KeyWaypointsChunk.KeySection lKeySection in KeyWaypoints.KeySections)
       {
         if (lKeySection.From >= xiFrom)
         {
-          lKeySection.From = (byte)(lKeySection.From + xiChangeBy);//qqTLP Bounds
+          int lNewValue = lKeySection.From + xiChangeBy;
+          if (lNewValue <= 0)
+          {
+            if (xiWrap > 0)
+            {
+              lNewValue += xiWrap;
+            }
+            else
+            {
+              lNewValue = 0;
+            }
+          }
+          else if (lNewValue > xiWrap)
+          {
+            lNewValue -= xiWrap;
+          }
+          lKeySection.From = (byte)lNewValue;
         }
 
         if (lKeySection.To >= xiFrom)
         {
-          lKeySection.To = (byte)(lKeySection.To + xiChangeBy);//qqTLP Bounds
+          int lNewValue = lKeySection.To + xiChangeBy;
+          if (lNewValue <= 0)
+          {
+            if (xiWrap > 0)
+            {
+              lNewValue += xiWrap;
+            }
+            else
+            {
+              lNewValue = 0;
+            }
+          }
+          else if (lNewValue > xiWrap)
+          {
+            lNewValue -= xiWrap;
+          }
+          lKeySection.To = (byte)lNewValue;
         }
       }
 

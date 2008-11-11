@@ -551,31 +551,31 @@ namespace MMEd.Viewers
 
       switch (xiAction)
       {
-        case eWaypointAction.Insert:
-        case eWaypointAction.AddIncrement:
-          if (mCurrentWaypoint == 255 && lWaypoint == 0)
+        case eWaypointAction.AddPath:
+        case eWaypointAction.Add:
+          if (mCurrentWaypoint == MAX_WAYPOINT && lWaypoint == 0)
           {
             System.Windows.Forms.MessageBox.Show(
               mMainForm,
-              "You can't add a waypoint higher than 255 - delete some of the existing ones first.",
+              "You can't add a waypoint higher than " + MAX_WAYPOINT.ToString() + " - delete some of the existing ones first.",
               "Error",
               MessageBoxButtons.OK,
               MessageBoxIcon.Error);
           }
-          else if ((lWaypoint == 0) || (xiAction == eWaypointAction.AddIncrement))
+          else if ((lWaypoint == 0) || (xiAction == eWaypointAction.Add))
           {
             mCurrentWaypoint++;
 
-            if (xiAction == eWaypointAction.Insert)
+            if (xiAction == eWaypointAction.AddPath)
             {
-                AdjustWaypoints(mCurrentWaypoint, 1);
+              AdjustWaypoints(mCurrentWaypoint, 1, -1);
             }
             mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Waypoint] = mCurrentWaypoint;
           }
           else
           {
             mCurrentWaypoint = (byte)(lWaypoint == 0 ? 0 : lWaypoint - 1);
-            AdjustWaypoints(lWaypoint, -1);
+            AdjustWaypoints(lWaypoint, -1, -1);
             mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Waypoint] = 0;
           }
           break;
@@ -587,7 +587,7 @@ namespace MMEd.Viewers
           if (mCurrentWaypoint > 1)
           {
               mCurrentWaypoint--;
-              AdjustWaypoints(mCurrentWaypoint + 1, -1);
+              AdjustWaypoints(mCurrentWaypoint + 1, -1, 1);
           }
           break;
 
@@ -599,7 +599,7 @@ namespace MMEd.Viewers
 
           if (lWaypoint == mCurrentWaypoint)
           {
-            SetCurrentWaypointToDefault();
+            mCurrentWaypoint = GetMaxWaypoint();
           }
           break;
         case eWaypointAction.Waypoints:
@@ -614,12 +614,27 @@ namespace MMEd.Viewers
             lShet.RemoveKeySection(lWaypoint);
           }
           break;
+        case eWaypointAction.Restart:
+          //===================================================================
+          // Set the selected position to be the starting point
+          //===================================================================
+          if (lWaypoint == 0)
+          {
+            mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Waypoint] = 1;
+          }
+          else
+          {
+            int lMaxWaypoint = GetMaxWaypoint();
+
+            AdjustWaypoints(1, 1 - lWaypoint, lMaxWaypoint);
+          }
+          break;
       }
     }
 
-    private void SetCurrentWaypointToDefault()
+    private byte GetMaxWaypoint()
     {
-      mCurrentWaypoint = 0;
+      byte lMaxWaypoint = 0;
 
       for (int x = 0; x < mSubject.Width; x++)
       {
@@ -627,12 +642,14 @@ namespace MMEd.Viewers
         {
           byte lWaypoint = mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Waypoint];
 
-          mCurrentWaypoint = Math.Max(mCurrentWaypoint, lWaypoint);
+          lMaxWaypoint = Math.Max(lMaxWaypoint, lWaypoint);
         }
       }
+
+      return lMaxWaypoint;
     }
 
-    private void AdjustWaypoints(int xiFrom, int xiChangeBy)
+    private void AdjustWaypoints(int xiFrom, int xiChangeBy, int xiWrap)
     {
       SHETChunk lShet = mMainForm.CurrentLevel.SHET;
 
@@ -651,15 +668,32 @@ namespace MMEd.Viewers
 
             if (lWaypoint >= xiFrom)
             {
-              int lNewValue = Math.Max(0, lWaypoint + xiChangeBy);
+              int lNewValue = lWaypoint + xiChangeBy;
+              if (lNewValue <= 0)
+              {
+                if (xiWrap > 0)
+                {
+                  lNewValue += xiWrap;
+                }
+                else
+                {
+                  lNewValue = 0;
+                }
+              }
+              else if (lNewValue > xiWrap)
+              {
+                lNewValue -= xiWrap;
+              }
               lFlat.TexMetaData[x][y][(byte)eTexMetaDataEntries.Waypoint] = (byte)lNewValue;
             }
           }
         }
       }
 
-      lShet.AdjustKeySections(xiFrom, xiChangeBy);
+      lShet.AdjustKeySections(xiFrom, xiChangeBy, xiWrap);
     }
+
+    private const int MAX_WAYPOINT = 255;
 
     // a precomputed cache of the objects in the whole level, as coloured polys
     // in the paint co-ords of the grid view
@@ -1260,7 +1294,7 @@ namespace MMEd.Viewers
 
         if (value == eViewMode.EditWaypoints && mCurrentWaypoint == 0)
         {
-          SetCurrentWaypointToDefault();
+          mCurrentWaypoint = GetMaxWaypoint();
         }
 
         if ((mSubject == null || mSubject.TexMetaData == null)
@@ -1482,7 +1516,7 @@ namespace MMEd.Viewers
 
     private Image GetWaypointBrush(int i)
     {
-      if (i > (int)eWaypointAction.Waypoints)
+      if (i > (int)eWaypointAction.Restart)
       {
         return null;
       }
@@ -1491,11 +1525,8 @@ namespace MMEd.Viewers
 
       switch (i)
       {
-        case (int)eWaypointAction.Insert:
+        case (int)eWaypointAction.AddPath:
           lLabel = "Add path";
-          break;
-        case (int)eWaypointAction.AddIncrement:
-          lLabel = "Add";
           break;
         default:
           lLabel = ((eWaypointAction)i).ToString();
@@ -1521,25 +1552,6 @@ namespace MMEd.Viewers
       g.DrawRectangle(p, 0, 0, lWidth - 1, lHeight - 1);
       Utils.DrawString(g, lLabel, lMidpoint);
 
-      //switch (i)
-      //{
-      //  case (int)eWaypointAction.Insert:
-      //    Utils.DrawString(g, "Add path", lMidpoint);
-      //    break;
-      //  case (int)eWaypointAction.Paint:
-      //    Utils.DrawString(g, "Duplicate", lMidpoint);
-      //    break;
-      //  case (int)eWaypointAction.SetTo:
-      //    Utils.DrawString(g, "Eyedropper", lMidpoint);
-      //    break;
-      //  case (int)eWaypointAction.ToggleKey:
-      //    Utils.DrawString(g, "Waypoints", lMidpoint);
-      //    break;
-      //  default:
-      //    Utils.DrawString(g, ((eWaypointAction)i).ToString(), lMidpoint);
-      //    break;
-      //}
-      //qqTLP Reset mCurrentWaypoint
       return lRet;
     }
 
@@ -1700,13 +1712,14 @@ namespace MMEd.Viewers
 
     private enum eWaypointAction
     {
-      Insert = 0,
-      AddIncrement = 1,
+      AddPath = 0,
+      Add = 1,
       Duplicate = 2,
       Decrement = 3,
       Eyedropper = 4,
       Erase = 5,
       Waypoints = 6,
+      Restart = 7
     }
 
     #endregion
