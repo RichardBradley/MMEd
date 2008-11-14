@@ -48,10 +48,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\GLTK\lib\Tao.Platform.Windows.dll</HintPath>
     </Reference>
-    <Reference Include="xmldiffpatch, Version=1.0.8.28, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\xmldiffpatch.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Ad3ds\Face.cs" />

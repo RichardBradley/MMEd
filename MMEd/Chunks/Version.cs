@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Xml.Serialization;
-using Microsoft.XmlDiffPatch;
 using System.Xml;
 using MMEd.Util;
 using System.Windows.Forms;

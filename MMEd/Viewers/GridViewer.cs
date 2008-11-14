@@ -599,7 +599,7 @@ namespace MMEd.Viewers
 
           if (lWaypoint == mCurrentWaypoint)
           {
-            mCurrentWaypoint = GetMaxWaypoint();
+            mCurrentWaypoint = GetDefaultWaypoint();
           }
           break;
         case eWaypointAction.Waypoints:
@@ -636,17 +636,42 @@ namespace MMEd.Viewers
     {
       byte lMaxWaypoint = 0;
 
+      foreach (FlatChunk lFlat in mMainForm.CurrentLevel.SHET.Flats)
+      {
+        if (!lFlat.HasMetaData)
+        {
+          continue;
+        }
+
+        for (int x = 0; x < lFlat.Width; x++)
+        {
+          for (int y = 0; y < lFlat.Height; y++)
+          {
+            byte lWaypoint = lFlat.TexMetaData[x][y][(byte)eTexMetaDataEntries.Waypoint];
+
+            lMaxWaypoint = Math.Max(lMaxWaypoint, lWaypoint);
+          }
+        }
+      }
+
+      return lMaxWaypoint;
+    }
+
+    private byte GetDefaultWaypoint()
+    {
+      byte lDefaultWaypoint = 0;
+
       for (int x = 0; x < mSubject.Width; x++)
       {
         for (int y = 0; y < mSubject.Height; y++)
         {
           byte lWaypoint = mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Waypoint];
 
-          lMaxWaypoint = Math.Max(lMaxWaypoint, lWaypoint);
+          lDefaultWaypoint = Math.Max(lDefaultWaypoint, lWaypoint);
         }
       }
 
-      return lMaxWaypoint;
+      return lDefaultWaypoint;
     }
 
     private void AdjustWaypoints(int xiFrom, int xiChangeBy, int xiWrap)
@@ -902,8 +927,8 @@ namespace MMEd.Viewers
       {
         int x = e.X / mSubjectTileScaledWidth;
         int y = e.Y / mSubjectTileScaledHeight;
-        int lPxX = (e.X % mSubjectTileScaledWidth) / (mSubjectTileScaledWidth / 8);
-        int lPxY = (e.Y % mSubjectTileScaledHeight) / (mSubjectTileScaledHeight / 8);
+        int lPxX = (int)((e.X % mSubjectTileScaledWidth) / ((double)mSubjectTileScaledWidth / 8.0));
+        int lPxY = (int)((e.Y % mSubjectTileScaledHeight) / ((double)mSubjectTileScaledHeight / 8));
 
         switch (ViewMode)
         {
@@ -1294,7 +1319,7 @@ namespace MMEd.Viewers
 
         if (value == eViewMode.EditWaypoints && mCurrentWaypoint == 0)
         {
-          mCurrentWaypoint = GetMaxWaypoint();
+          mCurrentWaypoint = GetDefaultWaypoint();
         }
 
         if ((mSubject == null || mSubject.TexMetaData == null)
@@ -1311,173 +1336,176 @@ namespace MMEd.Viewers
           value = eViewMode.ViewOnly; //reject change!
         }
 
-        mViewMode = value;
-
-        // update the editing palette
-        //
-        mMainForm.GridViewPalettePanel.SuspendLayout();
-        mMainForm.GridViewPalettePanel.Controls.Clear();
-        if (ViewMode == eViewMode.EditTextures
-          || ViewMode == eViewMode.EditBumpSquares
-          || ViewMode == eViewMode.EditBumpPixels
-          || ViewMode == eViewMode.EditCameras
-          || ViewMode == eViewMode.EditRespawns
-          || ViewMode == eViewMode.EditWaypoints)
+        if (mViewMode != value)
         {
-          Point lNextPbTL = new Point(0, 0);
-          IEnumerator<object> lKeys = mKeyOrMouseToSelPicBoxDict.Keys.GetEnumerator();
-          PictureBox lPalPB = null;
+          mViewMode = value;
 
-          //create shared GDI objects outside of loop:
-          Font lFont = null;
-          Brush lNameFGBrush = null, lNameBGBrush = null;
-          if (ViewMode == eViewMode.EditBumpPixels)
+          // update the editing palette
+          //
+          mMainForm.GridViewPalettePanel.SuspendLayout();
+          mMainForm.GridViewPalettePanel.Controls.Clear();
+          if (ViewMode == eViewMode.EditTextures
+            || ViewMode == eViewMode.EditBumpSquares
+            || ViewMode == eViewMode.EditBumpPixels
+            || ViewMode == eViewMode.EditCameras
+            || ViewMode == eViewMode.EditRespawns
+            || ViewMode == eViewMode.EditWaypoints)
           {
-            lFont = new Font(FontFamily.GenericSansSerif, 8);
-            lNameBGBrush = new SolidBrush(Color.White);
-            lNameFGBrush = new SolidBrush(Color.Black);
-          }
+            Point lNextPbTL = new Point(0, 0);
+            IEnumerator<object> lKeys = mKeyOrMouseToSelPicBoxDict.Keys.GetEnumerator();
+            PictureBox lPalPB = null;
 
-          //loop over allowed values
-          for (int i = 0; i < 256; i++)
-          {
-            Image im = null;
-
-            //fetch or create the appropriate palette image for the byte value "i"
-            if (ViewMode == eViewMode.EditTextures)
+            //create shared GDI objects outside of loop:
+            Font lFont = null;
+            Brush lNameFGBrush = null, lNameBGBrush = null;
+            if (ViewMode == eViewMode.EditBumpPixels)
             {
-              TIMChunk c = mMainForm.CurrentLevel.GetTileById(i);
-              if (c != null) im = c.ToImage();
-              if (im.Width != this.mSubjectTileNativeWidth
-               || im.Height != this.mSubjectTileNativeHeight)
-              {
-                im = null;
-              }
+              lFont = new Font(FontFamily.GenericSansSerif, 8);
+              lNameBGBrush = new SolidBrush(Color.White);
+              lNameFGBrush = new SolidBrush(Color.Black);
             }
-            else if (ViewMode == eViewMode.EditBumpSquares)
+
+            //loop over allowed values
+            for (int i = 0; i < 256; i++)
             {
-              BumpImageChunk bim = mMainForm.CurrentLevel.GetBumpById(i);
-              if (bim != null) im = bim.ToImage();
-            }
-            else if (ViewMode == eViewMode.EditBumpPixels)
-            {
-              if (i < BumpImageChunk.HIGHEST_KNOWN_BUMP_TYPE)
+              Image im = null;
+
+              //fetch or create the appropriate palette image for the byte value "i"
+              if (ViewMode == eViewMode.EditTextures)
               {
-                BumpImageChunk.BumpTypeInfo bti = BumpImageChunk.GetBumpTypeInfo((byte)i);
-
-                string lBumpTypeName = bti == null
-                  ? string.Format("0x{0:x}", i)
-                  : bti.Name;
-                Bitmap lBmp = new Bitmap(64, 64);
-                Graphics g = Graphics.FromImage(lBmp);
-                SizeF lBumpNameSize = g.MeasureString(lBumpTypeName, lFont);
-
-                //grow the bmp if needed (it'll be scaled back by the PictureBox
-                if (lBumpNameSize.Width > lBmp.Width)
+                TIMChunk c = mMainForm.CurrentLevel.GetTileById(i);
+                if (c != null) im = c.ToImage();
+                if (im.Width != this.mSubjectTileNativeWidth
+                 || im.Height != this.mSubjectTileNativeHeight)
                 {
-                  lBmp = new Bitmap((int)lBumpNameSize.Width, 64);
-                  g = Graphics.FromImage(lBmp);
+                  im = null;
+                }
+              }
+              else if (ViewMode == eViewMode.EditBumpSquares)
+              {
+                BumpImageChunk bim = mMainForm.CurrentLevel.GetBumpById(i);
+                if (bim != null) im = bim.ToImage();
+              }
+              else if (ViewMode == eViewMode.EditBumpPixels)
+              {
+                if (i < BumpImageChunk.HIGHEST_KNOWN_BUMP_TYPE)
+                {
+                  BumpImageChunk.BumpTypeInfo bti = BumpImageChunk.GetBumpTypeInfo((byte)i);
+
+                  string lBumpTypeName = bti == null
+                    ? string.Format("0x{0:x}", i)
+                    : bti.Name;
+                  Bitmap lBmp = new Bitmap(64, 64);
+                  Graphics g = Graphics.FromImage(lBmp);
+                  SizeF lBumpNameSize = g.MeasureString(lBumpTypeName, lFont);
+
+                  //grow the bmp if needed (it'll be scaled back by the PictureBox
+                  if (lBumpNameSize.Width > lBmp.Width)
+                  {
+                    lBmp = new Bitmap((int)lBumpNameSize.Width, 64);
+                    g = Graphics.FromImage(lBmp);
+                  }
+
+                  g.Clear(BumpImageChunk.GetColorForBumpType((byte)i));
+
+                  //write the name on:
+                  float xf = lBmp.Width / 2 - lBumpNameSize.Width / 2;
+                  float yf = 64 / 2 - lBumpNameSize.Height / 2;
+
+                  g.FillRectangle(lNameBGBrush, xf, yf, lBumpNameSize.Width, lBumpNameSize.Height);
+
+                  g.DrawString(
+                      lBumpTypeName,
+                      lFont,
+                      lNameFGBrush,
+                      xf,
+                      yf);
+
+                  im = lBmp;
+                }
+              }
+              else if (ViewMode == eViewMode.EditCameras)
+              {
+                // Skip all camera positions between 1 and 50 - they're not used
+                // for multiplayer mode.
+                if (i == 1)
+                {
+                  i = 51;
                 }
 
-                g.Clear(BumpImageChunk.GetColorForBumpType((byte)i));
-
-                //write the name on:
-                float xf = lBmp.Width / 2 - lBumpNameSize.Width / 2;
-                float yf = 64 / 2 - lBumpNameSize.Height / 2;
-
-                g.FillRectangle(lNameBGBrush, xf, yf, lBumpNameSize.Width, lBumpNameSize.Height);
-
-                g.DrawString(
-                    lBumpTypeName,
-                    lFont,
-                    lNameFGBrush,
-                    xf,
-                    yf);
-
-                im = lBmp;
+                CameraPosChunk cpc = mMainForm.CurrentLevel.GetCameraById(i);
+                if (cpc != null) im = cpc.ToImage();
               }
-            }
-            else if (ViewMode == eViewMode.EditCameras)
-            {
-              // Skip all camera positions between 1 and 50 - they're not used
-              // for multiplayer mode.
-              if (i == 1)
+              else if (ViewMode == eViewMode.EditRespawns)
               {
-                i = 51;
+                im = GetRespawnBrush(i);
+              }
+              else if (ViewMode == eViewMode.EditWaypoints)
+              {
+                im = GetWaypointBrush(i);
               }
 
-              CameraPosChunk cpc = mMainForm.CurrentLevel.GetCameraById(i);
-              if (cpc != null) im = cpc.ToImage();
-            }
-            else if (ViewMode == eViewMode.EditRespawns)
-            {
-              im = GetRespawnBrush(i);
-            }
-            else if (ViewMode == eViewMode.EditWaypoints)
-            {
-              im = GetWaypointBrush(i);
-            }
-
-            // have image, add it to editing palette
-            if (im != null)
-            {
-              lPalPB = new PictureBox();
-              lPalPB.Image = im;
-              mMainForm.GridViewPalettePanel.Size =
-                new Size(lNextPbTL.X + 64 + PADDING,
-                         lNextPbTL.Y + 64);
-              mMainForm.GridViewPalettePanel.Controls.Add(lPalPB);
-              lPalPB.Bounds = new Rectangle(lNextPbTL, new Size(64, 64));
-              lPalPB.SizeMode = PictureBoxSizeMode.StretchImage;
-              lPalPB.Tag = (byte)i;
-              lPalPB.MouseClick += new MouseEventHandler(PaletteImageMouseClick);
-              lNextPbTL.Offset(64 + PADDING, 0);
-              if (lKeys.MoveNext())
+              // have image, add it to editing palette
+              if (im != null)
               {
-                SetSelImage(lKeys.Current, lPalPB);
-              }
-            }
-          }
-
-          //if there were fewer palette entries than there are keys,
-          //fill the remaining keys with the last palette entry
-          while (lKeys.MoveNext())
-          {
-            SetSelImage(lKeys.Current, lPalPB);
-          }
-
-          mMainForm.GridViewSelImageGroupBox.Visible = true;
-        }
-        else //not edit tex or edit bump
-        {
-          mMainForm.GridViewSelImageGroupBox.Visible = false;
-        }
-        mMainForm.GridViewPalettePanel.ResumeLayout();
-
-        // make a list of how many times each bump tex is used, to be used
-        // in editing the bump map, pixel by pixel
-        if (ViewMode == eViewMode.EditBumpPixels)
-        {
-          mBumpImageUsageCountArray = new int[mMainForm.CurrentLevel.SHET.BumpImages.mChildren.Length];
-          int lBumpIdx = (int)eTexMetaDataEntries.Bumpmap;
-          foreach (FlatChunk flat in mMainForm.CurrentLevel.SHET.Flats)
-          {
-            if (flat.TexMetaData != null)
-            {
-              foreach (byte[][] row in flat.TexMetaData)
-              {
-                foreach (byte[] entry in row)
+                lPalPB = new PictureBox();
+                lPalPB.Image = im;
+                mMainForm.GridViewPalettePanel.Size =
+                  new Size(lNextPbTL.X + 64 + PADDING,
+                           lNextPbTL.Y + 64);
+                mMainForm.GridViewPalettePanel.Controls.Add(lPalPB);
+                lPalPB.Bounds = new Rectangle(lNextPbTL, new Size(64, 64));
+                lPalPB.SizeMode = PictureBoxSizeMode.StretchImage;
+                lPalPB.Tag = (byte)i;
+                lPalPB.MouseClick += new MouseEventHandler(PaletteImageMouseClick);
+                lNextPbTL.Offset(64 + PADDING, 0);
+                if (lKeys.MoveNext())
                 {
-                  int lBumpId = entry[lBumpIdx];
-                  if (lBumpId < mBumpImageUsageCountArray.Length)
+                  SetSelImage(lKeys.Current, lPalPB);
+                }
+              }
+            }
+
+            //if there were fewer palette entries than there are keys,
+            //fill the remaining keys with the last palette entry
+            while (lKeys.MoveNext())
+            {
+              SetSelImage(lKeys.Current, lPalPB);
+            }
+
+            mMainForm.GridViewSelImageGroupBox.Visible = true;
+          }
+          else //not edit tex or edit bump
+          {
+            mMainForm.GridViewSelImageGroupBox.Visible = false;
+          }
+          mMainForm.GridViewPalettePanel.ResumeLayout();
+
+          // make a list of how many times each bump tex is used, to be used
+          // in editing the bump map, pixel by pixel
+          if (ViewMode == eViewMode.EditBumpPixels)
+          {
+            mBumpImageUsageCountArray = new int[mMainForm.CurrentLevel.SHET.BumpImages.mChildren.Length];
+            int lBumpIdx = (int)eTexMetaDataEntries.Bumpmap;
+            foreach (FlatChunk flat in mMainForm.CurrentLevel.SHET.Flats)
+            {
+              if (flat.TexMetaData != null)
+              {
+                foreach (byte[][] row in flat.TexMetaData)
+                {
+                  foreach (byte[] entry in row)
                   {
-                    mBumpImageUsageCountArray[lBumpId]++;
-                  }
-                  else
-                  {
-                    Console.Error.WriteLine("Tex square in Flat {0} references non-existant bump id {1}",
-                      flat.Name,
-                      lBumpId);
+                    int lBumpId = entry[lBumpIdx];
+                    if (lBumpId < mBumpImageUsageCountArray.Length)
+                    {
+                      mBumpImageUsageCountArray[lBumpId]++;
+                    }
+                    else
+                    {
+                      Console.Error.WriteLine("Tex square in Flat {0} references non-existant bump id {1}",
+                        flat.Name,
+                        lBumpId);
+                    }
                   }
                 }
               }

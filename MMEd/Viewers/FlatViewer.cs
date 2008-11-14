@@ -146,9 +146,11 @@ namespace MMEd.Viewers
       short lDeltaY = 0;
       short lDeltaZ = 0;
 
-      if (mSubject.OriginPosition.X != lNewX ||
+      if ((mSubject.OriginPosition.X != lNewX ||
         mSubject.OriginPosition.Y != lNewY ||
-        mSubject.OriginPosition.Z != lNewZ)
+        mSubject.OriginPosition.Z != lNewZ) &&
+        (Panel.WeaponsTable.Controls.Count > 6 ||
+        Panel.ObjectsTable.Controls.Count > 11))
       {
         if (MessageBox.Show("You are moving the flat. Do you want to move all the objects and weapons by the same amount?",
           "MMEd", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
