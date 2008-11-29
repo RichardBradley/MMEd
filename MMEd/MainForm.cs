@@ -59,7 +59,7 @@ namespace MMEd
       ViewTabFlat.Tag = FlatViewer.InitialiseViewer(this);
       ViewTabImg.Tag = ImageViewer.InitialiseViewer(this);
       ViewTabBump.Tag = BumpViewer.InitialiseViewer(this);
-      ViewTabOdd.Tag = OddViewer.InitialiseViewer(this);
+      ViewTabSteering.Tag = SteeringViewer.InitialiseViewer(this);
       ViewTabCamera.Tag = CameraViewer.InitialiseViewer(this);
       ViewTabGrid.Tag = GridViewer.InitialiseViewer(this);
       ViewTab3D.Tag = ThreeDeeViewer.InitialiseViewer(this);

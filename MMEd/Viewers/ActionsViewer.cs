@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 using System.IO;
+using MMEd.Forms;
 
 // a viewer/editor which performs file wide actions
 
@@ -40,9 +41,9 @@ namespace MMEd.Viewers
       {
         lChunkArray = lLevel.SHET.BumpImages.mChildren;
       }
-      else if (xiImageType == eTexMetaDataEntries.Odds)
+      else if (xiImageType == eTexMetaDataEntries.Steering)
       {
-        lChunkArray = lLevel.SHET.OddImages.mChildren;
+        lChunkArray = lLevel.SHET.SteeringImages.mChildren;
       }
       else if (xiImageType == eTexMetaDataEntries.CameraPos)
       {
@@ -76,9 +77,9 @@ namespace MMEd.Viewers
       {
         if (lUseCount[i] == 0)
         {
-          // Ignore any unused images - otherwise we might try to remap used bumps
+          // Ignore any unused images - otherwise we might try to remap used images
           // to unused ones, which would cause errors when we remove all the unused
-          // bumps later on.
+          // images later on.
           continue;
         }
 
@@ -197,9 +198,9 @@ namespace MMEd.Viewers
       {
         lChunkArray = lLevel.SHET.BumpImages.mChildren;
       }
-      else if (xiImageType == eTexMetaDataEntries.Odds)
+      else if (xiImageType == eTexMetaDataEntries.Steering)
       {
-        lChunkArray = lLevel.SHET.OddImages.mChildren;
+        lChunkArray = lLevel.SHET.SteeringImages.mChildren;
       }
       else if (xiImageType == eTexMetaDataEntries.CameraPos)
       {
@@ -253,9 +254,9 @@ namespace MMEd.Viewers
       {
         lLevel.SHET.BumpImages.mChildren = lNewChunkArray;
       }
-      else if (xiImageType == eTexMetaDataEntries.Odds)
+      else if (xiImageType == eTexMetaDataEntries.Steering)
       {
-        lLevel.SHET.OddImages.mChildren = lNewChunkArray;
+        lLevel.SHET.SteeringImages.mChildren = lNewChunkArray;
       }
       else if (xiImageType == eTexMetaDataEntries.CameraPos)
       {
@@ -529,9 +530,86 @@ namespace MMEd.Viewers
       mMainForm.ActionsTabImportFlatImagesButton.Click += new EventHandler(ActionsTabImportFlatImagesButton_Click);
       mMainForm.ActionsTabExportTIMButton.Click += new EventHandler(ActionsTabExportTIMButton_Click);
       mMainForm.ActionsTabImportTIMButton.Click += new EventHandler(ActionsTabImportTIMButton_Click);
+      mMainForm.ActionsTabTIMTextureUsageButton.Click += new EventHandler(ActionsTabTIMTextureUsageButton_Click);
       mMainForm.ActionsTabExportTMDButton.Click += new EventHandler(ActionsTabExportTMDButton_Click);
       mMainForm.ActionsTabImportTMDButton.Click += new EventHandler(ActionsTabImportTMDButton_Click);
       SetSubject(null);
+    }
+
+    void ActionsTabTIMTextureUsageButton_Click(object sender, EventArgs e)
+    {
+      //=======================================================================
+      // Find all the TIMs that might be textures
+      //=======================================================================
+      Dictionary<int, List<string>> lUsageCount = new Dictionary<int, List<string>>();
+      int lIndex = 0;
+
+      foreach (Chunk lGroup in mMainForm.CurrentLevel.NamedImageGroups.GetChildren())
+      {
+        if (!(lGroup is NamedImageGroup))
+        {
+          continue;
+        }
+
+        foreach (Chunk lChunk in lGroup.GetChildren())
+        {
+          if (lChunk is TIMChunk && ((TIMChunk)lChunk).ImageWidth == 64 && ((TIMChunk)lChunk).ImageHeight == 64)
+          {
+            lUsageCount[lIndex] = new List<string>();
+          }
+
+          lIndex++;
+        }
+      }
+
+      //=======================================================================
+      // Find all the TIMs that are actually in use as textures
+      //=======================================================================
+      foreach (FlatChunk lFlat in mMainForm.CurrentLevel.SHET.Flats)
+      {
+        for (int ii = 0; ii < lFlat.Width; ii++)
+        {
+          for (int jj = 0; jj < lFlat.Height; jj++)
+          {
+            if (lUsageCount.ContainsKey(lFlat.TextureIds[ii][jj]))
+            {
+              lUsageCount[lFlat.TextureIds[ii][jj]].Add(lFlat.Name + string.Format(" ({0},{1})", ii, jj));
+            }
+          }
+        }
+      }
+
+      //=======================================================================
+      // Generate the report
+      //=======================================================================
+      StringBuilder lBuilder = new StringBuilder();
+      int[] lTextureIds = new List<int>(lUsageCount.Keys).ToArray();
+      int[] lUsages = new List<List<string>>(lUsageCount.Values).ConvertAll<int>(delegate (List<string> xiList) { return xiList.Count; }).ToArray();
+      Array.Sort(lUsages, lTextureIds);
+
+      foreach (int lTextureId in lTextureIds)
+      {
+        if (lUsageCount[lTextureId].Count == 0)
+        {
+          lBuilder.AppendLine(string.Format("{0}: Not used", 
+            lTextureId));
+        }
+        else if (lUsageCount[lTextureId].Count <= 3)
+        {
+          lBuilder.AppendLine(string.Format("{0}: Used in {1}", 
+            lTextureId, 
+            string.Join(", ", lUsageCount[lTextureId].ToArray())));
+        }
+        else
+        {
+          lBuilder.AppendLine(string.Format("{0}: Used in {1} and {2} other places", 
+            lTextureId, 
+            lUsageCount[lTextureId][0],
+            lUsageCount[lTextureId].Count - 1));
+        }
+      }
+
+      ReportForm.ShowReport("TIM Texture Usage Report", lBuilder.ToString());
     }
 
     void ActionsTabOptimiseButton_Click(object sender, EventArgs e)
@@ -546,14 +624,14 @@ namespace MMEd.Viewers
         CompactImages(eTexMetaDataEntries.Bumpmap);
       }
 
-      if (mMainForm.OptimiseOddsReindexCheckbox.Checked)
+      if (mMainForm.OptimiseSteeringReindexCheckbox.Checked)
       {
-        ReindexImages(eTexMetaDataEntries.Odds);
+        ReindexImages(eTexMetaDataEntries.Steering);
       }
 
-      if (mMainForm.OptimiseOddsCompactCheckbox.Checked)
+      if (mMainForm.OptimiseSteeringCompactCheckbox.Checked)
       {
-        CompactImages(eTexMetaDataEntries.Odds);
+        CompactImages(eTexMetaDataEntries.Steering);
       }
 
       if (mMainForm.OptimiseCameraReindexCheckbox.Checked)

@@ -132,8 +132,8 @@ namespace MMEd.Chunks
       mBumpTypes[0x08] = new BumpTypeInfo("hole", 0xffffff, "A void or hole in the surface");
       mBumpTypes[0x09] = new BumpTypeInfo("lilyPad", 0x33ff33, "NB This doesn't do much on a random pool course");
       mBumpTypes[0x0A] = new BumpTypeInfo("grassStalk", 0x00ff00);
-      mBumpTypes[0x0B] = new BumpTypeInfo("jumpWoosh3", 0xffd400, "A super speedup if you're going fast enough (found on the jump between tables in Rack)");
-      mBumpTypes[0x0C] = new BumpTypeInfo("unknown0C", 0x606060, "This is present in Rack & Roll, but driving over it has no discernable effect");
+      mBumpTypes[0x0B] = new BumpTypeInfo("jumpWhoosh3", 0xffd400, "A super speedup if you're going fast enough (found on the jump between tables in Rack)");
+      mBumpTypes[0x0C] = new BumpTypeInfo("unknown0C", 0x606060, "This is common before/after jumpWhoosh bumps, but its purpose has not yet been identified");
       mBumpTypes[0x0D] = new BumpTypeInfo("roadBorderPool", 0x89cbde, "Edge of the track in a pool table course");
       mBumpTypes[0x0E] = new BumpTypeInfo("poolPocket", 0xeeeeee, "A pool pocket - death trap");
       mBumpTypes[0x0F] = new BumpTypeInfo("lowSurvivalHeight", 0x00dddd, "Driving off the edge of this means you die even if you don't fall very far. (Also without it,the edge of the Rack & Roll table sometimes appears over the car rather than under it)");
@@ -144,11 +144,11 @@ namespace MMEd.Chunks
       mBumpTypes[0x14] = new BumpTypeInfo("redGoo", 0xff3333, "Makes you invisible");
       mBumpTypes[0x15] = new BumpTypeInfo("roadBorderLab", 0x89cbfd);
       mBumpTypes[0x16] = new BumpTypeInfo("jumpWhoosh", 0xffe400);
-      mBumpTypes[0x17] = new BumpTypeInfo("unknown17", 0x707070, "In Rack & Roll, this has no discernable effect");
-      mBumpTypes[0x18] = new BumpTypeInfo("unknown18", 0x787878, "In Rack & Roll, this has no discernable effect");
+      mBumpTypes[0x17] = new BumpTypeInfo("sludge", 0x707070, "Slows you down if you're going fast enough");
+      mBumpTypes[0x18] = new BumpTypeInfo("shrinkRay", 0x22ff22, "This looks like it's the beam that shrinks & teleports you in Interesting Voyage, although just driving through it on Rack & Roll doesn't do anything interesting");
       mBumpTypes[0x19] = new BumpTypeInfo("enterTestTube", 0xff9900);
-      mBumpTypes[0x1a] = new BumpTypeInfo("unknown1a", 0x808080, "In Rack & Roll, this has no discernable effect");
-      mBumpTypes[0x1b] = new BumpTypeInfo("unknown1b", 0x888888, "In Rack & Roll, this has no discernable effect");
+      mBumpTypes[0x1A] = new BumpTypeInfo("unknown1a", 0x808080, "In Rack & Roll, this has no discernable effect");
+      mBumpTypes[0x1B] = new BumpTypeInfo("teleport7", 0xff9900, "Teleport to world coord approx (21000, 4300) facing towards (0, 0); as used in the Interesting Voyage microscope");
       mBumpTypes[0x1C] = new BumpTypeInfo("microGooEdge", 0xaaaa00);
       mBumpTypes[0x1D] = new BumpTypeInfo("microGooMiddle", 0x888800);
       mBumpTypes[0x1E] = new BumpTypeInfo("exitMicroscope", 0xff7700, "Ascend vertically; screen blanks; reappear, rather smaller, at world coord approx (3000, 8300)");
@@ -172,7 +172,7 @@ namespace MMEd.Chunks
 
     // this wasn't necessary under the enum scheme, but I think it's
     // preferable to having the list of types twice...
-    public const int HIGHEST_KNOWN_BUMP_TYPE = 45;
+    public const int HIGHEST_KNOWN_BUMP_TYPE = 0x2D;
 
     public class BumpTypeInfo
     {

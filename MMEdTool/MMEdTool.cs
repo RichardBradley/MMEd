@@ -26,6 +26,8 @@ namespace MMEdTool
       const string UNUSED_VRAM_USAGE = "usage: mmedtool vram <path/to/MICRO>\n\nwrites a few png files representing the VRAM";
       const string FIND_CD_OFFSETS_USAGE = "usage: mmedtool findcdoffsets <path/to/cdimage.bin> <path/to/MICRO>\n\nsearches the CD image for all the level files found in the given tree, and outputs their offsets within the bin file";
       const string FIND_COURSENAME_OFFSETS_USAGE = "usage: mmedtool findcoursenameoffsets <path/to/cdimage.bin>";
+      const string FIND_TEXMETADATA_USAGE = "usage: mmedtool findtexmetadata <path/to/MICRO> <index_into_texmetadata> <value_to_find> [<upper_range_of_values_to_find>]";
+      const string FIND_BUMPDATA_USAGE = "usage: mmedtool findbumpdata <path/to/MICRO> <bump_to_find> [<upper_range_of_values_to_find>]";
 
       if (args.Length == 0)
       {
@@ -123,6 +125,45 @@ namespace MMEdTool
             return FindCourseNameOffsets(lCDImage);
           }
 
+        case "findtexmetadata":
+          {
+            DirectoryInfo lRootDir; int lIndex; byte lSearchValueMin; byte lSearchValueMax;
+            try
+            {
+              if (args.Length != 4 && args.Length != 5) throw new Exception("wrong number of args. expecting 4 or 5");
+              lRootDir = new DirectoryInfo(args[1]);
+              if (!lRootDir.Exists) throw new Exception(string.Format("directory {0} doesn't exist", lRootDir.FullName));
+              lIndex = int.Parse(args[2]);
+              lSearchValueMin = byte.Parse(args[3]);
+              lSearchValueMax = args.Length > 4 ? byte.Parse(args[4]) : lSearchValueMin;
+            }
+            catch (Exception e)
+            {
+              Console.Error.WriteLine("Error: {0}\n\n{1}", e, FIND_TEXMETADATA_USAGE);
+              return 1;
+            }
+            return FindTexMetaData(lRootDir, lIndex, lSearchValueMin, lSearchValueMax);
+          }
+
+        case "findbumpdata":
+          {
+            DirectoryInfo lRootDir; byte lSearchValueMin; byte lSearchValueMax;
+            try
+            {
+              if (args.Length != 3 && args.Length != 4) throw new Exception("wrong number of args. expecting 3 or 4");
+              lRootDir = new DirectoryInfo(args[1]);
+              if (!lRootDir.Exists) throw new Exception(string.Format("directory {0} doesn't exist", lRootDir.FullName));
+              lSearchValueMin = byte.Parse(args[2]);
+              lSearchValueMax = args.Length > 3 ? byte.Parse(args[3]) : lSearchValueMin;
+            }
+            catch (Exception e)
+            {
+              Console.Error.WriteLine("Error: {0}\n\n{1}", e, FIND_BUMPDATA_USAGE);
+              return 1;
+            }
+            return FindBumpData(lRootDir, lSearchValueMin, lSearchValueMax);
+          }
+
         case "help":
           if (args.Length == 1)
           {
@@ -158,6 +199,139 @@ namespace MMEdTool
           return 1;
       }
     }
+
+    #region Searching for things for research purposes
+
+    ///========================================================================
+    /// Static Method : FindTexMetaData
+    /// 
+    /// <summary>
+    /// 	Find a particular piece of metadata, by hunting through all the flats
+    /// </summary>
+    /// <param name="xiRootDir"></param>
+    /// <param name="xiIndex"></param>
+    /// <param name="xiSearchValueMin"></param>
+    /// <param name="xiSearchValueMax"></param>
+    /// <returns></returns>
+    ///========================================================================
+    private static int FindTexMetaData(DirectoryInfo xiRootDir, int xiIndex, byte xiSearchValueMin, byte xiSearchValueMax)
+    {
+      Files lAllFiles = LoadAllFilesFromRootPath(xiRootDir);
+
+      foreach (FileHolder lFile in lAllFiles.FileHolders)
+      {
+        foreach (FlatChunk lFlat in lFile.Level.SHET.Flats)
+        {
+          if (lFlat.HasMetaData)
+          {
+            bool lFound = false;
+
+            for (int ii = 0; ii < lFlat.Width; ii++)
+            {
+              for (int jj = 0; jj < lFlat.Height; jj++)
+              {
+                if (lFlat.TexMetaData[ii][jj][xiIndex] >= xiSearchValueMin && lFlat.TexMetaData[ii][jj][xiIndex] <= xiSearchValueMax)
+                {
+                  Console.Out.WriteLine(string.Format("{4}: Level {0} Flat {1} ({2}, {3})",
+                    lFile.Level.Name,
+                    lFlat.Name,
+                    ii,
+                    jj,
+                    lFlat.TexMetaData[ii][jj][xiIndex]));
+
+                  if (xiSearchValueMin == xiSearchValueMax)
+                  {
+                    lFound = true;
+                    break;
+                  }
+                }
+              }
+
+              if (lFound) break;
+            }
+          }
+        }
+      }
+
+      return 0;
+    }
+
+    ///========================================================================
+    /// Static Method : FindBumpData
+    /// 
+    /// <summary>
+    /// 	Find a specific bump, by hunting through all the flats
+    /// </summary>
+    /// <param name="xiRootDir"></param>
+    /// <param name="xiIndex"></param>
+    /// <param name="xiSearchValueMin"></param>
+    /// <param name="xiSearchValueMax"></param>
+    /// <returns></returns>
+    ///========================================================================
+    private static int FindBumpData(DirectoryInfo xiRootDir, byte xiSearchValueMin, byte xiSearchValueMax)
+    {
+      Files lAllFiles = LoadAllFilesFromRootPath(xiRootDir);
+
+      foreach (FileHolder lFile in lAllFiles.FileHolders)
+      {
+        bool lFound = false;
+
+        for (int lBumpImageIdx = 0; lBumpImageIdx < lFile.Level.SHET.BumpImages.GetChildren().Length; lBumpImageIdx++)
+        {
+          BumpImageChunk lBumpImage = (BumpImageChunk)lFile.Level.SHET.BumpImages.GetChildren()[lBumpImageIdx];
+
+          for (int ii = 0; ii < 8; ii++)
+          {
+            for (int jj = 0; jj < 8; jj++)
+            {
+              byte lBumpType = lBumpImage.GetPixelType(ii, jj);
+
+              if (lBumpType >= xiSearchValueMin && lBumpType <= xiSearchValueMax)
+              {
+                foreach (FlatChunk lFlat in lFile.Level.SHET.Flats)
+                {
+                  if (!lFlat.HasMetaData)
+                  {
+                    continue;
+                  }
+
+                  for (int kk = 0; kk < lFlat.Width; kk++)
+                  {
+                    for (int ll = 0; ll < lFlat.Height; ll++)
+                    {
+                      if (lFlat.TexMetaData[kk][ll][(int)eTexMetaDataEntries.Bumpmap] == lBumpImageIdx)
+                      {
+                        Console.Out.WriteLine(string.Format("{4}: Level {0} Flat {1} ({2}, {3})",
+                          lFile.Level.Name,
+                          lFlat.Name,
+                          kk,
+                          ll,
+                          lBumpImage.GetPixelType(ii, jj)));
+
+                        if (xiSearchValueMin == xiSearchValueMax)
+                        {
+                          lFound = true;
+                          break;
+                        }
+                      }
+                    }
+                    if (lFound) break;
+                  }
+                  if (lFound) break;
+                }
+              }
+              if (lFound) break;
+            }
+            if (lFound) break;
+          }
+          if (lFound) break;
+        }
+      }
+
+      return 0;
+    }
+
+    #endregion
 
     #region CD image processing stuff
 
@@ -417,11 +591,13 @@ namespace MMEdTool
       Regex lLevelNameRegex = new Regex("[A-Z]+\\\\[A-Z]+[0-9]\\.DAT$", RegexOptions.IgnoreCase);
       foreach (FileInfo file in xiTreeRoot.GetFiles("*.DAT", SearchOption.AllDirectories))
       {
+        Level lev;
+
         if (lLevelNameRegex.IsMatch(file.FullName))
         {
           using (FileStream fs = file.OpenRead())
           {
-            Level lev = new Level(fs);
+            lev = new Level(fs);
             FileHolder fh = new FileHolder(file.FullName, lev);
             lAcc.FileHolders.Add(fh);
           }

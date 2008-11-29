@@ -142,7 +142,7 @@ namespace MMEd.Chunks
       int lDistance = Math.Min((int)Distance, 1000);
       int lLineLength = (lDistance * xiMaxDistance) / (1000 * 2);
 
-      Utils.DrawArrow(g, p, xiMidpoint, Direction, lLineLength, false);
+      Utils.DrawArrow(g, p, xiMidpoint, Direction, lLineLength, 1, false);
     }
 
     public override List<string> GetDifferences(Chunk xiChunk)

@@ -21,14 +21,14 @@ namespace MMEd.Chunks
   // dimension of the TexMetaData array
   public enum eTexMetaDataEntries
   {
-    Odds = 0, // something which also follows the course. Can't be zeroed out without invalidating the level
-    One = 1, // something which seems to always be zero
-    Two = 2, // something to do with the corners? No immediately noticeable difference when zeroed out.
-    CameraPos = 3, // the camera position idx. Indexes entries in qq
-    Four = 4, // some sort of isobars around the path of the course, and ranges 0-4 or so. This seems to be something to do with the restart position for when you die
+    Steering = 0, // controls AI steering and respawn direction. Indexes entries in SHET.SteeringImages.
+    Unknown = 1, // something which seems to always be zero (except on School2-5, which have a handful of non-zero values)
+    Behaviour = 2, // controls behaviour of cars, mostly the AI ones but occasionally multiplayer (e.g. "no tumble")
+    CameraPos = 3, // the camera position idx. Indexes entries in SHET.CameraPositions.
+    Orientation = 4, // orientation of the square in the range (normally) 0-4. Rotates Steering.
     Waypoint = 5, // an ascending counter for the position
-    Bumpmap = 6, // the bump map. Indexes entries in qq
-    Seven = 7 // follows closely the path of the course, except for odd bits 0 elsewhere. It seems to control the restart angle after death, or the offset in the tex square where you restart.        
+    Bumpmap = 6, // the bump map. Indexes entries in SHET.BumpImages.
+    RespawnPos = 7 // restart location within the square where you respawn (interpreted as two 4-bit values x,y)
   }
 
   // The weapons available in the game
@@ -854,7 +854,7 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
 
                     Graphics g = Graphics.FromImage(lTexture);
 
-                    string lText = string.Format("{0:x}", lVal);
+                    string lText = lVal.ToString();
 
                     SizeF size = g.MeasureString(lText, lNumberFont);
 
@@ -949,10 +949,142 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
     }
 
     // Constants relating to the meta data
-    public const int ODDDIMENSION = 8;
-    public const int LAYERTWO_DEFAULT = 0;
-    public const int LAYERTWO_NORESPAWN = 8;
-    public const int LAYERZERO_HIGHESTDIRECTION = 15;
+    public const int STEERINGDIMENSION = 8;
+    public const int BEHAVIOUR_DEFAULT = 0;
+    public const int BEHAVIOUR_DEFAULTNORESPAWN = 8;
+    public const int STEERING_HIGHESTDIRECTION = 15;
+
+    ///========================================================================
+    /// Enum : eBehaviourTypes
+    /// 
+    /// <summary>
+    /// 	Known types of behaviour.
+    /// 
+    ///   Note that Unknown is a special case - in fact all behaviour types
+    ///   might have some unknown behaviour, but Unknown is only used where
+    ///   we /know/ that we don't know something.
+    /// </summary>
+    ///========================================================================
+    [Flags]
+    public enum eBehaviourTypes
+    {
+      None              = 0x00,
+      Unknown           = 0x01,
+      BlockRespawn      = 0x02,
+      NoTumble          = 0x04,
+      SlowCars          = 0x08,
+      SlightlySlowCars  = 0x10,
+      DeathTrap         = 0x20,
+      Fly               = 0x40 // Common under jumps - maybe controls how AI cars fly through the air?
+    }
+
+    ///========================================================================
+    /// Static Array : Behaviours
+    /// 
+    /// <summary>
+    /// 	All known behaviours
+    /// </summary>
+    ///========================================================================
+    public static Behaviour[] Behaviours = new Behaviour[] {
+      new Behaviour(0, eBehaviourTypes.None),
+      new Behaviour(1, eBehaviourTypes.Unknown),
+      new Behaviour(2, eBehaviourTypes.BlockRespawn),
+      new Behaviour(3, eBehaviourTypes.NoTumble),
+      new Behaviour(4, eBehaviourTypes.SlowCars),
+      new Behaviour(5, eBehaviourTypes.BlockRespawn),
+      new Behaviour(6, eBehaviourTypes.Unknown),
+      new Behaviour(7, eBehaviourTypes.DeathTrap),
+      new Behaviour(8, eBehaviourTypes.BlockRespawn),
+      new Behaviour(9, eBehaviourTypes.Unknown),
+      new Behaviour(10, eBehaviourTypes.SlowCars),
+      new Behaviour(11, eBehaviourTypes.SlightlySlowCars),
+      new Behaviour(12, eBehaviourTypes.BlockRespawn),
+      new Behaviour(13, eBehaviourTypes.BlockRespawn | eBehaviourTypes.NoTumble),
+      new Behaviour(14, eBehaviourTypes.BlockRespawn),
+      new Behaviour(15, eBehaviourTypes.Fly),
+      new Behaviour(16, eBehaviourTypes.Fly | eBehaviourTypes.BlockRespawn)
+    };
+
+    ///========================================================================
+    /// Class : Behaviours
+    /// 
+    /// <summary>
+    /// 	A particular metadata layer two (behaviour) value
+    /// </summary>
+    ///========================================================================
+    public class Behaviour
+    {
+      public Behaviour(int xiValue, eBehaviourTypes xiBehaviourTypes)
+      {
+        Value = xiValue;
+        BehaviourTypes = xiBehaviourTypes;
+      }
+
+      public Bitmap ToBitmap()
+      {
+        return ToBitmap(Pens.Black);
+      }
+
+      public Bitmap ToBitmap(Pen xiPen)
+      {
+        if (mBitmap == null || mActivePen == null || xiPen.Color != mActivePen.Color)
+        {
+          mBitmap = ToBitmapUncached(xiPen);
+          mActivePen = xiPen;
+        }
+        return mBitmap;
+      }
+
+      private Bitmap ToBitmapUncached(Pen xiPen)
+      {
+        Bitmap lBitmap = new Bitmap(8 * SCALE, 8 * SCALE);
+        Graphics lGraphics = Graphics.FromImage(lBitmap);
+
+        if ((BehaviourTypes & eBehaviourTypes.Unknown) != 0)
+        {
+          lGraphics.DrawString("Unknown", new Font(FontFamily.GenericMonospace, 10), xiPen.Brush, new PointF(0, 0));
+        }
+
+        if ((BehaviourTypes & eBehaviourTypes.BlockRespawn) != 0)
+        {
+          lGraphics.DrawString("Block Respawn", new Font(FontFamily.GenericMonospace, 10), xiPen.Brush, new PointF(0, SCALE));
+        }
+
+        if ((BehaviourTypes & eBehaviourTypes.NoTumble) != 0)
+        {
+          lGraphics.DrawString("No Tumble", new Font(FontFamily.GenericMonospace, 10), xiPen.Brush, new PointF(0, 2 * SCALE));
+        }
+
+        if ((BehaviourTypes & eBehaviourTypes.DeathTrap) != 0)
+        {
+          lGraphics.DrawString("Death Trap", new Font(FontFamily.GenericMonospace, 10), xiPen.Brush, new PointF(0, 3 * SCALE));
+        }
+
+        if ((BehaviourTypes & eBehaviourTypes.Fly) != 0)
+        {
+          lGraphics.DrawString("Fly Over", new Font(FontFamily.GenericMonospace, 10), xiPen.Brush, new PointF(0, 4 * SCALE));
+        }
+
+        if ((BehaviourTypes & eBehaviourTypes.SlowCars) != 0)
+        {
+          lGraphics.DrawString("Slow Cars", new Font(FontFamily.GenericMonospace, 10), xiPen.Brush, new PointF(0, 5 * SCALE));
+        }
+
+        if ((BehaviourTypes & eBehaviourTypes.SlightlySlowCars) != 0)
+        {
+          lGraphics.DrawString("Slightly Slow Cars", new Font(FontFamily.GenericMonospace, 10), xiPen.Brush, new PointF(0, 6 * SCALE));
+        }
+
+        return lBitmap;
+      }
+
+      public int Value;
+      public eBehaviourTypes BehaviourTypes;
+
+      private const int SCALE = 16;
+      private Bitmap mBitmap = null;
+      private Pen mActivePen = null;
+    }
 
   }
 }

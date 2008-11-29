@@ -8,36 +8,36 @@ using System.Windows.Forms;
 
 namespace MMEd.Viewers
 {
-  public class OddViewer : Viewer
+  public class SteeringViewer : Viewer
   {
-    private OddViewer(MainForm xiMainForm)
+    private SteeringViewer(MainForm xiMainForm)
       : base(xiMainForm)
     {
-      mMainForm.OddViewPictureBox.Click += new System.EventHandler(this.OddViewPictureBox_Click);
-      mMainForm.OddEditPictureBox.Click += new System.EventHandler(this.OddEditPictureBox_Click);
-      mMainForm.OddEditFillButton.Click += new EventHandler(OddEditFillButton_Click);
+      mMainForm.SteeringViewPictureBox.Click += new System.EventHandler(this.SteeringViewPictureBox_Click);
+      mMainForm.SteeringEditPictureBox.Click += new System.EventHandler(this.SteeringEditPictureBox_Click);
+      mMainForm.SteeringEditFillButton.Click += new EventHandler(SteeringEditFillButton_Click);
     }
 
     public override bool CanViewChunk(Chunk xiChunk)
     {
-      return xiChunk is OddImageChunk;
+      return xiChunk is SteeringImageChunk;
     }
 
     // Create an instance of the viewer manager class
     public static Viewer InitialiseViewer(MainForm xiMainForm)
     {
-      return new OddViewer(xiMainForm);
+      return new SteeringViewer(xiMainForm);
     }
 
     public override void SetSubject(Chunk xiChunk)
     {
-      if (!(xiChunk is OddImageChunk))
+      if (!(xiChunk is SteeringImageChunk))
       {
         mChunk = null;
       }
       else
       {
-        mChunk = (OddImageChunk)xiChunk;
+        mChunk = (SteeringImageChunk)xiChunk;
       }
 
       if (mLastSubject == mChunk)
@@ -47,12 +47,12 @@ namespace MMEd.Viewers
 
       if (mChunk == null)
       {
-        mMainForm.OddEditPictureBox.Image = null;
+        mMainForm.SteeringEditPictureBox.Image = null;
       }
       else
       {
         byte lType = mChunk.GetPixelType(mX, mY);
-        mMainForm.OddTypeLabel.Text = GetOddTypeName(lType);
+        mMainForm.SteeringTypeLabel.Text = GetSteeringDirectionName(lType);
         SetUpDropDown(lType);
 
         RefreshView();
@@ -61,21 +61,14 @@ namespace MMEd.Viewers
       mLastSubject = xiChunk;
     }
 
-    private static string GetOddTypeName(byte val)
+    private static string GetSteeringDirectionName(byte val)
     {
-      if (OddImageChunk.GetOddTypeInfo(val) == null)
-      {
-        return string.Format("{0:x} (Unknown)", val);
-      }
-      else
-      {
-        return OddImageChunk.GetOddTypeInfo(val).Name;
-      }
+      return SteeringImageChunk.GetDirectionName(val);
     }
 
     protected void RefreshView()
     {
-      Bitmap lBmp = mChunk.ToBitmapUncached();
+      Bitmap lBmp = mChunk.ToBitmapUncached(0);
 
       // Outline the squares in black
       for (int x = 0; x < 8; x++)
@@ -107,53 +100,53 @@ namespace MMEd.Viewers
         lBmp.SetPixel(((mX + 1) * mScale) - 1, y, Color.White);
       }
 
-      mMainForm.OddEditPictureBox.Image = lBmp;
-      mMainForm.OddViewPictureBox.Image = lBmp;
+      mMainForm.SteeringEditPictureBox.Image = lBmp;
+      mMainForm.SteeringViewPictureBox.Image = lBmp;
     }
 
     public override System.Windows.Forms.TabPage Tab
     {
-      get { return mMainForm.ViewTabOdd; }
+      get { return mMainForm.ViewTabSteering; }
     }
 
     protected void SetUpDropDown(byte xiSelected)
     {
-      for (byte b = 0; b < 50; b++)
+      for (byte b = 0; b <= FlatChunk.STEERING_HIGHESTDIRECTION; b++)
       {
-        mMainForm.OddCombo.Items.Add(GetOddTypeName(b));
+        mMainForm.SteeringCombo.Items.Add(GetSteeringDirectionName(b));
       }
 
-      mMainForm.OddCombo.SelectedIndex = xiSelected;
+      mMainForm.SteeringCombo.SelectedIndex = xiSelected;
     }
 
-    public void OddViewPictureBox_Click(object sender, EventArgs e)
+    public void SteeringViewPictureBox_Click(object sender, EventArgs e)
     {
       MouseEventArgs lArgs = (MouseEventArgs)e;
       mX = lArgs.X / mScale;
       mY = lArgs.Y / mScale;
 
       byte lType = mChunk.GetPixelType(mX, mY);
-      mMainForm.OddTypeLabel.Text = GetOddTypeName(lType);
+      mMainForm.SteeringTypeLabel.Text = GetSteeringDirectionName(lType);
 
       RefreshView();
     }
 
-    public void OddEditPictureBox_Click(object sender, EventArgs e)
+    public void SteeringEditPictureBox_Click(object sender, EventArgs e)
     {
       MouseEventArgs lArgs = (MouseEventArgs)e;
       mX = lArgs.X / mScale;
       mY = lArgs.Y / mScale;
 
-      byte lType = (byte)mMainForm.OddCombo.SelectedIndex;
+      byte lType = (byte)mMainForm.SteeringCombo.SelectedIndex;
       mChunk.SetPixelType(mX, mY, lType);
-      mMainForm.OddTypeLabel.Text = GetOddTypeName(lType);
+      mMainForm.SteeringTypeLabel.Text = GetSteeringDirectionName(lType);
 
       RefreshView();
     }
 
-    public void OddEditFillButton_Click(object sender, EventArgs e)
+    public void SteeringEditFillButton_Click(object sender, EventArgs e)
     {
-      byte lType = (byte)mMainForm.OddCombo.SelectedIndex;
+      byte lType = (byte)mMainForm.SteeringCombo.SelectedIndex;
 
       for (int x = 0; x < 8; x++)
       {
@@ -163,12 +156,12 @@ namespace MMEd.Viewers
         }
       }
 
-      mMainForm.OddTypeLabel.Text = GetOddTypeName(lType);
+      mMainForm.SteeringTypeLabel.Text = GetSteeringDirectionName(lType);
       RefreshView();
     }
 
-    private int mScale = OddImageChunk.SCALE;
-    private OddImageChunk mChunk;
+    private int mScale = SteeringImageChunk.SCALE;
+    private SteeringImageChunk mChunk;
     private Chunk mLastSubject = null;
     private int mX = 0;
     private int mY = 0;

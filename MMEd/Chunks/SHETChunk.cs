@@ -35,7 +35,8 @@ namespace MMEd.Chunks
     [Description("These waypoints cannot be skipped")]
     public KeyWaypointsChunk KeyWaypoints;
 
-    public GroupingChunk OddImages;
+    [Description("AI steering and respawn directions")]
+    public GroupingChunk SteeringImages;
 
     [Description(@"Camera position arrays. I forget which way round these go. 
 Each entry has three components, which are height, pitch and yaw, in some order")]
@@ -75,13 +76,13 @@ Each entry has three components, which are height, pitch and yaw, in some order"
 
       //now the first set of images. I don't really know
       //what these do. They might be referred to by TexMetaData[7]
-      short oddImgCount = bin.ReadInt16();
-      OddImageChunk[] oddImages = new OddImageChunk[oddImgCount];
-      for (int i = 0; i < oddImgCount; i++)
+      short steeringImgCount = bin.ReadInt16();
+      SteeringImageChunk[] steeringImages = new SteeringImageChunk[steeringImgCount];
+      for (int i = 0; i < steeringImgCount; i++)
       {
-        oddImages[i] = new OddImageChunk(i, inStr);
+        steeringImages[i] = new SteeringImageChunk(i, inStr);
       }
-      this.OddImages = new GroupingChunk("OddImages", oddImages);
+      this.SteeringImages = new GroupingChunk("SteeringImages", steeringImages);
 
       //now some camera positions:
       short cameraPositionCount = bin.ReadInt16();
@@ -129,10 +130,10 @@ Each entry has three components, which are height, pitch and yaw, in some order"
       //key waypoints 
       KeyWaypoints.Serialise(outStr);
 
-      //now the oddImages 
+      //now the steeringImages 
       //TODO: could add a method to GroupingChunk to do this pattern
-      bout.Write((short)OddImages.mChildren.Length);
-      OddImages.Serialise(outStr);
+      bout.Write((short)SteeringImages.mChildren.Length);
+      SteeringImages.Serialise(outStr);
 
       //now some camera positions:
       bout.Write((short)CameraPositions.mChildren.Length);
@@ -160,7 +161,7 @@ Each entry has three components, which are height, pitch and yaw, in some order"
       ArrayList acc = new ArrayList();
       acc.AddRange(Flats);
       acc.Add(KeyWaypoints);
-      acc.Add(OddImages);
+      acc.Add(SteeringImages);
       acc.Add(CameraPositions);
       acc.Add(BumpImages);
       return (Chunk[])acc.ToArray(typeof(Chunk));
@@ -182,9 +183,9 @@ Each entry has three components, which are height, pitch and yaw, in some order"
       {
         KeyWaypoints = (KeyWaypointsChunk)xiTo;
       }
-      else if (xiFrom == OddImages)
+      else if (xiFrom == SteeringImages)
       {
-        OddImages = (GroupingChunk)xiTo;
+        SteeringImages = (GroupingChunk)xiTo;
       }
       else if (xiFrom == CameraPositions)
       {
@@ -246,22 +247,22 @@ Each entry has three components, which are height, pitch and yaw, in some order"
     }
 
     ///========================================================================
-    /// Method : AddOdd
+    /// Method : AddSteeringImage
     /// 
     /// <summary>
-    /// 	Add a new Odd, returning the size of the added Odd in bytes
+    /// 	Add a new Steering Image, returning the size of the added image in bytes
     /// </summary>
-    /// <param name="xiOdd"></param>
+    /// <param name="xiSteeringImage"></param>
     /// <returns></returns>
     ///========================================================================
-    public int AddOdd(OddImageChunk xiOdd)
+    public int AddSteeringImage(SteeringImageChunk xiSteeringImage)
     {
-      Chunk[] lNewOddArray = new Chunk[OddImages.mChildren.Length + 1];
-      Array.Copy(OddImages.mChildren, lNewOddArray, OddImages.mChildren.Length);
-      lNewOddArray[OddImages.mChildren.Length] = xiOdd;
-      OddImages.mChildren = lNewOddArray;
+      Chunk[] lNewSteeringArray = new Chunk[SteeringImages.mChildren.Length + 1];
+      Array.Copy(SteeringImages.mChildren, lNewSteeringArray, SteeringImages.mChildren.Length);
+      lNewSteeringArray[SteeringImages.mChildren.Length] = xiSteeringImage;
+      SteeringImages.mChildren = lNewSteeringArray;
 
-      return xiOdd.Data.Length;
+      return xiSteeringImage.Data.Length;
     }
 
     ///========================================================================
@@ -270,7 +271,7 @@ Each entry has three components, which are height, pitch and yaw, in some order"
     /// <summary>
     /// 	Add a new Bump, returning the size of the added Bump in bytes
     /// </summary>
-    /// <param name="xiOdd"></param>
+    /// <param name="xiBump"></param>
     /// <returns></returns>
     ///========================================================================
     public int AddBump(BumpImageChunk xiBump)
@@ -350,45 +351,45 @@ Each entry has three components, which are height, pitch and yaw, in some order"
 
     #endregion
 
-    #region Odds manipulation
+    #region Steering image manipulation
 
     [XmlIgnore]
-    public Hashtable UnusedOdds
+    public Hashtable UnusedSteeringImages
     {
       get
       {
-        if (mUnusedOdds == null)
+        if (mUnusedSteeringImages == null)
         {
-          mUnusedOdds = new Hashtable();
-          FindUnusedOdds();
+          mUnusedSteeringImages = new Hashtable();
+          FindUnusedSteeringImages();
         }
 
-        return mUnusedOdds;
+        return mUnusedSteeringImages;
       }
       set
       {
-        mUnusedOdds = value;
+        mUnusedSteeringImages = value;
       }
     }
 
-    private void FindUnusedOdds()
+    private void FindUnusedSteeringImages()
     {
       //=======================================================================
-      // Get a list of all odds to start with.
+      // Get a list of all steering images to start with.
       //=======================================================================
-      for (int i = 0; i < OddImages.mChildren.Length; i++)
+      for (int i = 0; i < SteeringImages.mChildren.Length; i++)
       {
-        if (!(OddImages.mChildren[i] is OddImageChunk))
+        if (!(SteeringImages.mChildren[i] is SteeringImageChunk))
         {
           continue;
         }
 
-        OddImageChunk lOdd = (OddImageChunk)OddImages.mChildren[i];
-        mUnusedOdds[i] = lOdd;
+        SteeringImageChunk lSteeringImage = (SteeringImageChunk)SteeringImages.mChildren[i];
+        mUnusedSteeringImages[i] = lSteeringImage;
       }
 
       //=======================================================================
-      // Now remove all used odds.
+      // Now remove all used steering images.
       //=======================================================================
       foreach (FlatChunk lFlat in Flats)
       {
@@ -401,18 +402,18 @@ Each entry has three components, which are height, pitch and yaw, in some order"
         {
           for (int y = 0; y < lFlat.Height; y++)
           {
-            int lOddId = lFlat.TexMetaData[x][y][(byte)eTexMetaDataEntries.Odds];
+            int lSteeringId = lFlat.TexMetaData[x][y][(byte)eTexMetaDataEntries.Steering];
 
-            if (mUnusedOdds.ContainsKey(lOddId))
+            if (mUnusedSteeringImages.ContainsKey(lSteeringId))
             {
-              mUnusedOdds.Remove(lOddId);
+              mUnusedSteeringImages.Remove(lSteeringId);
             }
           }
         }
       }
     }
 
-    private Hashtable mUnusedOdds = null;
+    private Hashtable mUnusedSteeringImages = null;
 
     #endregion
 

@@ -32,6 +32,8 @@ namespace MMEd.Viewers
       new PropertyController(this, "OverlayGridColor").BindTo(mMainForm.OverlaySelectorGrid);
       new PropertyController(this, "OverlayCameraColor").BindTo(mMainForm.OverlaySelectorCamera);
       new PropertyController(this, "OverlayRespawnColor").BindTo(mMainForm.OverlaySelectorRespawn);
+      new PropertyController(this, "OverlaySteeringColor").BindTo(mMainForm.OverlaySelectorSteering);
+      new PropertyController(this, "OverlayBehaviourColor").BindTo(mMainForm.OverlaySelectorBehaviour);
 
       mMainForm.ViewerTabControl.KeyPress += new KeyPressEventHandler(this.ViewerTabControl_KeyPress);
 
@@ -80,51 +82,42 @@ namespace MMEd.Viewers
         {
           try
           {
-            // Draw the main texture for the square (all views)
+            //=================================================================
+            // Draw the main texture for the square
+            //=================================================================
             Bitmap lTileBitmap = mMainForm.CurrentLevel.GetTileById(mSubject.TextureIds[x][y]).ToBitmap();
-
-            e.Graphics.DrawImage(
-                lTileBitmap,
+            Rectangle lTileRect = new Rectangle(
                 x * mSubjectTileScaledWidth,
                 y * mSubjectTileScaledHeight,
                 mSubjectTileScaledWidth,
                 mSubjectTileScaledHeight);
 
+            e.Graphics.DrawImage(
+                lTileBitmap,
+                lTileRect);
+
+            //=================================================================
+            // Draw the bump map on top as a transparent image.
+            //=================================================================
+            Bitmap lBumpBitmap = mSubject.HasMetaData ?
+              mMainForm.CurrentLevel.GetBumpById(mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.Bumpmap]).ToBitmap() : 
+              null;
+
+            if (lBumpBitmap != null)
+            {
+              e.Graphics.DrawImage(
+                lBumpBitmap,
+                lTileRect,
+                0, // These 5 params define which part of the source image to use - all of it.
+                0,
+                lBumpBitmap.Width,
+                lBumpBitmap.Height,
+                GraphicsUnit.Pixel,
+                mTransparencyAttributes);
+            }
+
             switch (ViewMode)
             {
-              case eViewMode.ViewOdds:
-                Rectangle lOddDest = new Rectangle(
-                    x * mSubjectTileScaledWidth,
-                    y * mSubjectTileScaledHeight,
-                    mSubjectTileScaledWidth,
-                    mSubjectTileScaledHeight);
-                OddImageChunk oic = mSubject.HasMetaData ? mMainForm.CurrentLevel.GetOddById(mSubject.TexMetaData[x][y][(int)SelectedMeta]) : null;
-
-                // If we don't have an odd to draw here, bic is null
-                // and nothing is drawn - just leave the base texture as-is.
-                if (oic != null)
-                {
-                  DrawTransparentImage(e, oic.ToImage(), lOddDest);
-                }
-                break;
-
-              case eViewMode.ViewBump:
-              case eViewMode.EditBumpSquares:
-              case eViewMode.EditBumpPixels:
-                // Draw the bump map on top as a transparent image.
-                Rectangle lBumpDest = new Rectangle(
-                    x * mSubjectTileScaledWidth,
-                    y * mSubjectTileScaledHeight,
-                    mSubjectTileScaledWidth,
-                    mSubjectTileScaledHeight);
-                BumpImageChunk bic = mSubject.HasMetaData ? mMainForm.CurrentLevel.GetBumpById(mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.Bumpmap]) : null;
-
-                if (bic != null)
-                {
-                  DrawTransparentImage(e, bic.ToImage(), lBumpDest);
-                }
-                break;
-
               case eViewMode.EditMetadata:
               case eViewMode.FillMetadata:
                 //draw the selected metadata on as text
@@ -150,7 +143,7 @@ namespace MMEd.Viewers
           mWireFrameCache = new List<ColoredPolygon>();
 
           IEnumerable<Entity> lScene
-            = mSubject.GetEntities(mMainForm.CurrentLevel, MMEd.Viewers.ThreeDee.eTextureMode.WireFrame, eTexMetaDataEntries.Odds);
+            = mSubject.GetEntities(mMainForm.CurrentLevel, MMEd.Viewers.ThreeDee.eTextureMode.WireFrame, eTexMetaDataEntries.Steering);
 
           //find the entity correspoding to mSubject
           Entity lSubjectsEntity = null;
@@ -263,6 +256,16 @@ namespace MMEd.Viewers
               DrawCameraOverlay(e.Graphics, new Pen(OverlayCameraColor), x, y);
             }
 
+            if (OverlaySteeringColor != Color.Transparent)
+            {
+              DrawSteeringOverlay(e.Graphics, new Pen(OverlaySteeringColor), x, y);
+            }
+
+            if (OverlayBehaviourColor != Color.Transparent)
+            {
+              DrawBehaviourOverlay(e.Graphics, new Pen(OverlayBehaviourColor), x, y);
+            }
+
             if (OverlayRespawnColor != Color.Transparent)
             {
               DrawRespawnOverlay(e.Graphics, new Pen(OverlayRespawnColor), x, y);
@@ -286,11 +289,13 @@ namespace MMEd.Viewers
       switch (ViewMode)
       {
         case eViewMode.EditBumpSquares:
+        case eViewMode.EditSteeringSquares:
         case eViewMode.EditMetadata:
         case eViewMode.FillMetadata:
         case eViewMode.EditTextures:
         case eViewMode.EditCameras:
         case eViewMode.EditWaypoints:
+        case eViewMode.EditBehaviours:
           lHighlightRect = new Rectangle(
             lMousePos.X / mSubjectTileScaledWidth * mSubjectTileScaledWidth,
             lMousePos.Y / mSubjectTileScaledHeight * mSubjectTileScaledHeight,
@@ -298,6 +303,7 @@ namespace MMEd.Viewers
             mSubjectTileScaledHeight);
           break;
         case eViewMode.EditBumpPixels:
+        case eViewMode.EditSteeringPixels:
         case eViewMode.EditRespawns:
           int lTexX = (int)Math.Floor(lMousePos.X / (double)mSubjectTileScaledWidth);
           int lTexY = (int)Math.Floor(lMousePos.Y / (double)mSubjectTileScaledHeight);
@@ -372,6 +378,47 @@ namespace MMEd.Viewers
       lCamera.Draw(g, p, GetMidpoint(x, y), mSubjectTileScaledWidth);
     }
 
+    private void DrawSteeringOverlay(Graphics g, Pen p, int x, int y)
+    {
+      if (!mSubject.HasMetaData)
+      {
+        return;
+      }
+
+      SteeringImageChunk lSteeringImage = mMainForm.CurrentLevel.GetSteeringImageById(mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.Steering]);
+      byte lOrientation = mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.Orientation];
+      Rectangle lDest = new Rectangle(
+          x * mSubjectTileScaledWidth,
+          y * mSubjectTileScaledHeight,
+          mSubjectTileScaledWidth,
+          mSubjectTileScaledHeight);
+
+      g.DrawImage(lSteeringImage.ToImage(lOrientation, p), lDest);
+    }
+
+    private void DrawBehaviourOverlay(Graphics g, Pen p, int x, int y)
+    {
+      if (!mSubject.HasMetaData)
+      {
+        return;
+      }
+
+      byte lBehaviourValue = mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Behaviour];
+      FlatChunk.Behaviour lBehaviour = lBehaviourValue < FlatChunk.Behaviours.Length ?
+        FlatChunk.Behaviours[lBehaviourValue] : null;
+
+      Rectangle lTarget = new Rectangle(
+          x * mSubjectTileScaledWidth,
+          y * mSubjectTileScaledHeight,
+          mSubjectTileScaledWidth,
+          mSubjectTileScaledHeight);
+
+      if (lBehaviour != null)
+      {
+        g.DrawImage(lBehaviour.ToBitmap(p), lTarget);
+      }
+    }
+
     private void DrawRespawnOverlay(Graphics g, Pen p, int x, int y)
     {
       if (!mSubject.HasMetaData)
@@ -388,43 +435,43 @@ namespace MMEd.Viewers
         return;
       }
 
-      byte lZeroValue = mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Odds];
-      byte lTwoValue = mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Two];
-      byte lFourValue = mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Four];
-      byte lSevenValue = mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Seven];
+      byte lSteeringValue = mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Steering];
+      byte lBehaviourValue = mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Behaviour];
+      byte lOrientationValue = mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Orientation];
+      byte lRespawnValue = mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.RespawnPos];
       Point lMidpoint = GetMidpoint(x, y);
       int lLineLength = (int)(mSubjectTileScaledWidth * 0.4);
 
-      if (Array.IndexOf(sNoRespawnValues, lTwoValue) >= 0)
+      if (Array.IndexOf(sNoRespawnValues, lBehaviourValue) >= 0)
       {
         Utils.DrawCross(g, p, lMidpoint, (int)(mSubjectTileScaledWidth * 0.4));
       }
       else
       {
-        // Get the odds image and find the point within it indicated by the
-        // Seven value.
-        int lRespawnX = (int)(lSevenValue / 16);
-        int lRespawnY = (int)(lSevenValue % 16);
-        OddImageChunk lOdd = mMainForm.CurrentLevel.GetOddById(mSubject.TexMetaData[x][y][0]);
-        byte lOddValue = lOdd.Data[8 * lRespawnX + lRespawnY];
+        // Get the steering image and find the point within it indicated by the
+        // respawn value.
+        int lRespawnX = (int)(lRespawnValue / 16);
+        int lRespawnY = (int)(lRespawnValue % 16);
+        SteeringImageChunk lSteeringImage = mMainForm.CurrentLevel.GetSteeringImageById(mSubject.TexMetaData[x][y][0]);
+        byte lSteeringDirection = lSteeringImage.GetPixelType(lRespawnX, lRespawnY);
 
-        // Calculate the direction from the combination of the Four value and
-        // the value taken from the odds image.
-        int lDirection = 2048 + lFourValue == 0 ?
-          lOddValue * 256 :
-          (lFourValue * 1024) + (lOddValue * -256);
+        // Calculate the direction from the combination of the orientation value and
+        // the value taken from the steering image.
+        int lDirection = 2048 + lOrientationValue == 0 ?
+          lSteeringDirection * 256 :
+          (lOrientationValue * 1024) + (lSteeringDirection * -256);
 
-        if (lFourValue == 0)
+        if (lOrientationValue == 0)
         {
-          lDirection = lOddValue * 256;
+          lDirection = lSteeringDirection * 256;
         }
         else
         {
-          lDirection = (lFourValue * 1024) + (lOddValue * -256);
+          lDirection = (lOrientationValue * 1024) + (lSteeringDirection * -256);
         }
 
         Point lRespawnPoint = GetPointInTile(x, y, lRespawnX, lRespawnY);
-        Utils.DrawArrow(g, p, lRespawnPoint, lDirection, lLineLength, false);
+        Utils.DrawArrow(g, p, lRespawnPoint, lDirection, lLineLength, 1, false);
       }
     }
 
@@ -751,19 +798,6 @@ namespace MMEd.Viewers
       InvalidateGridDisplay();
     }
 
-    private void DrawTransparentImage(PaintEventArgs e, Image xiImage, Rectangle xiDest)
-    {
-      e.Graphics.DrawImage(
-        xiImage,
-        xiDest,
-        0, // These 5 params define which part of the source image to use - all of it.
-        0,
-        xiImage.Width,
-        xiImage.Height,
-        GraphicsUnit.Pixel,
-        mTransparencyAttributes);
-    }
-
     public override bool CanViewChunk(Chunk xiChunk)
     {
       return xiChunk is FlatChunk;
@@ -904,12 +938,23 @@ namespace MMEd.Viewers
           lBumpString = "Bump: " + BumpImageChunk.GetBumpTypeInfo(lBumpPixel).Name;
         }
 
+        byte lSteeringIdx = mSubject.TexMetaData == null ? (byte)0 : mSubject.TexMetaData[lTexX][lTexY][(int)eTexMetaDataEntries.Steering];
+        SteeringImageChunk lSteeringChunk = mMainForm.CurrentLevel.GetSteeringImageById(lSteeringIdx);
+        string lSteeringString = null;
+
+        if (lSteeringChunk != null)
+        {
+          byte lSteeringPixel = lSteeringChunk.GetPixelType(lPxX, lPxY);
+          lSteeringString = "Steering: " + SteeringImageChunk.GetDirectionName(lSteeringPixel);
+        }
+
         mMainForm.GridViewerStatusLabel.Text = string.Format(
-          "Tex Coord: ({0:0}, {1:0}) Flat Coord: ({2:0}, {3:0}) {4} Tex:{5} {6}",
+          "Tex Coord: ({0:0}, {1:0}) Flat Coord: ({2:0}, {3:0}) {4} Tex:{5} {6} {7}",
           lTexX, lTexY, x * mSubject.ScaleX, y * mSubject.ScaleY,
           lWorldCoord,
           mSubject.TextureIds[lTexX][lTexY],
-          lBumpString);
+          lBumpString,
+          lSteeringString);
 
         //this seems a bit ott, but is needed for the red square highlight
         InvalidateGridDisplay();
@@ -929,6 +974,9 @@ namespace MMEd.Viewers
         int y = e.Y / mSubjectTileScaledHeight;
         int lPxX = (int)((e.X % mSubjectTileScaledWidth) / ((double)mSubjectTileScaledWidth / 8.0));
         int lPxY = (int)((e.Y % mSubjectTileScaledHeight) / ((double)mSubjectTileScaledHeight / 8));
+
+        PictureBox lSel = mKeyOrMouseToSelPicBoxDict[e.Button];
+        BrushData lBrush = BrushData.FromPictureBox(lSel);
 
         switch (ViewMode)
         {
@@ -976,61 +1024,82 @@ namespace MMEd.Viewers
 
           case eViewMode.EditTextures:
             //edit textures mode
-            if (mKeyOrMouseToSelPicBoxDict.ContainsKey(e.Button))
+            if (lBrush != null)
             {
-              PictureBox lSel = mKeyOrMouseToSelPicBoxDict[e.Button];
-              mSubject.TextureIds[x][y] = (byte)lSel.Tag;
+              mSubject.TextureIds[x][y] = lBrush.Value;
               InvalidateGridDisplay();
             }
             break;
 
           case eViewMode.EditBumpSquares:
             //edit bump mode
-            if (mKeyOrMouseToSelPicBoxDict.ContainsKey(e.Button))
+            if (lBrush != null)
             {
-              PictureBox lSel = mKeyOrMouseToSelPicBoxDict[e.Button];
-              mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.Bumpmap] = (byte)lSel.Tag;
+              mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.Bumpmap] = lBrush.Value;
               InvalidateGridDisplay();
             }
             break;
 
           case eViewMode.EditBumpPixels:
-            //edit bump mode
-            if (mKeyOrMouseToSelPicBoxDict.ContainsKey(e.Button))
+            //edit bump mode (pixels)
+            if (lBrush != null)
             {
-              PictureBox lSel = mKeyOrMouseToSelPicBoxDict[e.Button];
-              byte lNewVal = (byte)lSel.Tag;
-              UpdateBumpPixel(x, y, lPxX, lPxY, lNewVal);
+              UpdateBumpPixel(x, y, lPxX, lPxY, lBrush.Value);
+              InvalidateGridDisplay();
+            }
+            break;
+
+          case eViewMode.EditSteeringSquares:
+            // edit steering mode
+            if (lBrush != null)
+            {
+              mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.Steering] = lBrush.Value;
+              mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.Orientation] = lBrush.Orientation;
+              InvalidateGridDisplay();
+            }
+            break;
+
+          case eViewMode.EditSteeringPixels:
+            // edit steering mode (pixels)
+            if (lBrush != null)
+            {
+              UpdateSteeringPixel(x, y, lPxX, lPxY, lBrush.Value); 
               InvalidateGridDisplay();
             }
             break;
 
           case eViewMode.EditCameras:
             //edit camera positions
-            if (mKeyOrMouseToSelPicBoxDict.ContainsKey(e.Button))
+            if (lBrush != null)
             {
-              PictureBox lSel = mKeyOrMouseToSelPicBoxDict[e.Button];
-              mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.CameraPos] = (byte)lSel.Tag;
+              mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.CameraPos] = lBrush.Value;
               InvalidateGridDisplay();
             }
             break;
 
           case eViewMode.EditRespawns:
             //edit respawns
-            if (mKeyOrMouseToSelPicBoxDict.ContainsKey(e.Button))
+            if (lBrush != null)
             {
-              PictureBox lSel = mKeyOrMouseToSelPicBoxDict[e.Button];
-              SetRespawnPosition(x, y, new RespawnSetting(lPxX, lPxY, (byte)lSel.Tag));
+              SetRespawnPosition(x, y, new RespawnSetting(lPxX, lPxY, lBrush.Value));
               InvalidateGridDisplay();
             }
             break;
 
           case eViewMode.EditWaypoints:
             //edit waypoints
-            if (mKeyOrMouseToSelPicBoxDict.ContainsKey(e.Button))
+            if (lBrush != null)
             {
-              PictureBox lSel = mKeyOrMouseToSelPicBoxDict[e.Button];
-              MakeWaypointChange(x, y, (eWaypointAction)(byte)lSel.Tag);
+              MakeWaypointChange(x, y, (eWaypointAction)lBrush.Value);
+              InvalidateGridDisplay();
+            }
+            break;
+
+          case eViewMode.EditBehaviours:
+            //edit behaviours
+            if (lBrush != null)
+            {
+              mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.Behaviour] = lBrush.Value;
               InvalidateGridDisplay();
             }
             break;
@@ -1038,6 +1107,18 @@ namespace MMEd.Viewers
       }
     }
 
+    ///========================================================================
+    /// Method : UpdateBumpPixel
+    /// 
+    /// <summary>
+    /// 	Update an individual pixel in the bump maps
+    /// </summary>
+    /// <param name="xiTexX"></param>
+    /// <param name="xiTexY"></param>
+    /// <param name="xiBumpPxX"></param>
+    /// <param name="xiBumpPxY"></param>
+    /// <param name="xiNewVal"></param>
+    ///========================================================================
     private void UpdateBumpPixel(
       int xiTexX,  //the x-offset of the tex square in the grid
       int xiTexY,
@@ -1124,6 +1205,128 @@ namespace MMEd.Viewers
       }
     }
 
+    ///========================================================================
+    /// Method : UpdateSteeringPixel
+    /// 
+    /// <summary>
+    /// 	Update an individual pixel in the steering maps.
+    /// 
+    ///   Note that we don't just blindly accept the new value supplied - 
+    ///   we assume it's relative to orientation 4, and if this square's
+    ///   orientation is different we rotate it first.
+    /// </summary>
+    /// <param name="xiTexX"></param>
+    /// <param name="xiTexY"></param>
+    /// <param name="xiSteeringPxX"></param>
+    /// <param name="xiSteeringPxY"></param>
+    /// <param name="xiNewVal"></param>
+    ///========================================================================
+    private void UpdateSteeringPixel(
+      int xiTexX,  //the x-offset of the tex square in the grid
+      int xiTexY,
+      int xiSteeringPxX, //the x-offset of the steering pixel in the square
+      int xiSteeringPxY,
+      byte xiNewVal)
+    {
+      byte lSteeringImageIdx = mSubject.TexMetaData[xiTexX][xiTexY][(int)eTexMetaDataEntries.Steering];
+      byte lOrientation = mSubject.TexMetaData[xiTexX][xiTexY][(int)eTexMetaDataEntries.Orientation];
+
+      if (lSteeringImageIdx >= mSteeringImageUsageCountArray.Length)
+      {
+        MessageBox.Show("Cannot edit that steering square: it indexes a non-existant steering image. Please edit it numerically first");
+        return;
+      }
+
+      //=======================================================================
+      // Re-orient the target value based on the actual orientation of the
+      // square. Note that bytes wrap round from 0 to 255 if you add or subtract
+      // to give an out-of-range value.
+      //=======================================================================
+      if (lOrientation > 0 && lOrientation < 4)
+      {
+        xiNewVal -= (byte)(16 - lOrientation * 4);
+
+        if (xiNewVal >= 16)
+        {
+          xiNewVal += 16;
+        }
+      }
+      else if (lOrientation == 0 && xiNewVal > 0)
+      {
+        xiNewVal = (byte)(16 - xiNewVal);
+      }
+
+      //how to update the steering pix depends on how many tex squares
+      //use that steering pix
+      switch (mSteeringImageUsageCountArray[lSteeringImageIdx])
+      {
+        case 0:
+          throw new Exception("Interal error: unreachable statement!");
+
+        case 1:
+          SteeringImageChunk lSteeringChunk = mMainForm.CurrentLevel.GetSteeringImageById(lSteeringImageIdx);
+          lSteeringChunk.SetPixelType(xiSteeringPxX, xiSteeringPxY, xiNewVal);
+          break;
+
+        default: // i.e. > 1
+          SHETChunk lShet = mMainForm.CurrentLevel.SHET;
+          SteeringImageChunk lNewSteering = null;
+          int lNewSteeringId = -1;
+
+          if (lShet.UnusedSteeringImages.Count == 0)
+          {
+            //=================================================================
+            // Create a new steering image
+            //=================================================================
+            lNewSteeringId = lShet.SteeringImages.mChildren.Length;
+            lNewSteering = new SteeringImageChunk(lNewSteeringId);
+            int lSizeIncrease = lShet.AddSteeringImage(lNewSteering);
+            lShet.TrailingZeroByteCount -= lSizeIncrease;
+
+            if (lShet.TrailingZeroByteCount < 0)
+            {
+              MessageBox.Show(string.Format(
+                "WARNING: You have just run out of space in your level file - you will need to free up {0} bytes before you can save your changes.",
+                -lShet.TrailingZeroByteCount));
+            }
+
+            //=================================================================
+            // Update our usage count array to include the new steering image
+            //=================================================================
+            int[] lNewSteeringImageUsageCountArray = new int[lNewSteeringId + 1];
+            Array.Copy(mSteeringImageUsageCountArray, lNewSteeringImageUsageCountArray, mSteeringImageUsageCountArray.Length);
+            mSteeringImageUsageCountArray = lNewSteeringImageUsageCountArray;
+          }
+          else
+          {
+            //=================================================================
+            // Find the first unused steering image and use that
+            //=================================================================
+            foreach (DictionaryEntry lEntry in lShet.UnusedSteeringImages)
+            {
+              lNewSteeringId = (int)lEntry.Key;
+              lNewSteering = (SteeringImageChunk)lEntry.Value;
+              break;
+            }
+
+            lShet.UnusedSteeringImages.Remove(lNewSteeringId);
+          }
+
+          //===================================================================
+          // Update the steering image with the desired contents, and update 
+          // the terrain square to use it
+          //===================================================================
+          SteeringImageChunk lOldSteering = mMainForm.CurrentLevel.GetSteeringImageById(lSteeringImageIdx);
+          lNewSteering.CopyFrom(lOldSteering);
+          lNewSteering.SetPixelType(xiSteeringPxX, xiSteeringPxY, xiNewVal);
+          mSubject.TexMetaData[xiTexX][xiTexY][(int)eTexMetaDataEntries.Steering]
+           = (byte)lNewSteeringId;
+          mSteeringImageUsageCountArray[lSteeringImageIdx]--;
+          mSteeringImageUsageCountArray[lNewSteeringId]++;
+          break;
+      }
+    }
+    
     Dictionary<object, PictureBox> mKeyOrMouseToSelPicBoxDict = new Dictionary<object, PictureBox>();
     Dictionary<object, Label> mKeyOrMouseToLabelDict = new Dictionary<object, Label>();
     private void SetSelImage(object xiKey, PictureBox xiNewVal)
@@ -1143,6 +1346,8 @@ namespace MMEd.Viewers
          && (ViewMode == eViewMode.EditTextures
            || ViewMode == eViewMode.EditBumpSquares
            || ViewMode == eViewMode.EditBumpPixels 
+           || ViewMode == eViewMode.EditSteeringSquares
+           || ViewMode == eViewMode.EditSteeringPixels
            || ViewMode == eViewMode.EditCameras
            || ViewMode == eViewMode.EditRespawns
            || ViewMode == eViewMode.EditWaypoints)
@@ -1176,30 +1381,43 @@ namespace MMEd.Viewers
             int lPxX = (p.X % mSubjectTileScaledWidth) / (mSubjectTileScaledWidth / 8);
             int lPxY = (p.Y % mSubjectTileScaledHeight) / (mSubjectTileScaledHeight / 8);
             PictureBox lSel = mKeyOrMouseToSelPicBoxDict[e.KeyChar];
+            BrushData lBrush = BrushData.FromPictureBox(lSel);
             if (ViewMode == eViewMode.EditTextures)
             {
-              mSubject.TextureIds[x][y] = (byte)lSel.Tag;
+              mSubject.TextureIds[x][y] = lBrush.Value;
             }
             else if (ViewMode == eViewMode.EditBumpSquares)
             {
-              mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.Bumpmap] = (byte)lSel.Tag;
+              mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.Bumpmap] = lBrush.Value;
             }
             else if (ViewMode == eViewMode.EditBumpPixels)
             {
-              byte lNewVal = (byte)lSel.Tag;
-              UpdateBumpPixel(x, y, lPxX, lPxY, lNewVal);
+              UpdateBumpPixel(x, y, lPxX, lPxY, lBrush.Value);
+            }
+            else if (ViewMode == eViewMode.EditSteeringSquares)
+            {
+              mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.Steering] = lBrush.Value;
+              mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.Orientation] = lBrush.Orientation;
+            }
+            else if (ViewMode == eViewMode.EditSteeringPixels)
+            {
+              UpdateSteeringPixel(x, y, lPxX, lPxY, lBrush.Value);
             }
             else if (ViewMode == eViewMode.EditCameras)
             {
-              mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.CameraPos] = (byte)lSel.Tag;
+              mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.CameraPos] = lBrush.Value;
             }
             else if (ViewMode == eViewMode.EditRespawns)
             {
-              SetRespawnPosition(x, y, new RespawnSetting(lPxX, lPxY, (byte)lSel.Tag));
+              SetRespawnPosition(x, y, new RespawnSetting(lPxX, lPxY, lBrush.Value));
             }
             else if (ViewMode == eViewMode.EditWaypoints)
             {
-              MakeWaypointChange(x, y, (eWaypointAction)(byte)lSel.Tag);
+              MakeWaypointChange(x, y, (eWaypointAction)lBrush.Value);
+            }
+            else if (ViewMode == eViewMode.EditBehaviours)
+            {
+              mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.Behaviour] = lBrush.Value;
             }
             InvalidateGridDisplay();
             return;
@@ -1222,28 +1440,28 @@ namespace MMEd.Viewers
       // on a different metadata sheet.
       if (xiRespawnSetting.Direction == eDirection.None)
       {
-        mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Two] = FlatChunk.LAYERTWO_NORESPAWN;
+        mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Behaviour] = FlatChunk.BEHAVIOUR_DEFAULTNORESPAWN;
         return;
       }
-      else if (Array.IndexOf(sNoRespawnValues, mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Two]) >= 0)
+      else if (Array.IndexOf(sNoRespawnValues, mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Behaviour]) >= 0)
       {
-        mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Two] = FlatChunk.LAYERTWO_DEFAULT;
+        mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Behaviour] = FlatChunk.BEHAVIOUR_DEFAULT;
       }
 
-      // Find an Odd image which can be used for this direction, at one of the four orientations
-      int lOddId = FindOddMatchingDirection(ref xiRespawnSetting);
+      // Find a steering image which can be used for this direction, at one of the four orientations
+      int lSteeringId = FindSteeringImageMatchingDirection(ref xiRespawnSetting);
 
-      if (lOddId == int.MinValue)
+      if (lSteeringId == int.MinValue)
       {
         xiRespawnSetting.RotateTo(eOrientation.North);
 
-        if (lShet.UnusedOdds.Count == 0)
+        if (lShet.UnusedSteeringImages.Count == 0)
         {
-          lOddId = lShet.OddImages.mChildren.Length;
-          OddImageChunk lNewOdd = new OddImageChunk(
-            lOddId,
+          lSteeringId = lShet.SteeringImages.mChildren.Length;
+          SteeringImageChunk lNewSteeringImage = new SteeringImageChunk(
+            lSteeringId,
             (byte)xiRespawnSetting.Direction);
-          int lSizeIncrease = lShet.AddOdd(lNewOdd);
+          int lSizeIncrease = lShet.AddSteeringImage(lNewSteeringImage);
           lShet.TrailingZeroByteCount -= lSizeIncrease;
 
           if (lShet.TrailingZeroByteCount < 0)
@@ -1255,50 +1473,50 @@ namespace MMEd.Viewers
         }
         else
         {
-          foreach (DictionaryEntry lEntry in lShet.UnusedOdds)
+          foreach (DictionaryEntry lEntry in lShet.UnusedSteeringImages)
           {
             // Just get the first unused.
-            lOddId = (int)lEntry.Key;
-            OddImageChunk lOdd = (OddImageChunk)lEntry.Value;
-            lOdd.FlushToValue((byte)xiRespawnSetting.Direction);
+            lSteeringId = (int)lEntry.Key;
+            SteeringImageChunk lSteeringImage = (SteeringImageChunk)lEntry.Value;
+            lSteeringImage.FlushToValue((byte)xiRespawnSetting.Direction);
             break;
           }
 
-          lShet.UnusedOdds.Remove(lOddId);
+          lShet.UnusedSteeringImages.Remove(lSteeringId);
         }
       }
 
       // Use 4 instead of 0 for orientation North, because orientation 0 
       // reverses the directions...
-      mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Four] =
+      mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Orientation] =
        xiRespawnSetting.Orientation == eOrientation.North ? (byte)4 : (byte)xiRespawnSetting.Orientation;
-      mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Odds] = (byte)lOddId;
+      mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Steering] = (byte)lSteeringId;
       
       // Rotate back to north to set position (layer seven)
       xiRespawnSetting.RotateTo(eOrientation.North);
-      byte lSevenValue = PointToLayerSevenValue(new Point(xiRespawnSetting.X, xiRespawnSetting.Y));
-      mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.Seven] = lSevenValue;
+      byte lRespawnValue = PointToRespawnPos(new Point(xiRespawnSetting.X, xiRespawnSetting.Y));
+      mSubject.TexMetaData[x][y][(byte)eTexMetaDataEntries.RespawnPos] = lRespawnValue;
     }
 
-    private byte PointToLayerSevenValue(Point xiPoint)
+    private byte PointToRespawnPos(Point xiPoint)
     {
       return (byte)(xiPoint.X * 16 + xiPoint.Y);
     }
 
-    private int FindOddMatchingDirection(ref RespawnSetting xbRespawnSetting)
+    private int FindSteeringImageMatchingDirection(ref RespawnSetting xbRespawnSetting)
     {
       SHETChunk lShet = mMainForm.CurrentLevel.SHET;
 
-      for (int i = 0; i < lShet.OddImages.mChildren.Length; i++)
+      for (int i = 0; i < lShet.SteeringImages.mChildren.Length; i++)
       {
-        if (!(lShet.OddImages.mChildren[i] is OddImageChunk))
+        if (!(lShet.SteeringImages.mChildren[i] is SteeringImageChunk))
         {
           continue;
         }
 
-        OddImageChunk lOdd = (OddImageChunk)lShet.OddImages.mChildren[i];
+        SteeringImageChunk lSteeringImage = (SteeringImageChunk)lShet.SteeringImages.mChildren[i];
 
-        if (xbRespawnSetting.MatchToOdd(lOdd))
+        if (xbRespawnSetting.MatchToSteeringImage(lSteeringImage))
         {
           return i;
         }
@@ -1325,13 +1543,14 @@ namespace MMEd.Viewers
         if ((mSubject == null || mSubject.TexMetaData == null)
          && (value == eViewMode.EditBumpPixels
           || value == eViewMode.EditBumpSquares
+          || value == eViewMode.EditSteeringPixels
+          || value == eViewMode.EditSteeringSquares
           || value == eViewMode.EditCameras
           || value == eViewMode.EditRespawns
           || value == eViewMode.EditWaypoints
+          || value == eViewMode.EditBehaviours
           || value == eViewMode.EditMetadata
-          || value == eViewMode.FillMetadata
-          || value == eViewMode.ViewBump
-          || value == eViewMode.ViewOdds))
+          || value == eViewMode.FillMetadata))
         {
           value = eViewMode.ViewOnly; //reject change!
         }
@@ -1347,9 +1566,12 @@ namespace MMEd.Viewers
           if (ViewMode == eViewMode.EditTextures
             || ViewMode == eViewMode.EditBumpSquares
             || ViewMode == eViewMode.EditBumpPixels
+            || ViewMode == eViewMode.EditSteeringSquares
+            || ViewMode == eViewMode.EditSteeringPixels
             || ViewMode == eViewMode.EditCameras
             || ViewMode == eViewMode.EditRespawns
-            || ViewMode == eViewMode.EditWaypoints)
+            || ViewMode == eViewMode.EditWaypoints
+            || ViewMode == eViewMode.EditBehaviours)
           {
             Point lNextPbTL = new Point(0, 0);
             IEnumerator<object> lKeys = mKeyOrMouseToSelPicBoxDict.Keys.GetEnumerator();
@@ -1366,9 +1588,10 @@ namespace MMEd.Viewers
             }
 
             //loop over allowed values
-            for (int i = 0; i < 256; i++)
+            for (int i = 0; i < (ViewMode == eViewMode.EditSteeringSquares ? 256 * 5 : 256); i++)
             {
               Image im = null;
+              BrushData lBrush = null;
 
               //fetch or create the appropriate palette image for the byte value "i"
               if (ViewMode == eViewMode.EditTextures)
@@ -1380,11 +1603,17 @@ namespace MMEd.Viewers
                 {
                   im = null;
                 }
+
+                lBrush = new BrushData((byte)i, "TIM " + i.ToString());
               }
               else if (ViewMode == eViewMode.EditBumpSquares)
               {
                 BumpImageChunk bim = mMainForm.CurrentLevel.GetBumpById(i);
-                if (bim != null) im = bim.ToImage();
+                if (bim != null)
+                {
+                  im = bim.ToImage();
+                  lBrush = new BrushData((byte)i, "Bump " + i.ToString());
+                }
               }
               else if (ViewMode == eViewMode.EditBumpPixels)
               {
@@ -1422,7 +1651,21 @@ namespace MMEd.Viewers
                       yf);
 
                   im = lBmp;
+                  lBrush = new BrushData((byte)i, "Bump type " + bti.Name + ": " + bti.Description);
                 }
+              }
+              else if (ViewMode == eViewMode.EditSteeringSquares)
+              {
+                SteeringImageChunk lSteeringChunk = mMainForm.CurrentLevel.GetSteeringImageById((int)(i / 5));
+                if (lSteeringChunk != null)
+                {
+                  im = lSteeringChunk.ToImage((byte)(i % 5), Pens.Black);
+                  lBrush = new BrushData((byte)(i / 5), (byte)(i % 5), "Steering image " + ((byte)(i / 5)).ToString() + "; Orientation " + (i % 5).ToString());
+                }
+              }
+              else if (ViewMode == eViewMode.EditSteeringPixels)
+              {
+                im = GetSteeringPixelBrush(i, out lBrush);
               }
               else if (ViewMode == eViewMode.EditCameras)
               {
@@ -1434,15 +1677,23 @@ namespace MMEd.Viewers
                 }
 
                 CameraPosChunk cpc = mMainForm.CurrentLevel.GetCameraById(i);
-                if (cpc != null) im = cpc.ToImage();
+                if (cpc != null)
+                {
+                  im = cpc.ToImage();
+                  lBrush = new BrushData((byte)i, "Camera pos " + i.ToString());
+                }
               }
               else if (ViewMode == eViewMode.EditRespawns)
               {
-                im = GetRespawnBrush(i);
+                im = GetRespawnBrush(i, out lBrush);
               }
               else if (ViewMode == eViewMode.EditWaypoints)
               {
-                im = GetWaypointBrush(i);
+                im = GetWaypointBrush(i, out lBrush);
+              }
+              else if (ViewMode == eViewMode.EditBehaviours)
+              {
+                im = GetBehaviourBrush(i, out lBrush);
               }
 
               // have image, add it to editing palette
@@ -1456,8 +1707,10 @@ namespace MMEd.Viewers
                 mMainForm.GridViewPalettePanel.Controls.Add(lPalPB);
                 lPalPB.Bounds = new Rectangle(lNextPbTL, new Size(64, 64));
                 lPalPB.SizeMode = PictureBoxSizeMode.StretchImage;
-                lPalPB.Tag = (byte)i;
+                lPalPB.BorderStyle = BorderStyle.FixedSingle; //qq:MWR
+                lPalPB.Tag = lBrush;
                 lPalPB.MouseClick += new MouseEventHandler(PaletteImageMouseClick);
+                lPalPB.MouseMove += new MouseEventHandler(PaletteImageMouseMove);
                 lNextPbTL.Offset(64 + PADDING, 0);
                 if (lKeys.MoveNext())
                 {
@@ -1481,10 +1734,12 @@ namespace MMEd.Viewers
           }
           mMainForm.GridViewPalettePanel.ResumeLayout();
 
-          // make a list of how many times each bump tex is used, to be used
-          // in editing the bump map, pixel by pixel
           if (ViewMode == eViewMode.EditBumpPixels)
           {
+            //=================================================================
+            // Make a list of how many times each bump tex is used, to be used
+            // in editing the bump map, pixel by pixel
+            //=================================================================
             mBumpImageUsageCountArray = new int[mMainForm.CurrentLevel.SHET.BumpImages.mChildren.Length];
             int lBumpIdx = (int)eTexMetaDataEntries.Bumpmap;
             foreach (FlatChunk flat in mMainForm.CurrentLevel.SHET.Flats)
@@ -1511,6 +1766,49 @@ namespace MMEd.Viewers
               }
             }
           }
+          else if (ViewMode == eViewMode.EditSteeringPixels)
+          {
+            //=================================================================
+            // Make a list of how many times each steering tex is used, to be 
+            // used in editing the steering map, pixel by pixel
+            //=================================================================
+            mSteeringImageUsageCountArray = new int[mMainForm.CurrentLevel.SHET.SteeringImages.mChildren.Length];
+            int lSteeringIdx = (int)eTexMetaDataEntries.Steering;
+            foreach (FlatChunk flat in mMainForm.CurrentLevel.SHET.Flats)
+            {
+              if (flat.TexMetaData != null)
+              {
+                foreach (byte[][] row in flat.TexMetaData)
+                {
+                  foreach (byte[] entry in row)
+                  {
+                    int lSteeringId = entry[lSteeringIdx];
+                    if (lSteeringId < mSteeringImageUsageCountArray.Length)
+                    {
+                      mSteeringImageUsageCountArray[lSteeringId]++;
+                    }
+                    else
+                    {
+                      Console.Error.WriteLine("Tex square in Flat {0} references non-existant steering id {1}",
+                        flat.Name,
+                        lSteeringId);
+                    }
+                  }
+                }
+              }
+            }
+          }
+
+          //===================================================================
+          // Make sure that we can view bumps, if we're editing them
+          //===================================================================
+          if ((ViewMode == eViewMode.EditBumpPixels ||
+            ViewMode == eViewMode.EditBumpSquares) &&
+            mMainForm.GridViewTransparencySlider.Value == mMainForm.GridViewTransparencySlider.Minimum)
+          {
+            mMainForm.GridViewTransparencySlider.Value =
+              (mMainForm.GridViewTransparencySlider.Maximum - mMainForm.GridViewTransparencySlider.Minimum) / 2;
+          }
         }
 
         if (OnViewModeChanged != null) OnViewModeChanged(this, null);
@@ -1518,7 +1816,13 @@ namespace MMEd.Viewers
       }
     }
 
-    private Image GetRespawnBrush(int i)
+    void PaletteImageMouseMove(object sender, MouseEventArgs e)
+    {
+      string lStatusText = BrushData.FromPictureBox(sender).Caption;
+      mMainForm.GridViewerStatusLabel.Text = lStatusText;
+    }
+
+    private Image GetRespawnBrush(int i, out BrushData xoBrush)
     {
       Bitmap lRet = new Bitmap(4 * SCALE, 4 * SCALE);
       Graphics g = Graphics.FromImage(lRet);
@@ -1528,24 +1832,70 @@ namespace MMEd.Viewers
       if (i == 0)
       {
         Utils.DrawCross(g, p, lMidpoint, (int)(mSubjectTileScaledWidth * 0.8));
+        xoBrush = new BrushData((byte)i, "No respawn (Warning: Corrupts Behaviours)");
         return lRet;
       }
-      else if (i <= FlatChunk.LAYERZERO_HIGHESTDIRECTION + 1)
+      else if (i <= FlatChunk.STEERING_HIGHESTDIRECTION + 1)
       {
         g.DrawRectangle(p, 0, 0, 63, 63);
-        Utils.DrawArrow(g, p, lMidpoint, 4096 - ((i - 1) * 256), (int)(mSubjectTileScaledWidth * 0.4), true);
+        Utils.DrawArrow(g, p, lMidpoint, 4096 - ((i - 1) * 256), (int)(mSubjectTileScaledWidth * 0.4), 1, true);
+        xoBrush = new BrushData((byte)i, "Respawn direction " + i.ToString() + " (Warning: Corrupts Steering)");
         return lRet;
       }
       else
       {
+        xoBrush = null;
         return null;
       }
     }
 
-    private Image GetWaypointBrush(int i)
+    ///========================================================================
+    /// Method : GetSteeringPixelBrush
+    /// 
+    /// <summary>
+    /// 	Get the brush for pixel-by-pixel editing of steering controls
+    /// </summary>
+    /// <param name="i"></param>
+    /// <returns></returns>
+    ///========================================================================
+    private Image GetSteeringPixelBrush(int i, out BrushData xoBrush)
+    {
+      Bitmap lRet = new Bitmap(4 * SCALE, 4 * SCALE);
+      Graphics g = Graphics.FromImage(lRet);
+      Pen p = new Pen(Color.Black, 1);
+      Point lMidpoint = new Point(2 * SCALE, 2 * SCALE);
+
+      if (i <= FlatChunk.STEERING_HIGHESTDIRECTION)
+      {
+        g.DrawRectangle(p, 0, 0, 63, 63);
+        Utils.DrawArrow(g, p, lMidpoint, 4096 - (i * 256), (int)(mSubjectTileScaledWidth * 0.4), 1, true);
+        xoBrush = new BrushData((byte)i, "Steering direction " + SteeringImageChunk.GetDirectionName((byte)i));
+        return lRet;
+      }
+      else
+      {
+        xoBrush = null;
+        return null;
+      }
+    }
+
+    private Image GetBehaviourBrush(int i, out BrushData xoBrush)
+    {
+      if (i >= FlatChunk.Behaviours.Length)
+      {
+        xoBrush = null;
+        return null;
+      }
+
+      xoBrush = new BrushData((byte)i, FlatChunk.Behaviours[i].BehaviourTypes.ToString());
+      return FlatChunk.Behaviours[i].ToBitmap();
+    }
+
+    private Image GetWaypointBrush(int i, out BrushData xoBrush)
     {
       if (i > (int)eWaypointAction.Restart)
       {
+        xoBrush = null;
         return null;
       }
 
@@ -1580,6 +1930,8 @@ namespace MMEd.Viewers
       g.DrawRectangle(p, 0, 0, lWidth - 1, lHeight - 1);
       Utils.DrawString(g, lLabel, lMidpoint);
 
+      xoBrush = new BrushData((byte)i, lLabel);
+
       return lRet;
     }
 
@@ -1588,6 +1940,7 @@ namespace MMEd.Viewers
     #endregion
 
     private int[] mBumpImageUsageCountArray;
+    private int[] mSteeringImageUsageCountArray;
 
     #region SelectedMeta property
 
@@ -1691,19 +2044,54 @@ namespace MMEd.Viewers
 
     #endregion
 
+    #region OverlaySteeringColor property
+
+    private Color mOverlaySteeringColor = Color.Transparent;
+    public Color OverlaySteeringColor
+    {
+      get { return mOverlaySteeringColor; }
+      set
+      {
+        mOverlaySteeringColor = value;
+        if (OnOverlaySteeringColorChanged != null) OnOverlaySteeringColorChanged(this, null);
+        InvalidateGridDisplay();
+      }
+    }
+    public event EventHandler OnOverlaySteeringColorChanged;
+
+    #endregion
+
+    #region OverlayBehaviourColor property
+
+    private Color mOverlayBehaviourColor = Color.Transparent;
+    public Color OverlayBehaviourColor
+    {
+      get { return mOverlayBehaviourColor; }
+      set
+      {
+        mOverlayBehaviourColor = value;
+        if (OnOverlayBehaviourColorChanged != null) OnOverlayBehaviourColorChanged(this, null);
+        InvalidateGridDisplay();
+      }
+    }
+    public event EventHandler OnOverlayBehaviourColorChanged;
+
+    #endregion
+
     #region Enums
 
     public enum eViewMode
     {
       ViewOnly,
-      ViewBump,
-      ViewOdds,
       EditTextures,
       EditBumpSquares,
       EditBumpPixels,
+      EditSteeringSquares,
+      EditSteeringPixels,
       EditCameras,
       EditRespawns,
       EditWaypoints,
+      EditBehaviours,
       EditMetadata,
       FillMetadata
     }
@@ -1754,6 +2142,37 @@ namespace MMEd.Viewers
 
     #region Helper classes
 
+    ///========================================================================
+    /// Class : BrushData
+    /// 
+    /// <summary>
+    /// 	Class to hold data associated with a brush
+    /// </summary>
+    ///========================================================================
+    private class BrushData
+    {
+      public byte Value;
+      public byte Orientation; // Only applicable to EditSteeringSquares
+      public string Caption;
+
+      public BrushData(byte xiValue, byte xiOrientation, string xiCaption)
+      {
+        Value = xiValue;
+        Orientation = xiOrientation;
+        Caption = xiCaption;
+      }
+
+      public BrushData(byte xiValue, string xiCaption)
+        : this(xiValue, 0, xiCaption)
+      {
+      }
+
+      public static BrushData FromPictureBox(object xiPictureBox)
+      {
+        return xiPictureBox == null ? null : (BrushData)((PictureBox)xiPictureBox).Tag;
+      }
+    }      
+
     private class ColoredPolygon
     {
       public Color Color;
@@ -1774,7 +2193,7 @@ namespace MMEd.Viewers
         Y = y;
         Orientation = eOrientation.North;
 
-        if (xiNewDirectionValue > FlatChunk.LAYERZERO_HIGHESTDIRECTION + 1)
+        if (xiNewDirectionValue > FlatChunk.STEERING_HIGHESTDIRECTION + 1)
         {
           throw new Exception("Tried to set respawn direction to a value higher than the maximum");
         }
@@ -1783,7 +2202,7 @@ namespace MMEd.Viewers
         Direction = (eDirection)(xiNewDirectionValue - 1);
       }
 
-      public bool MatchToOdd(OddImageChunk xiOdd)
+      public bool MatchToSteeringImage(SteeringImageChunk xiSteeringImage)
       {
         eOrientation lOriginalOrientation = Orientation;
 
@@ -1792,7 +2211,7 @@ namespace MMEd.Viewers
           RotateTo((eOrientation)lOrientation);
 
           // y needs to be flipped.
-          if (xiOdd.GetPixelType(X, (FlatChunk.ODDDIMENSION - 1) - Y) == (byte)Direction)
+          if (xiSteeringImage.GetPixelType(X, (FlatChunk.STEERINGDIMENSION - 1) - Y) == (byte)Direction)
           {
             return true;
           }
@@ -1813,7 +2232,7 @@ namespace MMEd.Viewers
 
         int lOldX = X;
         int lOldY = Y;
-        int lMaxValue = FlatChunk.ODDDIMENSION - 1;
+        int lMaxValue = FlatChunk.STEERINGDIMENSION - 1;
 
         switch (lDifference)
         {

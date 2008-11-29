@@ -309,9 +309,10 @@ namespace MMEd.Util
       Point xiTip,
       int xiDirection,
       int xiLength,
+      int xiHeadSize,
       bool xiCentre)
     {
-      int lArrowHeadLength = 8;
+      int lArrowHeadLength = 8 * xiHeadSize;
       double lAngle = Math.PI * ((double)xiDirection / 2048);
 
       if (xiCentre)
@@ -335,8 +336,8 @@ namespace MMEd.Util
         xiTip.Y + (int)(lArrowHeadLength * Math.Cos(lArrowAngle2)));
 
       xiGraphics.DrawLine(xiPen, xiTip, lLineEnd);
-      xiGraphics.DrawLine(xiPen, xiTip, lArrowHead1);
-      xiGraphics.DrawLine(xiPen, xiTip, lArrowHead2);
+      xiGraphics.DrawPolygon(xiPen, new Point[] { xiTip, lArrowHead1, lArrowHead2 });
+      xiGraphics.FillPolygon(xiPen.Brush, new Point[] { xiTip, lArrowHead1, lArrowHead2 });
     }
 
     public static void DrawCircle(

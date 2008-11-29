@@ -63,6 +63,7 @@
     <Compile Include="Chunk.cs" />
     <Compile Include="Chunks\BumpImageChunk.cs" />
     <Compile Include="Chunks\CameraPositionChunk.cs" />
+    <Compile Include="Chunks\SteeringImageChunk.cs" />
     <Compile Include="Chunks\Version.cs" />
     <Compile Include="Chunks\FileChunk.cs" />
     <Compile Include="Chunks\IReindexableChunk.cs" />
@@ -74,7 +75,6 @@
     <Compile Include="Chunks\KeyWaypointsChunk.cs" />
     <Compile Include="Chunks\Level.cs" />
     <Compile Include="Chunks\NamedImageGroup.cs" />
-    <Compile Include="Chunks\OddImageChunk.cs" />
     <Compile Include="Chunks\SHETChunk.cs" />
     <Compile Include="Chunks\Short3Coord.cs" />
     <Compile Include="Chunks\TIMChunk.cs" />
@@ -86,6 +86,12 @@
     </Compile>
     <Compile Include="Forms\NewForm.Designer.cs">
       <DependentUpon>NewForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ReportForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ReportForm.Designer.cs">
+      <DependentUpon>ReportForm.cs</DependentUpon>
     </Compile>
     <Compile Include="GlobalSettings.cs" />
     <Compile Include="LocalSettings.cs" />
@@ -103,6 +109,12 @@
     </Compile>
     <Compile Include="Util\CDImage.cs" />
     <Compile Include="Util\EquivalenceCollection.cs" />
+    <Compile Include="Util\LabelledSlider.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Util\LabelledSlider.Designer.cs">
+      <DependentUpon>LabelledSlider.cs</DependentUpon>
+    </Compile>
     <Compile Include="Util\MMCD.cs" />
     <Compile Include="Util\OverlaySelector.cs">
       <SubType>UserControl</SubType>
@@ -116,6 +128,10 @@
       <SubType>Designer</SubType>
       <DependentUpon>NewForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ReportForm.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>ReportForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <SubType>Designer</SubType>
       <DependentUpon>MainForm.cs</DependentUpon>
@@ -123,6 +139,10 @@
     <EmbeddedResource Include="Forms\PublishForm.resx">
       <SubType>Designer</SubType>
       <DependentUpon>PublishForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Util\LabelledSlider.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>LabelledSlider.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Util\OverlaySelector.resx">
       <SubType>Designer</SubType>
@@ -184,7 +204,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Viewers\MMEdViewerView.cs" />
-    <Compile Include="Viewers\OddViewer.cs" />
+    <Compile Include="Viewers\SteeringViewer.cs" />
     <Compile Include="Viewers\ThreeDeeEditor.cs">
       <SubType>Code</SubType>
     </Compile>

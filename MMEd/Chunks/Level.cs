@@ -20,7 +20,7 @@ namespace MMEd.Chunks
   // member variables:
   [XmlInclude(typeof(NamedImageGroup)), XmlInclude(typeof(TIMChunk)),
   XmlInclude(typeof(CameraPosChunk)), XmlInclude(typeof(CameraPosChunk)),
-  XmlInclude(typeof(OddImageChunk)), XmlInclude(typeof(BumpImageChunk)),
+  XmlInclude(typeof(SteeringImageChunk)), XmlInclude(typeof(BumpImageChunk)),
   XmlInclude(typeof(TMDChunk)), XmlInclude(typeof(TypedRawDataChunk))]
   public class Level : Chunk, Viewers.ThreeDee.IEntityProvider
   {
@@ -85,11 +85,11 @@ namespace MMEd.Chunks
       }
     }
 
-    public OddImageChunk GetOddById(int xiId)
+    public SteeringImageChunk GetSteeringImageById(int xiId)
     {
-      if (xiId < SHET.OddImages.mChildren.Length)
+      if (xiId < SHET.SteeringImages.mChildren.Length)
       {
-        return (OddImageChunk)SHET.OddImages.mChildren[xiId];
+        return (SteeringImageChunk)SHET.SteeringImages.mChildren[xiId];
       }
       else
       {
