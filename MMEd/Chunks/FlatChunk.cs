@@ -974,8 +974,8 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
       NoTumble          = 0x04,
       SlowCars          = 0x08,
       SlightlySlowCars  = 0x10,
-      DeathTrap         = 0x20,
-      Fly               = 0x40 // Common under jumps - maybe controls how AI cars fly through the air?
+      DeathTrap         = 0x20, // Die on contact
+      Fly               = 0x40  // Common under jumps - maybe controls how AI cars fly through the air?
     }
 
     ///========================================================================
@@ -994,7 +994,7 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
       new Behaviour(5, eBehaviourTypes.BlockRespawn),
       new Behaviour(6, eBehaviourTypes.Unknown),
       new Behaviour(7, eBehaviourTypes.DeathTrap),
-      new Behaviour(8, eBehaviourTypes.BlockRespawn),
+      new Behaviour(8, eBehaviourTypes.BlockRespawn), // Used by MMEd's "block respawn" in the grid view's respawn editor
       new Behaviour(9, eBehaviourTypes.Unknown),
       new Behaviour(10, eBehaviourTypes.SlowCars),
       new Behaviour(11, eBehaviourTypes.SlightlySlowCars),

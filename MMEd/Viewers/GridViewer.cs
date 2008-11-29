@@ -373,9 +373,22 @@ namespace MMEd.Viewers
         return;
       }
 
-      CameraPosChunk lCamera =
-        mMainForm.CurrentLevel.GetCameraById(mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.CameraPos]);
-      lCamera.Draw(g, p, GetMidpoint(x, y), mSubjectTileScaledWidth);
+      int lCameraIdx = mSubject.TexMetaData[x][y][(int)eTexMetaDataEntries.CameraPos];
+
+      if (lCameraIdx > 50)
+      {
+        CameraPosChunk lCamera = mMainForm.CurrentLevel.GetCameraById(lCameraIdx);
+        lCamera.Draw(g, p, GetMidpoint(x, y), mSubjectTileScaledWidth);
+      }
+      else
+      {
+        //=====================================================================
+        // Camera positions 0-50 aren't used in multi-player mode, and we're
+        // only displaying multiplayer data here. Just draw a circle to 
+        // represent the default camera position.
+        //=====================================================================
+        Utils.DrawCircle(g, p, GetMidpoint(x, y), 5);
+      }
     }
 
     private void DrawSteeringOverlay(Graphics g, Pen p, int x, int y)
@@ -1669,19 +1682,7 @@ namespace MMEd.Viewers
               }
               else if (ViewMode == eViewMode.EditCameras)
               {
-                // Skip all camera positions between 1 and 50 - they're not used
-                // for multiplayer mode.
-                if (i == 1)
-                {
-                  i = 51;
-                }
-
-                CameraPosChunk cpc = mMainForm.CurrentLevel.GetCameraById(i);
-                if (cpc != null)
-                {
-                  im = cpc.ToImage();
-                  lBrush = new BrushData((byte)i, "Camera pos " + i.ToString());
-                }
+                im = GetCameraBrush(i, out lBrush);
               }
               else if (ViewMode == eViewMode.EditRespawns)
               {
@@ -1935,6 +1936,52 @@ namespace MMEd.Viewers
       return lRet;
     }
 
+    private Image GetCameraBrush(int i, out BrushData xoBrush)
+    {
+      if (i >= 1)
+      {
+        int lCameraIdx = i + 50;
+        CameraPosChunk lCameraPos = mMainForm.CurrentLevel.GetCameraById(lCameraIdx);
+
+        if (lCameraPos == null)
+        {
+          xoBrush = null;
+          return null;
+        }
+
+        xoBrush = new BrushData((byte)lCameraIdx, "Camera pos " + lCameraIdx.ToString());
+        return lCameraPos.ToImage();
+      }
+      
+      //=======================================================================
+      // Camera position 0 is the "default" camera position (in multi-player
+      // mode, anyway)
+      //=======================================================================
+      string lLabel = "Default";
+      int lWidth = 4 * SCALE;
+      int lHeight = 4 * SCALE;
+      Bitmap lRet = new Bitmap(lWidth, lHeight);
+      Graphics g = Graphics.FromImage(lRet);
+      Font lFont = new Font(FontFamily.GenericMonospace, 10);
+      int lTextWidth = (int)(g.MeasureString(lLabel, lFont).Width);
+
+      if (lTextWidth > lWidth)
+      {
+        lWidth = (int)lTextWidth;
+        lRet = new Bitmap(lWidth, lHeight);
+        g = Graphics.FromImage(lRet);
+      }
+
+      Pen p = new Pen(Color.Black, 1);
+      Point lMidpoint = new Point(lWidth / 2, lHeight / 2);
+      g.DrawRectangle(p, 0, 0, lWidth - 1, lHeight - 1);
+      Utils.DrawString(g, lLabel, lMidpoint);
+
+      xoBrush = new BrushData(0, "Default camera");
+
+      return lRet;
+    }
+    
     public event EventHandler OnViewModeChanged;
 
     #endregion

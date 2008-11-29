@@ -252,8 +252,8 @@ namespace MMEd.Viewers
       }
 
       // TODO: The elevation isn't rending quite right yet...
-      short x = (short)(Math.Sin(mSubject.Direction * Math.PI / 2048) * mSubject.Distance);
-      short y = (short)(Math.Cos(mSubject.Direction * Math.PI / 2048) * mSubject.Distance);
+      short x = (short)(Math.Sin(-mSubject.Direction * Math.PI / 2048) * mSubject.Distance);
+      short y = (short)(Math.Cos(-mSubject.Direction * Math.PI / 2048) * mSubject.Distance);
       mCamera.Position = ThreeDeeViewer.Short3CoordToPoint(new Short3Coord(x, y, mSubject.Elevation));
       mCamera.LookAt(new GLTK.Point(0, 0, 0), new GLTK.Vector(0, 0, 1));
       mMainForm.CameraRenderingSurface.Invalidate();
