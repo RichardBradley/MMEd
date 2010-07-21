@@ -16,32 +16,34 @@ namespace MMEd.Viewers
       mViewer = xiViewer;
     }
 
-    protected override void RenderObject(GLTK.Entity xiObject, RenderOptions xiOptions)
+    protected override void RenderScene()
     {
       if (mCamera.ProjectionMode != eProjectionMode.Orthographic
         && mViewer.DrawNormalsMode == eDrawNormalsMode.DrawNormals)
       {
-        xiOptions |= RenderOptions.ShowNormals;
+        mRenderer.RenderScene(mScene, mCamera, RenderOptions.ShowNormals);
       }
-      base.RenderObject(xiObject, xiOptions);
+      else
+      {
+        base.RenderScene();
+      }
 
       if (mActiveEntity == null)
       {
-        foreach (Mesh lMesh in xiObject.Meshes)
+        foreach (Entity lEntity in mScene.Entities)
         {
-          OwnedMesh lOm = lMesh as OwnedMesh;
-          if (lOm != null && lOm.Owner == mViewer.ActiveObject)
+          foreach (Mesh lMesh in lEntity.Meshes)
           {
-            mActiveEntity = xiObject;
-            break;
+            OwnedMesh lOm = lMesh as OwnedMesh;
+            if (lOm != null && lOm.Owner == mViewer.ActiveObject)
+            {
+              mActiveEntity = lEntity;
+              goto breakouter;
+            }
           }
         }
+        breakouter: ;
       }
-    }
-
-    protected override void RenderScene()
-    {
-      base.RenderScene();
 
       if (mActiveEntity != null)
       {
@@ -86,7 +88,7 @@ namespace MMEd.Viewers
         lBox.Meshes.Add(lBoundingMesh);
 
         mRenderer.ClearDepthBuffer();
-        RenderObject(lBox, RenderOptions.Default);
+        mRenderer.RenderSingleObject(lBox, RenderOptions.Default);
         mActiveEntity = null;
       }
     }

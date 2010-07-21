@@ -16,14 +16,17 @@ namespace MMEd.Viewers
       mViewer = xiViewer;
     }
 
-    protected override void RenderObject(GLTK.Entity xiObject, RenderOptions xiOptions)
+    protected override void RenderScene()
     {
       if (mCamera.ProjectionMode != eProjectionMode.Orthographic
         && mViewer.DrawNormalsMode == eDrawNormalsMode.DrawNormals)
       {
-        xiOptions |= RenderOptions.ShowNormals;
+        mRenderer.RenderScene(mScene, mCamera, RenderOptions.ShowNormals);
       }
-      base.RenderObject(xiObject, xiOptions);
+      else
+      {
+        base.RenderScene();
+      }
     }
 
     private ThreeDeeViewer mViewer;

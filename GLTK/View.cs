@@ -21,48 +21,7 @@ namespace GLTK
 
     protected virtual void RenderScene()
     {
-      mRenderer.Clear();
-      mRenderer.ResetLights();
-
-      SetCamera();
-
-      foreach (Light lLight in mScene.Lights)
-      {
-        SetupLight(lLight);
-      }
-
-      foreach (Entity lObject in mScene.Objects)
-      {
-        RenderObject(lObject, RenderOptions.Default);
-      }
-    }
-
-    protected virtual void SetCamera()
-    {
-      mRenderer.SetCamera(mCamera);
-    }
-
-    protected virtual void SetupLight(Light xiLight)
-    {
-      if (xiLight.On)
-      {
-        mRenderer.SetLight(xiLight);
-      }
-    }
-
-    protected virtual void RenderObject(Entity xiObject, RenderOptions xiOptions)
-    {
-      mRenderer.PushTransform(xiObject.Transform);
-      foreach (Mesh lMesh in xiObject.Meshes)
-      {
-        RenderMesh(lMesh, xiOptions);
-      }
-      mRenderer.PopTransform();
-    }
-
-    protected virtual void RenderMesh(Mesh xiMesh, RenderOptions xiOptions)
-    {
-      mRenderer.RenderMesh(xiMesh, xiOptions);
+      mRenderer.RenderScene(mScene, mCamera, RenderOptions.Default);
     }
 
     public Camera Camera

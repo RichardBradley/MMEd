@@ -29,16 +29,23 @@ namespace MMEd.Util
       return ((r << 16) | (g << 8) | b) | alpha;
     }
 
+    // qq - change alpha to 1-alpha
+    // this may not be right -- it's probably a rendering artifact from this OpenGL impl
     public static Color PSRGBColorToColor(int xiVal)
-    {
+    { //A => 1-A
       //ABGR => XRGB
-      return Color.FromArgb((xiVal & unchecked((int)0xff000000)) | ((xiVal >> 16) & 0xff) | (xiVal & 0xff00) | ((xiVal << 16) & 0xff0000));
+      int alpha = 0xff & ((xiVal & unchecked((int)0xff000000)) >> 24);
+      alpha = 255 - alpha;
+
+      return Color.FromArgb((alpha << 24) | ((xiVal >> 16) & 0xff) | (xiVal & 0xff00) | ((xiVal << 16) & 0xff0000));
     }
 
+    // qq - change alpha to 1-alpha
+    // this may not be right -- it's probably a rendering artifact from this OpenGL impl
     public static int ColorToPSRGBColor(Color xiVal)
-    {
+    { //A => 1-A
       //XRGB => ABGR
-      return (int)((xiVal.A << 24) | (xiVal.B << 16) | (xiVal.G << 8) | (xiVal.R));
+      return (int)(((255-xiVal.A) << 24) | (xiVal.B << 16) | (xiVal.G << 8) | (xiVal.R));
     }
 
     /// <summary>

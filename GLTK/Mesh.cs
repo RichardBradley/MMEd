@@ -6,11 +6,13 @@ namespace GLTK
 {
   public enum RenderMode
   {
-    Undefined =0,
+    Undefined = 0,
     Points = 1,
     Wireframe = 2,
     Filled = 3,
-    Textured = 4
+    Textured = 4,
+    TranslucentFilled = 5
+    //TODO: no translucent textured yet
   }
 
   // the values of the entries in this enumeration should

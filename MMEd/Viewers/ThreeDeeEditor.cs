@@ -356,7 +356,6 @@ namespace MMEd.Viewers
       ChunkTreeView_NodeMouseClick(null, null);
     }
 
-
     public override bool CanViewChunk(Chunk xiChunk)
     {
       return xiChunk is IEntityProvider;

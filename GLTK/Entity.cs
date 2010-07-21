@@ -39,7 +39,6 @@ namespace GLTK
 
     public void RotateAboutWorldOrigin(double xiAngle, Vector xiAxis)
     {
-
       mTransform = mTransform * Matrix.Rotation(xiAngle, xiAxis);
 
       Reorthogonalise();

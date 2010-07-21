@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -407,16 +408,22 @@ namespace GLTK
 
     public static int ImageToTextureId(Bitmap xiTexture)
     {
-      //WeakReference lRef = new WeakReference(xiTexture); //gives strange behaviour
-      Bitmap lRef = xiTexture;
-      if (mImageToTextureIdMap.ContainsKey(lRef))
+      // TODO: should return an IDisposable here, and UnLoadTexture on dispose
+      // will need to rely on GC dispose, not using() though
+
+      if (mImageToTextureIdMap.ContainsKey(xiTexture))
       {
-        return mImageToTextureIdMap[lRef];
+        int lRet = mImageToTextureIdMap[xiTexture];
+        Debug.WriteLine(string.Format("Image with hashcode #{0:x} already loaded as texture #{1:x}",
+          xiTexture.GetHashCode(), lRet));
+        return lRet;
       }
       else
       {
         int lRet = LoadTexture(xiTexture);
-        mImageToTextureIdMap[lRef] = lRet;
+        Debug.WriteLine(string.Format("Loaded image with hashcode #{0:x} into vram as texture #{1:x}",
+          xiTexture.GetHashCode(), lRet));
+        mImageToTextureIdMap[xiTexture] = lRet;
         return lRet;
       }
     }
@@ -541,6 +548,87 @@ namespace GLTK
       }
     }
 
+    public virtual void RenderScene(Scene xiScene, Camera xiCamera, RenderOptions xiOptions)
+    {
+      Clear();
+      ResetLights();
+
+      SetCamera(xiCamera);
+
+      foreach (Light lLight in xiScene.Lights)
+      {
+        if (lLight.On)
+        {
+          SetLight(lLight);
+        }
+      }
+
+      // first, render all the opaque objects,
+      // then render all the translucent objects, in reverse depth order
+      //
+      // TODO: this sort order is wrong: we need to sort by depth, based on camera & matrix
+      SortedList<Mesh, Matrix[]> lDepthSortedTranslucentMeshesToTransform =
+        new SortedList<Mesh, Matrix[]>(new FirstTriMidPointDepthComparer());
+      Stack<Matrix> lMatrixStack = new Stack<Matrix>();
+
+      foreach (Entity lObject in xiScene.Objects)
+      {
+        PushTransform(lObject.Transform);
+        lMatrixStack.Push(lObject.Transform);
+
+        foreach (Mesh lMesh in lObject.Meshes)
+        {
+          if (lMesh.RenderMode == RenderMode.TranslucentFilled)
+          {
+            lDepthSortedTranslucentMeshesToTransform.Add(lMesh, lMatrixStack.ToArray());
+          }
+          else
+          {
+            RenderMesh(lMesh, xiOptions);
+          }
+        }
+
+        PopTransform();
+        lMatrixStack.Pop();
+      }
+
+      // now render the translucent polys
+      if (lDepthSortedTranslucentMeshesToTransform.Count > 0)
+      {
+        Gl.glEnable(Gl.GL_BLEND);
+        Gl.glBlendFunc(Gl.GL_SRC_ALPHA, Gl.GL_ONE_MINUS_SRC_ALPHA);
+
+        foreach (KeyValuePair<Mesh, Matrix[]> lKV in lDepthSortedTranslucentMeshesToTransform)
+        {
+          foreach (Matrix lM in lKV.Value)
+          {
+            PushTransform(lM);
+          }
+
+          RenderMesh(lKV.Key, xiOptions);
+
+          foreach (Matrix lM in lKV.Value)
+          {
+            PopTransform();
+          }
+        }
+
+        Gl.glDisable(Gl.GL_BLEND);
+      }
+    }
+
+    public virtual void RenderSingleObject(Entity xiObject, RenderOptions xiOptions)
+    {
+      PushTransform(xiObject.Transform);
+
+      foreach (Mesh lMesh in xiObject.Meshes)
+      {
+        RenderMesh(lMesh, xiOptions);
+      }
+      
+      PopTransform();
+    }
+
     public void RenderMesh(Mesh xiMesh)
     {
       RenderMesh(xiMesh, RenderOptions.Default);
@@ -567,6 +655,14 @@ namespace GLTK
     }
 
     protected abstract void RenderMeshInternal(Mesh xiMesh, RenderOptions xiOptions);
+
+    private class FirstTriMidPointDepthComparer : IComparer<Mesh>
+    {
+      public int Compare(Mesh xiLeft, Mesh xiRight)
+      {
+        return xiLeft.GetHashCode().CompareTo(xiRight.GetHashCode());
+      }
+    }
 
     public RenderMode FixedRenderMode
     {

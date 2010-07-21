@@ -274,6 +274,7 @@ namespace MMEd.Chunks
       MMEdEntity lAcc = new MMEdEntity(xiMeshOwner);
       Mesh lColouredMesh = null;
       Dictionary<int, Mesh> lPageIdToTexturedMeshMap = new Dictionary<int, Mesh>();
+      List<Mesh> lTranslucentMeshes = new List<Mesh>();
 
       //qq move all this into Face class?
       //qq add quad mode meshes (needs separate meshes currently...)
@@ -305,7 +306,8 @@ namespace MMEd.Chunks
             }
           }
 
-          //tex or solid?
+          // Create a new mesh if appropriate, or add this face to an existing mesh
+          // First check if it's tex or solid?
           Mesh lMesh;
           if (f.mTexCoords != null)
           {
@@ -333,21 +335,38 @@ namespace MMEd.Chunks
           }
           else
           {
-            if (lColouredMesh == null)
+            if (f.IsTranslucent())
             {
-              lColouredMesh = new OwnedMesh(xiMeshOwner);
-
+              lMesh = new OwnedMesh(xiMeshOwner);
               if (xiTextureMode == eTextureMode.NormalTextures
                 || xiTextureMode == eTextureMode.NormalTexturesWithMetadata)
               {
-                lColouredMesh.RenderMode = RenderMode.Filled;
+                lMesh.RenderMode = RenderMode.TranslucentFilled;
               }
               else
               {
-                lColouredMesh.RenderMode = RenderMode.Wireframe;
+                lMesh.RenderMode = RenderMode.Wireframe;
               }
+              lTranslucentMeshes.Add(lMesh);
             }
-            lMesh = lColouredMesh;
+            else
+            {
+              if (lColouredMesh == null)
+              {
+                lColouredMesh = new OwnedMesh(xiMeshOwner);
+
+                if (xiTextureMode == eTextureMode.NormalTextures
+                  || xiTextureMode == eTextureMode.NormalTexturesWithMetadata)
+                {
+                  lColouredMesh.RenderMode = RenderMode.Filled;
+                }
+                else
+                {
+                  lColouredMesh.RenderMode = RenderMode.Wireframe;
+                }
+              }
+              lMesh = lColouredMesh;
+            }
           }
 
           if (f.mVertexIds.Length == 3)
@@ -367,6 +386,7 @@ namespace MMEd.Chunks
         lAcc.Meshes.Add(lTexturedMesh);
       }
       if (lColouredMesh != null) lAcc.Meshes.Add(lColouredMesh);
+      lAcc.Meshes.AddRange(lTranslucentMeshes);
 
       lAcc.Scale(1, 1, -1);
 
@@ -434,19 +454,19 @@ namespace MMEd.Chunks
       // Let's just brute force it for now.
       // Code duplication helps sometimes...
       public enum Mode
-      {
-        Tri_Flat_Colored = 0x20,
-        Tri_Flat_Textured = 0x24,
-        Tri_Gouraud_Colored = 0x30,
-        Tri_Gouraud_Textured = 0x34,
-        Quad_Flat_Colored = 0x28,
-        Quad_Flat_Textured = 0x2c,
-        Quad_Gouraud_Colored = 0x38,
-        Quad_Gouraud_Textured = 0x3c,
-        Unknown21 = 0x21, //?
-        Unknown22 = 0x22, //probably tri flat semi-transparent
-        Unknown32 = 0x32, //probably tri gouraud semi-transparent
-        Unknown36 = 0x36 //probably quad gouraud semi-transparent
+      {                                   //  fedcba   f=1, e=Gouraud, d=Quad, c=Textured, b=translucent, a=?
+        Tri_Flat_Colored = 0x20,          //0b100000
+        Tri_Flat_Textured = 0x24,         //0b100100
+        Tri_Gouraud_Colored = 0x30,       //0b110000
+        Tri_Gouraud_Textured = 0x34,      //0b110100
+        Quad_Flat_Colored = 0x28,         //0b101000
+        Quad_Flat_Textured = 0x2c,        //0b101100
+        Quad_Gouraud_Colored = 0x38,      //0b111000
+        Quad_Gouraud_Textured = 0x3c,     //0b111100
+        Unknown21 = 0x21,                 //0b100001  ?
+        Tri_Flat_Colored_Alpha = 0x22,    //0b100010
+        Tri_Gouraud_Colored_Alpha = 0x32, //0b110010
+        Unknown36 = 0x36                  //0b110110  probably tri textured gouraud semi-transparent
       }
 
       public byte mOLen;
@@ -500,6 +520,12 @@ namespace MMEd.Chunks
         return mData != null;
       }
 
+      public bool IsTranslucent()
+      {
+        return mMode == Mode.Tri_Flat_Colored_Alpha
+         || mMode == Mode.Tri_Gouraud_Colored_Alpha;
+      }
+
       public void Deserialise(BinaryReader bin)
       {
         mOLen = bin.ReadByte();
@@ -517,8 +543,6 @@ namespace MMEd.Chunks
 
         // don't attempt to parse unknown face types
         if (mMode == Mode.Unknown21
-            || mMode == Mode.Unknown22
-            || mMode == Mode.Unknown32
             || mMode == Mode.Unknown36)
         {
           mData = bin.ReadBytes(4 * mILen);
@@ -534,6 +558,8 @@ namespace MMEd.Chunks
           case Mode.Tri_Flat_Textured:
           case Mode.Tri_Gouraud_Colored:
           case Mode.Tri_Gouraud_Textured:
+          case Mode.Tri_Flat_Colored_Alpha:
+          case Mode.Tri_Gouraud_Colored_Alpha:
             lVertexCount = 3;
             break;
           case Mode.Quad_Flat_Colored:
@@ -553,6 +579,8 @@ namespace MMEd.Chunks
           case Mode.Tri_Gouraud_Colored:
           case Mode.Quad_Flat_Colored:
           case Mode.Quad_Gouraud_Colored:
+          case Mode.Tri_Flat_Colored_Alpha:
+          case Mode.Tri_Gouraud_Colored_Alpha:
             int lColCount =
               (mFlag == Flags.Colour_Per_Vertex ? lVertexCount : 1);
             mColors = new int[lColCount];
@@ -594,6 +622,7 @@ namespace MMEd.Chunks
           case Mode.Tri_Flat_Textured:
           case Mode.Quad_Flat_Colored:
           case Mode.Quad_Flat_Textured:
+          case Mode.Tri_Flat_Colored_Alpha:
             mNormalIds = new short[] { bin.ReadInt16() };
             mVertexIds = new short[lVertexCount];
             for (int i = 0; i < lVertexCount; i++)
@@ -610,6 +639,7 @@ namespace MMEd.Chunks
           case Mode.Tri_Gouraud_Textured:
           case Mode.Quad_Gouraud_Colored:
           case Mode.Quad_Gouraud_Textured:
+          case Mode.Tri_Gouraud_Colored_Alpha:
             mNormalIds = new short[lVertexCount];
             mVertexIds = new short[lVertexCount];
             for (int i = 0; i < lVertexCount; i++)

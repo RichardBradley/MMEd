@@ -573,6 +573,12 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
 
       public IEnumerable<GLTK.Entity> GetEntities(Chunk xiRootChunk, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata)
       {
+        //a bit hacky:
+        if (this.TreeNode.Checked)
+        {
+          return new Entity[0];
+        }
+
         List<GLTK.Entity> lRet = new List<Entity>();
         TMDChunk lObjt = ((Level)xiRootChunk).GetObjtById(this.ObjtType);
         if (lObjt != null)
@@ -679,6 +685,12 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
 
       public IEnumerable<GLTK.Entity> GetEntities(Chunk xiRootChunk, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata)
       {
+        //a bit hacky:
+        if (this.TreeNode.Checked)
+        {
+          return new Entity[0];
+        }
+
         Entity lWeaponEntity = ((Level)xiRootChunk).GetObjtById(TMDChunk.OBJT_ID_FOR_WEAPONS_BOX)
           .GetEntity(xiRootChunk, xiTextureMode, xiSelectedMetadata, this);
 
@@ -787,12 +799,39 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
 
     public IEnumerable<GLTK.Entity> GetEntities(Level xiLevel, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata)
     {
+      List<Entity> lAcc = new List<Entity>();
+
       //a bit hacky:
-      if (this.TreeNode.Checked)
+      if (!this.TreeNode.Checked)
       {
-        return new Entity[0];
+        lAcc.Add(GetSurfaceEntity(xiLevel, xiTextureMode, xiSelectedMetadata));
       }
 
+      /////////////////////////////////////////////////////
+      // The child weapons
+      if (Weapons != null)
+      {
+        foreach (WeaponEntry lWeapon in Weapons)
+        {
+          lAcc.AddRange(lWeapon.GetEntities(xiLevel, xiTextureMode, xiSelectedMetadata));
+        }
+      }
+
+      /////////////////////////////////////////////////////
+      // The child objects
+      if (Objects != null)
+      {
+        foreach (ObjectEntry oe in Objects)
+        {
+          lAcc.AddRange(oe.GetEntities(xiLevel, xiTextureMode, xiSelectedMetadata));
+        }
+      }
+
+      return lAcc;
+    }
+
+    private GLTK.Entity GetSurfaceEntity(Level xiLevel, eTextureMode xiTextureMode, eTexMetaDataEntries xiSelectedMetadata)
+    {
       // notes: 
       // invert the textures along the y-axis
       // use level co-ords, so z is down
@@ -922,30 +961,7 @@ See enum TexMetaDataEntries. Arry dimensions are Width*Height*8. Only Flats with
       Point lNewPos = ThreeDeeViewer.Short3CoordToPoint(OriginPosition);
       lSurface.Position = new Point(lNewPos.x, lNewPos.y, -lNewPos.z);
 
-      List<Entity> lAcc = new List<Entity>();
-      lAcc.Add(lSurface);
-
-      /////////////////////////////////////////////////////
-      // The child weapons
-      if (Weapons != null)
-      {
-        foreach (WeaponEntry lWeapon in Weapons)
-        {
-          lAcc.AddRange(lWeapon.GetEntities(xiLevel, xiTextureMode, xiSelectedMetadata));
-        }
-      }
-
-      /////////////////////////////////////////////////////
-      // The child objects
-      if (Objects != null)
-      {
-        foreach (ObjectEntry oe in Objects)
-        {
-          lAcc.AddRange(oe.GetEntities(xiLevel, xiTextureMode, xiSelectedMetadata));
-        }
-      }
-
-      return lAcc;
+      return lSurface;
     }
 
     // Constants relating to the meta data
