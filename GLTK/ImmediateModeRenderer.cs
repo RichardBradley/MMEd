@@ -34,6 +34,7 @@ namespace GLTK
             break;
 
           case RenderMode.Filled:
+          case RenderMode.TranslucentFilled:
             Gl.glPolygonMode(Gl.GL_FRONT_AND_BACK, Gl.GL_FILL);
             Gl.glBindTexture(Gl.GL_TEXTURE_2D, 0);
             break;
@@ -62,10 +63,22 @@ namespace GLTK
 
         foreach (Vertex lVertex in xiMesh.Vertices)
         {
-          Gl.glColor3d(
-            (double)lVertex.Color.R / 255,
-            (double)lVertex.Color.G / 255,
-            (double)lVertex.Color.B / 255);
+          if (lMode == RenderMode.TranslucentFilled)
+          {
+            Gl.glColor4d(
+              (double)lVertex.Color.R / 255,
+              (double)lVertex.Color.G / 255,
+              (double)lVertex.Color.B / 255,
+              (double)lVertex.Color.A / 255);
+          }
+          else
+          {
+            Gl.glColor3d(
+              (double)lVertex.Color.R / 255,
+              (double)lVertex.Color.G / 255,
+              (double)lVertex.Color.B / 255);
+          }
+
           Gl.glNormal3d(lVertex.Normal.x, lVertex.Normal.y, lVertex.Normal.z);
           Gl.glTexCoord2d(lVertex.TexCoordX, lVertex.TexCoordY);
           Gl.glVertex3d(lVertex.Position.x, lVertex.Position.y, lVertex.Position.z);
