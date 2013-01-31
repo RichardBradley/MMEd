@@ -116,6 +116,11 @@ namespace MMEd.Viewers
         mCachedTexPages = new Bitmap[32];
         mRootChunkForCachedTexPages = xiRootChunk;
       }
+      if (mCachedTexPages == null)
+      {
+        // not a level file -- no textures available
+        return null;
+      }
       //cache miss?
       if (mCachedTexPages[xiPageId] == null)
       {

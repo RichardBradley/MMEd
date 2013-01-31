@@ -96,6 +96,12 @@ namespace MMEd.Util
       return lRotation;
     }
 
+    /// <summary>
+    /// Converts a GLTK rotation matrix into the MMs representation of a rotation.
+    /// 
+    /// The input matrix must be rotation-only, otherwise the output of this method
+    /// is not defined.
+    /// </summary>
     public static Chunks.Short3Coord RotationMatrixToShort3Coord(GLTK.Matrix xiRotation)
     {
       // Algorithm is as follows:

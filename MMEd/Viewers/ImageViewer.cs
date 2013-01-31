@@ -42,19 +42,21 @@ namespace MMEd.Viewers
       {
         Image im = ((IImageProvider)xiChunk).ToImage();
         mMainForm.ImgPictureBox.Image = im;
-        int scaleFactor =
-            Math.Max(1, 128 / Math.Max(Math.Max(im.Width, im.Height), 1));
-        if (scaleFactor != 1)
+        if (im != null)
         {
-          mMainForm.ImgPictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
-          mMainForm.ImgPictureBox.Width = im.Width * scaleFactor;
-          mMainForm.ImgPictureBox.Height = im.Height * scaleFactor;
+          int scaleFactor =
+            Math.Max(1, 128/Math.Max(Math.Max(im.Width, im.Height), 1));
+          if (scaleFactor != 1)
+          {
+            mMainForm.ImgPictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
+            mMainForm.ImgPictureBox.Width = im.Width*scaleFactor;
+            mMainForm.ImgPictureBox.Height = im.Height*scaleFactor;
+          }
+          else
+          {
+            mMainForm.ImgPictureBox.SizeMode = PictureBoxSizeMode.AutoSize;
+          }
         }
-        else
-        {
-          mMainForm.ImgPictureBox.SizeMode = PictureBoxSizeMode.AutoSize;
-        }
-
       }
       mLastSubject = xiChunk;
     }

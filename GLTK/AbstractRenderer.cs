@@ -414,6 +414,10 @@ namespace GLTK
       // TODO: should return an IDisposable here, and UnLoadTexture on dispose
       // will need to rely on GC dispose, not using() though
 
+      if (xiTexture == null)
+      {
+        return 0;
+      }
       if (mImageToTextureIdMap.ContainsKey(xiTexture))
       {
         int lRet = mImageToTextureIdMap[xiTexture];

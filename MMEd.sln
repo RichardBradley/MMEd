@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MMEd", "MMEd\MMEd.csproj", "{3AD895EE-6580-4C3D-9096-64EB3CF27906}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GLTK", "GLTK\GLTK.csproj", "{D52784AE-DD6E-4DB3-8D2A-76B37B00A32C}"

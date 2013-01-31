@@ -20,6 +20,7 @@ namespace MMEd
     public string LastTIMFile;
     public string LastTMDFile;
     public string LastSavedSceneFile;
+    public string LastSavedVRMLFile;
     public string LastFlatImagesDir;
     public string LastPublishedBinaryFilePath;
     public string LastPublishedCDImage;

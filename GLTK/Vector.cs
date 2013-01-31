@@ -194,9 +194,9 @@ namespace GLTK
 
       Vector lOther = (Vector)obj;
 
-      return lOther[0].Equals(mElements[0])
-        && lOther[1].Equals(mElements[1])
-        && lOther[2].Equals(mElements[2]);
+      return FloatHelper.AlmostEqual(lOther[0], mElements[0])
+        && FloatHelper.AlmostEqual(lOther[1], mElements[1])
+        && FloatHelper.AlmostEqual(lOther[2], mElements[2]);
     }
 
     public static bool operator == (Vector xiLhs, Vector xiRhs)
@@ -212,6 +212,11 @@ namespace GLTK
     public override int GetHashCode()
     {
       return base.GetHashCode(); //qq
+    }
+
+    public override string ToString()
+    {
+      return string.Format("[{0}, {1}, {2}]", mElements[0], mElements[1], mElements[2]);
     }
 
     #region IXmlSerializable implementation

@@ -333,21 +333,28 @@ namespace MMEd.Chunks
         }
         catch (Exception)
         {
-          //I seem to get a fair number of GDI+ exceptions from the
-          //unmanaged call. Don't really know why.
-          //qq Console.Error.WriteLine(e);
-          switch (BPP)
+          try
           {
-            case TimBPP._4BPP:
-              mBitmapCache = CreateBitmapManaged4bpp();
-              break;
-            case TimBPP._8BPP:
-              mBitmapCache = CreateBitmapManaged8bpp();
-              break;
-            case TimBPP._16BPP:
-              mBitmapCache = CreateBitmapManaged16bpp();
-              break;
-            default: throw new Exception(string.Format("Unsupported TIM type. Found 0x{0:x8} BPP type", BPP));
+            //I seem to get a fair number of GDI+ exceptions from the
+            //unmanaged call. Don't really know why.
+            switch (BPP)
+            {
+              case TimBPP._4BPP:
+                mBitmapCache = CreateBitmapManaged4bpp();
+                break;
+              case TimBPP._8BPP:
+                mBitmapCache = CreateBitmapManaged8bpp();
+                break;
+              case TimBPP._16BPP:
+                mBitmapCache = CreateBitmapManaged16bpp();
+                break;
+              default:
+                throw new Exception(string.Format("Unsupported TIM type. Found 0x{0:x8} BPP type", BPP));
+            }
+          }
+          catch (Exception e)
+          {
+            Console.WriteLine("Unable to generate bitmap: " + e);
           }
         }
       }

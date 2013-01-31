@@ -26,13 +26,7 @@ namespace GLTK
 
     public void Move(Vector xiVector)
     {
-      Matrix lTransform = new Matrix(
-        1, 0, 0, 0,
-        0, 1, 0, 0,
-        0, 0, 1, 0,
-        xiVector.x, xiVector.y, xiVector.z, 1);
-
-      mTransform = mTransform * lTransform;
+      mTransform = mTransform * Matrix.Translation(xiVector);
 
       Reorthogonalise();
     }
@@ -108,20 +102,13 @@ namespace GLTK
       if (mOperationCount > 50)
       {
         mOperationCount = 0;
-
-        Vector lColumn1 = new Vector(mTransform[1, 0], mTransform[1, 1], mTransform[1, 2]);
-        Vector lColumn2 = new Vector(mTransform[2, 0], mTransform[2, 1], mTransform[2, 2]);
-
-        Vector lNewColumn0 = (lColumn1 ^ lColumn2).Normalise();
-        Vector lNewColumn1 = lColumn1.Normalise();
-        Vector lNewColumn2 = (lNewColumn0 ^ lColumn1).Normalise();
-
-        mTransform = new Matrix(
-          lNewColumn0.x, lNewColumn0.y, lNewColumn0.z, 0,
-          lNewColumn1.x, lNewColumn1.y, lNewColumn1.z, 0,
-          lNewColumn2.x, lNewColumn2.y, lNewColumn2.z, 0,
-          mTransform[3, 0], mTransform[3, 1], mTransform[3, 2], mTransform[3, 3]);
+        mTransform = GetTransformOrthogonalised();
       }
+    }
+
+    public Matrix GetTransformOrthogonalised()
+    {
+      return mTransform.Orthogonalise();
     }
 
     public List<Mesh> Meshes

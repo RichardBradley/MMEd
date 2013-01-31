@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.Xml.Serialization;
 using GLTK;
 using MMEd.Viewers.ThreeDee;
+using MMEd.VRML;
 
 
 namespace MMEd.Viewers
@@ -71,12 +72,16 @@ namespace MMEd.Viewers
         mOptionsMenu.DropDownItems.Add(new ToolStripMenuItem(
           "Save scene to XML...",
           null,
-          new EventHandler(this.SaveSceneToXML)));
+          SaveSceneToXML));
         mOptionsMenu.DropDownItems.Add(new ToolStripMenuItem(
           "Load scene from XML...",
           null,
-          new EventHandler(this.LoadSceneFromXML)));
+          LoadSceneFromXML));
       }
+      mOptionsMenu.DropDownItems.Add(new ToolStripMenuItem(
+        "Export scene to VRML...",
+        null,
+        ExportSceneToVRML));
       //
       mMainForm.mMenuStrip.Items.Add(mOptionsMenu);
     }
@@ -593,6 +598,33 @@ namespace MMEd.Viewers
         }
       }
       mMainForm.LocalSettings.LastSavedSceneFile = sfd.FileName;
+    }
+
+    private void ExportSceneToVRML(object sender, EventArgs e)
+    {
+      SaveFileDialog sfd = new SaveFileDialog();
+      sfd.Filter = "VRML files|*.wrl|All files|*.*";
+      sfd.FileName = mMainForm.LocalSettings.LastSavedVRMLFile;
+      DialogResult res = sfd.ShowDialog(mMainForm);
+      if (res == DialogResult.OK)
+      {
+        string lExceptionWhen = "";
+        try
+        {
+          lExceptionWhen = "creating the VRML world";
+          World wrl = new World(mScene);
+
+          lExceptionWhen = "serialising the scene";
+          wrl.Serialize(sfd.FileName, this, mMainForm);
+        }
+        catch (Exception err)
+        {
+          System.Diagnostics.Trace.WriteLine(err);
+          MessageBox.Show(string.Format("Exception occurred while {0}: {1}", lExceptionWhen, err.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+          return;
+        }
+        mMainForm.LocalSettings.LastSavedVRMLFile = sfd.FileName;
+      }
     }
 
     [XmlInclude(typeof(MMEdEntity)), XmlInclude(typeof(OwnedMesh))]

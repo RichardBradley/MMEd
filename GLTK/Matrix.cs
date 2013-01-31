@@ -1,14 +1,20 @@
 using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
-using System.Diagnostics;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
-using Tao.OpenGl;
+using Microsoft.Xna.Framework;
 
 namespace GLTK
 {
+  /// <summary>
+  /// A 4x4 matrix representing a linear transformation of 3-space, with a translation.
+  /// 
+  /// To mesh better with OpenGL, the elements are stored internally in column-major
+  /// order, i.e. this[y,x] -- hence this[0,x] gives the first row for x=0,1,2,3
+  ///
+  /// Confusingly, the list constructor Matrix(a,b,c....) accepts arguments in row-major
+  /// order.
+  /// </summary>
   public struct Matrix : IXmlSerializable
   {
     public static Matrix Identity = new Matrix(
@@ -38,6 +44,20 @@ namespace GLTK
         0, 0, 0, 1);
     }
 
+    public static Matrix Translation(double x, double y, double z)
+    {
+      return new Matrix(
+  1, 0, 0, 0,
+  0, 1, 0, 0,
+  0, 0, 1, 0,
+  x, y, z, 1);
+    }
+
+    public static Matrix Translation(Vector xiVector)
+    {
+      return Translation(xiVector.x, xiVector.y, xiVector.z);
+    }
+
     public static Matrix ScalingMatrix(double x, double y, double z)
     {
       return new Matrix(
@@ -47,6 +67,12 @@ namespace GLTK
         0, 0, 0, 1);
     }
 
+    /// <summary>
+    /// Constructs a new matrix, given the following entries (in row-major order),
+    /// i.e. (r1_x, r1_y, r1_z, 0, r2_x, ...)
+    /// 
+    /// The values will be stored internally in column-major order.
+    /// </summary>
     public Matrix(double aa, double ab, double ac, double ad,
         double ba, double bb, double bc, double bd,
         double ca, double cb, double cc, double cd,
@@ -94,9 +120,12 @@ namespace GLTK
       }
     }
 
-    //qq:rtb this method will perform very badly in certain cases
-    //see e.g. the public domain JAMA library for examples of how to 
-    //fix this.
+    // TODO this method will perform very badly in certain cases
+    // see e.g. the public domain JAMA library for examples of how to 
+    // fix this.
+    //
+    // We could use e.g. alglib instead
+    // http://www.alglib.net/translator/man/manual.csharp.html
     public Matrix Inverse()
     {
       return new Matrix(subDet(0, 0), -subDet(1, 0), subDet(2, 0), -subDet(3, 0),
@@ -111,6 +140,84 @@ namespace GLTK
       mElements[0, 1], mElements[1, 1], mElements[2, 1], mElements[3, 1],
       mElements[0, 2], mElements[1, 2], mElements[2, 2], mElements[3, 2],
       mElements[0, 3], mElements[1, 3], mElements[2, 3], mElements[3, 3]);
+    }
+
+    /// <summary>
+    /// TODO: document this method...
+    /// 
+    /// Not 100% sure what this does -- it came from the GLTK code.
+    /// I think it keeps the rotations the same but makes them more 'normalised'?
+    /// </summary>
+    public Matrix Orthogonalise()
+    {
+      Vector lColumn1 = new Vector(this[1, 0], this[1, 1], this[1, 2]);
+      Vector lColumn2 = new Vector(this[2, 0], this[2, 1], this[2, 2]);
+
+      Vector lNewColumn0 = (lColumn1 ^ lColumn2).Normalise();
+      Vector lNewColumn1 = lColumn1.Normalise();
+      Vector lNewColumn2 = (lNewColumn0 ^ lColumn1).Normalise();
+
+      return new Matrix(
+        lNewColumn0.x, lNewColumn0.y, lNewColumn0.z, 0,
+        lNewColumn1.x, lNewColumn1.y, lNewColumn1.z, 0,
+        lNewColumn2.x, lNewColumn2.y, lNewColumn2.z, 0,
+        this[3, 0], this[3, 1], this[3, 2], this[3, 3]);
+    }
+
+    /// <summary>
+    /// If possible, decomposes this matrix into S*R*T
+    /// for a translation T, a rotation R and a scaling S.
+    ///
+    /// The rotation is represented as an angle in radians about an axis.
+    ///
+    /// http://graphcomp.com/info/specs/sgi/vrml/spec/part1/concepts.html#CoordinateSystems
+    /// http://graphcomp.com/info/specs/sgi/vrml/spec/part1/nodesRef.html#Transform
+    /// </summary>
+    public void Decompose(out Vector translation, out Vector rotationAxis, out double rotationAngle, out Vector scale)
+    {
+
+      translation = new Vector(this[3, 0], this[3, 1], this[3, 2]);
+
+      var M11 = this[0, 0];
+      var M12 = this[0, 1];
+      var M13 = this[0, 2];
+      var M14 = this[0, 3];
+      var M21 = this[1, 0];
+      var M22 = this[1, 1];
+      var M23 = this[1, 2];
+      var M24 = this[1, 3];
+      var M31 = this[2, 0];
+      var M32 = this[2, 1];
+      var M33 = this[2, 2];
+      var M34 = this[2, 3];
+      var M41 = this[3, 0];
+      var M42 = this[3, 1];
+      var M43 = this[3, 2];
+
+      float xs = (Math.Sign(M11 * M12 * M13 * M14) < 0) ? -1f : 1f;
+      float ys = (Math.Sign(M21 * M22 * M23 * M24) < 0) ? -1f : 1f;
+      float zs = (Math.Sign(M31 * M32 * M33 * M34) < 0) ? -1f : 1f;
+
+      var scaleX = xs * (float)Math.Sqrt(M11 * M11 + M12 * M12 + M13 * M13);
+      var scaleY = ys * (float)Math.Sqrt(M21 * M21 + M22 * M22 + M23 * M23);
+      var scaleZ = zs * (float)Math.Sqrt(M31 * M31 + M32 * M32 + M33 * M33);
+      scale = new Vector(scaleX,scaleY,scaleZ);
+
+      if (scaleX == 0.0 || scaleY == 0.0 || scaleZ == 0.0)
+      {
+        rotationAngle = 0;
+        rotationAxis = new Vector(1, 0, 0);
+        return;
+      }
+
+      Matrix m1 = new Matrix(M11 / scaleX, M12 / scaleX, M13 / scaleX, 0,
+                             M21 / scaleY, M22 / scaleY, M23 / scaleY, 0,
+                             M31 / scaleZ, M32 / scaleZ, M33 / scaleZ, 0,
+                             0, 0, 0, 1);
+
+      var rotation = Quaternion.CreateFromRotationMatrix(m1);
+
+      rotation.ToAxisAngle(out rotationAxis, out rotationAngle);
     }
 
     public double this[int x, int y]
@@ -133,13 +240,25 @@ namespace GLTK
         return true;
       }
 
-      Matrix lOther = (Matrix)obj;
+      Matrix lOther = (Matrix) obj;
 
       return
-    mElements[0, 0] == lOther[0, 0] && mElements[0, 1] == lOther[0, 1] && mElements[0, 2] == lOther[0, 2] && mElements[0, 3] == lOther[0, 3] &&
-    mElements[1, 0] == lOther[1, 0] && mElements[1, 1] == lOther[1, 1] && mElements[1, 2] == lOther[1, 2] && mElements[1, 3] == lOther[1, 3] &&
-    mElements[2, 0] == lOther[2, 0] && mElements[2, 1] == lOther[2, 1] && mElements[2, 2] == lOther[2, 2] && mElements[2, 3] == lOther[2, 3] &&
-    mElements[3, 0] == lOther[3, 0] && mElements[3, 1] == lOther[3, 1] && mElements[3, 2] == lOther[3, 2] && mElements[3, 3] == lOther[3, 3];
+        FloatHelper.AlmostEqual(mElements[0, 0], lOther[0, 0]) &&
+        FloatHelper.AlmostEqual(mElements[0, 1], lOther[0, 1]) &&
+        FloatHelper.AlmostEqual(mElements[0, 2], lOther[0, 2]) &&
+        FloatHelper.AlmostEqual(mElements[0, 3], lOther[0, 3]) &&
+        FloatHelper.AlmostEqual(mElements[1, 0], lOther[1, 0]) &&
+        FloatHelper.AlmostEqual(mElements[1, 1], lOther[1, 1]) &&
+        FloatHelper.AlmostEqual(mElements[1, 2], lOther[1, 2]) &&
+        FloatHelper.AlmostEqual(mElements[1, 3], lOther[1, 3]) &&
+        FloatHelper.AlmostEqual(mElements[2, 0], lOther[2, 0]) &&
+        FloatHelper.AlmostEqual(mElements[2, 1], lOther[2, 1]) &&
+        FloatHelper.AlmostEqual(mElements[2, 2], lOther[2, 2]) &&
+        FloatHelper.AlmostEqual(mElements[2, 3], lOther[2, 3]) &&
+        FloatHelper.AlmostEqual(mElements[3, 0], lOther[3, 0]) &&
+        FloatHelper.AlmostEqual(mElements[3, 1], lOther[3, 1]) &&
+        FloatHelper.AlmostEqual(mElements[3, 2], lOther[3, 2]) &&
+        FloatHelper.AlmostEqual(mElements[3, 3], lOther[3, 3]);
     }
 
     public override int GetHashCode()
@@ -224,6 +343,11 @@ namespace GLTK
         xiMatrix[3, 0] * xiScalar, xiMatrix[3, 1] * xiScalar, xiMatrix[3, 2] * xiScalar, xiMatrix[3, 3] * xiScalar);
     }
 
+    /// <summary>
+    /// Applies this matrix to the given Vector, excluding any transformation
+    /// (because Vectors are location-independent directions -- if you want
+    /// translation included then use Points instead)
+    /// </summary>
     public static Vector operator *(Matrix xiMatrix, Vector xiVector)
     {
       return new Vector(
@@ -232,18 +356,26 @@ namespace GLTK
         xiMatrix[2, 0] * xiVector[0] + xiMatrix[2, 1] * xiVector[1] + xiMatrix[2, 2] * xiVector[2]);
     }
 
-
+    /// <summary>
+    /// Applies this matrix to the given Point, including any transformation
+    /// </summary>
     public static Point operator *(Matrix xiMatrix, Point xiPoint)
     {
+      // This looks like we are doing (xiMatrix.Transpose() * xiPoint), but remember
+      // that our indices are in column-major order, so this is actually correct.
       return new Point(
         xiMatrix[0, 0] * xiPoint[0] + xiMatrix[0, 1] * xiPoint[1] + xiMatrix[0, 2] * xiPoint[2] + xiMatrix[0, 3],
         xiMatrix[1, 0] * xiPoint[0] + xiMatrix[1, 1] * xiPoint[1] + xiMatrix[1, 2] * xiPoint[2] + xiMatrix[1, 3],
         xiMatrix[2, 0] * xiPoint[0] + xiMatrix[2, 1] * xiPoint[1] + xiMatrix[2, 2] * xiPoint[2] + xiMatrix[2, 3]);
     }
 
-    // (equivalent to (xiMatrix.Transpose() * xiPoint))
+    /// <summary>
+    /// left-applies this matrix to the given Point, including any transformation
+    /// </summary>
     public static Point operator *(Point xiPoint, Matrix xiMatrix)
     {
+      // This looks like we are doing (xiMatrix.Transpose() * xiPoint), but remember
+      // that our indices are in column-major order, so this is actually correct.
       return new Point(
         xiMatrix[0, 0] * xiPoint[0] + xiMatrix[1, 0] * xiPoint[1] + xiMatrix[2, 0] * xiPoint[2] + xiMatrix[3, 0],
         xiMatrix[0, 1] * xiPoint[0] + xiMatrix[1, 1] * xiPoint[1] + xiMatrix[2, 1] * xiPoint[2] + xiMatrix[3, 1],
@@ -282,6 +414,20 @@ namespace GLTK
         mElements[1, 0], mElements[1, 1], mElements[1, 2], mElements[1, 3],
         mElements[2, 0], mElements[2, 1], mElements[2, 2], mElements[2, 3],
         mElements[3, 0], mElements[3, 1], mElements[3, 2], mElements[3, 3] };
+    }
+
+    public override string ToString()
+    {
+      return string.Format(
+        @"[{0:e},{1:e},{2:e},{3:e},
+{4:e},{5:e},{6:e},{7:e},
+{8:e},{9:e},{10:e},{11:e},
+{12:e},{13:e},{14:e},{15:e}]",
+        // note column-major ordering:
+        this[0, 0], this[0, 1], this[0, 2], this[0, 3],
+        this[1, 0], this[1, 1], this[1, 2], this[1, 3],
+        this[2, 0], this[2, 1], this[2, 2], this[2, 3],
+        this[3, 0], this[3, 1], this[3, 2], this[3, 3]);
     }
 
     public Matrix Clone()

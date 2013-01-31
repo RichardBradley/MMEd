@@ -337,7 +337,6 @@ namespace MMEd.Viewers
 
     Scene mScene;
     Camera mCamera;
-    Light mLight;
     ImmediateModeRenderer mRenderer;
     GLTK.View mView;
   }
