@@ -2,7 +2,7 @@ using System;
 
 namespace GLTK
 {
-  class DeviceContextEventArgs : EventArgs
+  public class DeviceContextEventArgs : EventArgs
   {
     public DeviceContextEventArgs(IntPtr xiContext)
     {

@@ -406,6 +406,9 @@ namespace GLTK
       }
     }
 
+    // TODO: this is a failure of encapsulation
+    // we should just store the bitmaps on the meshes and
+    // do this mapping in the renderer
     public static int ImageToTextureId(Bitmap xiTexture)
     {
       // TODO: should return an IDisposable here, and UnLoadTexture on dispose
