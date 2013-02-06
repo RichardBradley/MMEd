@@ -555,10 +555,7 @@ namespace MMEd
             {
               return new FileInfo(xiFilename);
             }));
-          Array.Sort<FileInfo>(lAllBackups, new Comparison<FileInfo>(delegate(FileInfo xiBackup1, FileInfo xiBackup2)
-            {
-              return xiBackup2.CreationTime.CompareTo(xiBackup1.CreationTime);
-            }));
+          Utils.ArrayStableSort(lAllBackups, x => x.CreationTime);
 
           for (int ii = (int)lForm.BackupCountUpDown.Value; ii < lAllBackups.Length; ii++)
           {

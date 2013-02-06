@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
+using MMEd.Util;
 
 // represents an entire MMv3 file (not necessarily a level)
 //
@@ -144,24 +145,9 @@ namespace MMEd.Chunks
     private Chunk[] mChildren = new Chunk[0];
     public override Chunk[] GetChildren()
     {
-      Chunk[] lTmp = (Chunk[])mChildren.Clone();
-      Array.Sort(lTmp, new TypeComparer());
+      var lTmp = (Chunk[])mChildren.Clone();
+      Utils.ArrayStableSort(lTmp, x => x.GetType().Name);
       return lTmp;
-    }
-
-    private class TypeComparer : System.Collections.IComparer
-    {
-      public int Compare(object a, object b)
-      {
-        if (a == null || b == null)
-        {
-          return a == null ? (b == null ? 0 : -1) : 1;
-        }
-        else
-        {
-          return string.Compare(a.GetType().Name, b.GetType().Name);
-        }
-      }
     }
 
     private string mName = "FileChunk";

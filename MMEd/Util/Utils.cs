@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Drawing;
@@ -260,6 +262,9 @@ namespace MMEd.Util
       return acc;
     }
 
+    /// <summary>
+    /// Recursive array compare.
+    /// </summary>
     public static bool ArrayCompare(Array xiArray1, Array xiArray2)
     {
       if (xiArray1 == null || xiArray2 == null)
@@ -287,6 +292,15 @@ namespace MMEd.Util
         }
       }
       return true;
+    }
+
+    /// <summary>
+    /// Not as fast as Array.Sort, but is stable
+    /// </summary>
+    public static void ArrayStableSort<T, TKey>(T[] xiArray, Func<T, TKey> xiComparer)
+    {
+      var lSorted = xiArray.OrderBy(xiComparer).ToArray();
+      Array.Copy(lSorted, xiArray, xiArray.Length);
     }
 
     public static string CamelCaseToSentence(string xiVal)
