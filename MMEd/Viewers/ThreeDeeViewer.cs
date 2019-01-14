@@ -35,7 +35,11 @@ namespace MMEd.Viewers
       mRenderer.Attach(mMainForm.Viewer3DRenderingSurface);
 
       mScene = new Scene();
-      mCamera = new Camera(80, 0.1, 1e10);
+      // Far distance: 1e3 is half-way along a table, 1e5 seems to include everything on the levels I looked at
+      // Near distance: 100 doesn't seem to lose any details until you are right up close to an object, and
+      // increases to near distance make a huge improvement in z-clipping.
+      // See e.g. https://stackoverflow.com/questions/32938159/how-to-avoid-z-fighting-in-distance
+      mCamera = new Camera(80, 100, 1e5);
       mView = new MMEdViewerView(this, mScene, mCamera, mRenderer);
       mLight = new Light();
       mLight.DiffuseIntensity = 0.1;
